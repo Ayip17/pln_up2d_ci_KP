@@ -200,5 +200,261 @@
     <?php endif; ?>
 </script>
 
+<!-- Login Activity Monitor Modal (Admin Only) -->
+<?php 
+$user_role = $this->session->userdata('user_role');
+if (isset($user_role) && strpos(strtolower($user_role), 'admin') !== false): 
+?>
+<div class="modal fade" id="loginActivityModal" tabindex="-1" aria-labelledby="loginActivityModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="loginActivityModalLabel">
+                    <i class="fa fa-users me-2"></i>Login Activity Monitor
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Role Selector -->
+                <div class="mb-3">
+                    <label for="roleSelector" class="form-label">Select Role:</label>
+                    <select class="form-select" id="roleSelector">
+                        <option value="">-- All Roles Summary --</option>
+                        <option value="Perencanaan">Perencanaan</option>
+                        <option value="Admin">Admin</option>
+                        <option value="Operasi Sistem Distribusi">Operasi Sistem Distribusi</option>
+                        <option value="Fasilitas Operasi">Fasilitas Operasi</option>
+                        <option value="Pemeliharaan">Pemeliharaan</option>
+                        <option value="K3L & KAM">K3L & KAM</option>
+                    </select>
+                </div>
 
+                <!-- Loading Spinner -->
+                <div id="loadingSpinner" class="text-center my-4" style="display:none;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Loading data...</p>
+                </div>
+
+                <!-- Summary View (All Roles) -->
+                <div id="summaryView" style="display:none;">
+                    <h6 class="mb-3" style="font-size: 0.95rem;">Login Summary by Role</h6>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-sm">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 35%;">Role</th>
+                                    <th style="width: 18%;" class="text-center">Total Users</th>
+                                    <th style="width: 18%;" class="text-center">Total Logins</th>
+                                    <th style="width: 29%;">Latest Login</th>
+                                </tr>
+                            </thead>
+                            <tbody id="summaryTableBody">
+                                <!-- Populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Detail View (Specific Role) -->
+                <div id="detailView" style="display:none;">
+                    <h6 class="mb-3" style="font-size: 0.95rem;">Users in <span id="selectedRoleName" class="text-primary"></span> Role</h6>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-sm">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 8%;" class="text-center">#</th>
+                                    <th style="width: 28%;">Name</th>
+                                    <th style="width: 32%;">Email</th>
+                                    <th style="width: 12%;" class="text-center">Count</th>
+                                    <th style="width: 20%;">Last Login</th>
+                                </tr>
+                            </thead>
+                            <tbody id="detailTableBody">
+                                <!-- Populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Error Message -->
+                <div id="errorMessage" class="alert alert-danger" style="display:none;" role="alert">
+                    <i class="fa fa-exclamation-triangle me-2"></i>
+                    <span id="errorText"></span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const loginActivityBtn = document.getElementById('loginActivityBtn');
+    if (!loginActivityBtn) return; // Exit if button doesn't exist
+    
+    const loginActivityModal = new bootstrap.Modal(document.getElementById('loginActivityModal'));
+    const roleSelector = document.getElementById('roleSelector');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const summaryView = document.getElementById('summaryView');
+    const detailView = document.getElementById('detailView');
+    const errorMessage = document.getElementById('errorMessage');
+
+    // Open modal on button click
+    loginActivityBtn.addEventListener('click', function() {
+        loginActivityModal.show();
+        loadLoginStats(); // Load summary by default
+    });
+
+    // Handle role change
+    roleSelector.addEventListener('change', function() {
+        loadLoginStats();
+    });
+
+    function loadLoginStats() {
+        const selectedRole = roleSelector.value;
+        
+        // Show loading, hide others
+        loadingSpinner.style.display = 'block';
+        summaryView.style.display = 'none';
+        detailView.style.display = 'none';
+        errorMessage.style.display = 'none';
+
+        // Build URL
+        const url = selectedRole 
+            ? '<?= base_url('dashboard/get_role_login_stats') ?>?role=' + encodeURIComponent(selectedRole)
+            : '<?= base_url('dashboard/get_role_login_stats') ?>';
+
+        // Fetch data
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                loadingSpinner.style.display = 'none';
+                
+                if (data.success) {
+                    if (data.summary) {
+                        // Show summary view
+                        displaySummary(data.summary);
+                    } else if (data.users) {
+                        // Show detail view
+                        displayDetails(data.role, data.users);
+                    }
+                } else {
+                    showError(data.message || 'Failed to load data');
+                }
+            })
+            .catch(error => {
+                loadingSpinner.style.display = 'none';
+                showError('Network error: ' + error.message);
+            });
+    }
+
+    function displaySummary(summary) {
+        const tbody = document.getElementById('summaryTableBody');
+        tbody.innerHTML = '';
+
+        if (summary.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center">No data available</td></tr>';
+        } else {
+            summary.forEach(item => {
+                const row = document.createElement('tr');
+                const formattedDate = formatDateTime(item.latest_login);
+                row.innerHTML = `
+                    <td><strong style="font-size: 0.85rem;">${escapeHtml(item.role || 'N/A')}</strong></td>
+                    <td class="text-center">${item.total_users || 0}</td>
+                    <td class="text-center"><span class="badge bg-primary">${item.total_logins || 0}</span></td>
+                    <td><small>${formattedDate}</small></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        summaryView.style.display = 'block';
+    }
+
+    function displayDetails(role, users) {
+        document.getElementById('selectedRoleName').textContent = role;
+        const tbody = document.getElementById('detailTableBody');
+        tbody.innerHTML = '';
+
+        if (users.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center">No users found for this role</td></tr>';
+        } else {
+            users.forEach((user, index) => {
+                const row = document.createElement('tr');
+                const formattedDate = formatDateTime(user.last_login);
+                row.innerHTML = `
+                    <td class="text-center">${index + 1}</td>
+                    <td style="font-size: 0.85rem;">${escapeHtml(user.name || 'N/A')}</td>
+                    <td><small>${escapeHtml(user.email || 'N/A')}</small></td>
+                    <td class="text-center"><span class="badge bg-info">${user.login_count || 0}</span></td>
+                    <td><small>${formattedDate}</small></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        detailView.style.display = 'block';
+    }
+
+    function formatDateTime(dateTimeString) {
+        if (!dateTimeString || dateTimeString === 'Never') {
+            return 'Never';
+        }
+        
+        try {
+            // Format: 2025-11-03 07:29:03 -> 03/11 07:29
+            const parts = dateTimeString.split(' ');
+            if (parts.length === 2) {
+                const datePart = parts[0].split('-');
+                const timePart = parts[1].substring(0, 5); // Get HH:MM only
+                return `${datePart[2]}/${datePart[1]} ${timePart}`;
+            }
+            return dateTimeString;
+        } catch (e) {
+            return dateTimeString;
+        }
+    }
+
+    function showError(message) {
+        document.getElementById('errorText').textContent = message;
+        errorMessage.style.display = 'block';
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+});
+</script>
+
+<style>
+/* Responsive Modal for Login Activity Monitor */
+#loginActivityModal .modal-dialog {
+    max-width: 700px;
+    width: 90%;
+}
+
+@media (max-width: 768px) {
+    #loginActivityModal .modal-dialog {
+        max-width: 95%;
+    }
+    
+    #loginActivityModal table {
+        font-size: 0.8rem;
+    }
+    
+    #loginActivityModal th,
+    #loginActivityModal td {
+        padding: 0.4rem 0.3rem;
+    }
+}
+</style>
+<?php endif; ?>
+
+</body>
 </html>

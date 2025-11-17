@@ -48,7 +48,7 @@
                 <?php 
                 // Get user role
                 $user_role = $this->session->userdata('user_role');
-                if (isset($user_role) && strtolower($user_role) === 'admin'): 
+                if (isset($user_role) && strpos(strtolower($user_role), 'admin') !== false): 
                 ?>
                 <!-- Login Activity Monitor (Admin Only) -->
                 <li class="nav-item px-2 d-flex align-items-center me-3">
