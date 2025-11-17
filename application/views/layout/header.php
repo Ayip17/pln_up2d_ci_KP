@@ -358,16 +358,15 @@
 
             </ul>
           </div>
-        <?php endif; ?>
-
-        <?php if ($role !== 'up3' && $role !== 'guest'): ?>
-          <!-- Anggaran -->
+          <?php
+          $anggaran_active = in_array($this->uri->segment(1), ['anggaran', 'input_kontrak']);
+          ?>
           <li class="nav-item">
             <a href="#menuAnggaran"
-              class="nav-link d-flex align-items-center justify-content-between <?= ($this->uri->segment(1) == 'anggaran') ? 'active text-dark bg-light' : '' ?>"
+              class="nav-link d-flex align-items-center justify-content-between <?= $anggaran_active ? 'active text-dark bg-light' : '' ?>"
               data-bs-toggle="collapse"
               role="button"
-              aria-expanded="<?= ($this->uri->segment(1) == 'anggaran') ? 'true' : 'false' ?>"
+              aria-expanded="<?= $anggaran_active ? 'true' : 'false' ?>"
               aria-controls="menuAnggaran">
               <div class="d-flex align-items-center">
                 <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
@@ -376,125 +375,95 @@
                 <span class="nav-link-text ms-1">Anggaran</span>
               </div>
             </a>
+            <div class="collapse <?= $anggaran_active ? 'show' : '' ?>" id="menuAnggaran">
+              <ul class="nav ms-4">
+                <li class="nav-item">
+                  <a class="nav-link <?= ($this->uri->segment(1) == 'input_kontrak') ? 'active' : '' ?>"
+                    href="<?= base_url('input_kontrak'); ?>">
+                    <i class="fas fa-file-signature me-2"></i> Input Kontrak
+                  </a>
+                </li>
+
+                <li class="nav-item">
+                  <a class="nav-link <?= ($this->uri->segment(3) == 'rekomposisi') ? 'active' : '' ?>"
+                    href="<?= base_url('anggaran/investasi/rekomposisi'); ?>">
+                    <i class="fas fa-random me-2"></i> Rekomposisi
+                  </a>
+                </li>
+
+                <li class="nav-item">
+                  <a class="nav-link <?= ($this->uri->segment(3) == 'monitoring') ? 'active' : '' ?>"
+                    href="<?= base_url('anggaran/investasi/monitoring'); ?>">
+                    <i class="fas fa-chart-line me-2"></i> Monitoring
+                  </a>
+                </li>
+
+                <!-- Rekap PRK -->
+                <li class="nav-item">
+                  <a class="nav-link <?= ($this->uri->segment(3) == 'rekap_prk') ? 'active' : '' ?>"
+                    href="<?= base_url('anggaran/investasi/rekap_prk'); ?>">
+                    <i class="fas fa-clipboard-list me-2"></i> Rekap PRK
+                  </a>
+                </li>
+
+                <!-- Prognosa -->
+                <li class="nav-item">
+                  <a class="nav-link <?= ($this->uri->segment(3) == 'prognosa') ? 'active' : '' ?>"
+                    href="<?= base_url('anggaran/investasi/prognosa'); ?>">
+                    <i class="fas fa-chart-pie me-2"></i> Prognosa
+                  </a>
+                </li>
+
+              </ul>
+            </div>
+          <?php endif; ?>
+
+          <!-- Account Pages -->
+          <li class="nav-item mt-3">
+            <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Account Pages</h6>
           </li>
 
-          <!-- Submenu Anggaran -->
-          <div class="collapse <?= ($this->uri->segment(1) == 'anggaran') ? 'show' : '' ?>" id="menuAnggaran">
-            <ul class="nav flex-column submenu-list">
-              <!-- Anggaran Instansi (collapsible subgroup) -->
-              <li class="nav-item">
-                <a href="#anggaranInstansi"
-                  class="nav-link d-flex align-items-center justify-content-between <?= ($this->uri->segment(1) == 'anggaran' && $this->uri->segment(2) == 'investasi') ? 'active' : '' ?>"
-                  data-bs-toggle="collapse"
-                  role="button"
-                  aria-expanded="<?= ($this->uri->segment(1) == 'anggaran' && $this->uri->segment(2) == 'investasi') ? 'true' : 'false' ?>"
-                  aria-controls="anggaranInstansi">
-                  <div><i class="fas fa-building me-2"></i> Anggaran Investasi</div>
-                </a>
-              </li>
-
-              <div class="collapse <?= ($this->uri->segment(1) == 'anggaran' && $this->uri->segment(2) == 'investasi') ? 'show' : '' ?>" id="anggaranInstansi">
-                <ul class="nav flex-column submenu-list ps-3">
-                  <li class="nav-item">
-                    <a class="nav-link <?= ($this->uri->segment(1) == 'anggaran' && $this->uri->segment(2) == 'investasi' && $this->uri->segment(3) == 'progress_kontrak') ? 'active' : '' ?>" href="<?= base_url('anggaran/investasi/progress_kontrak'); ?>">
-                      <span style="font-size:9px; line-height:1; display:inline-block; width:8px; text-align:center; color:#6c757d;" class="me-2">&bull;</span> Progress Kontrak
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link <?= ($this->uri->segment(1) == 'anggaran' && $this->uri->segment(2) == 'investasi' && $this->uri->segment(3) == 'rekomposisi') ? 'active' : '' ?>" href="<?= base_url('anggaran/investasi/rekomposisi'); ?>">
-                      <span style="font-size:9px; line-height:1; display:inline-block; width:8px; text-align:center; color:#6c757d;" class="me-2">&bull;</span> Rekomposisi
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link <?= ($this->uri->segment(1) == 'anggaran' && $this->uri->segment(2) == 'investasi' && $this->uri->segment(3) == 'monitoring') ? 'active' : '' ?>" href="<?= base_url('anggaran/investasi/monitoring'); ?>">
-                      <span style="font-size:9px; line-height:1; display:inline-block; width:8px; text-align:center; color:#6c757d;" class="me-2">&bull;</span> Monitoring
-                    </a>
-                  </li>
-                </ul>
-              </div>
-
-              <!-- Anggaran Operasi (collapsible subgroup) -->
-              <li class="nav-item">
-                <a href="#anggaranOperasi"
-                  class="nav-link d-flex align-items-center justify-content-between <?= ($this->uri->segment(1) == 'anggaran' && $this->uri->segment(2) == 'operasi') ? 'active' : '' ?>"
-                  data-bs-toggle="collapse"
-                  role="button"
-                  aria-expanded="<?= ($this->uri->segment(1) == 'anggaran' && $this->uri->segment(2) == 'operasi') ? 'true' : 'false' ?>"
-                  aria-controls="anggaranOperasi">
-                  <div><i class="fas fa-cogs me-2"></i> Anggaran Operasi</div>
-                </a>
-              </li>
-
-              <div class="collapse <?= ($this->uri->segment(1) == 'anggaran' && $this->uri->segment(2) == 'operasi') ? 'show' : '' ?>" id="anggaranOperasi">
-                <ul class="nav flex-column submenu-list ps-3">
-                  <li class="nav-item">
-                    <a class="nav-link <?= ($this->uri->segment(1) == 'anggaran' && $this->uri->segment(2) == 'operasi' && $this->uri->segment(3) == 'progress_kontrak') ? 'active' : '' ?>" href="<?= base_url('anggaran/operasi/progress_kontrak'); ?>">
-                      <span style="font-size:9px; line-height:1; display:inline-block; width:8px; text-align:center; color:#6c757d;" class="me-2">&bull;</span> Progress Kontrak
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link <?= ($this->uri->segment(1) == 'anggaran' && $this->uri->segment(2) == 'operasi' && $this->uri->segment(3) == 'rekomposisi') ? 'active' : '' ?>" href="<?= base_url('anggaran/operasi/rekomposisi'); ?>">
-                      <span style="font-size:9px; line-height:1; display:inline-block; width:8px; text-align:center; color:#6c757d;" class="me-2">&bull;</span> Rekomposisi
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link <?= ($this->uri->segment(1) == 'anggaran' && $this->uri->segment(2) == 'operasi' && $this->uri->segment(3) == 'monitoring') ? 'active' : '' ?>" href="<?= base_url('anggaran/operasi/monitoring'); ?>">
-                      <span style="font-size:9px; line-height:1; display:inline-block; width:8px; text-align:center; color:#6c757d;" class="me-2">&bull;</span> Monitoring
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </ul>
-          </div>
-        <?php endif; ?>
-
-
-        <!-- Account Pages -->
-        <li class="nav-item mt-3">
-          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Account Pages</h6>
-        </li>
-
-        <!-- Profile -->
-        <li class="nav-item">
-          <a class="nav-link" href="<?= base_url('pages/profile'); ?>">
-            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-single-02 text-dark text-sm opacity-10"></i>
-            </div>
-            <span class="nav-link-text ms-1">Profile</span>
-          </a>
-        </li>
-
-        <!-- Sign In -->
-        <li class="nav-item">
-          <a class="nav-link" href="<?= base_url('login'); ?>">
-            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-key-25 text-dark text-sm opacity-10"></i>
-            </div>
-            <span class="nav-link-text ms-1">Sign In</span>
-          </a>
-        </li>
-
-        <!-- Sign Up -->
-        <li class="nav-item">
-          <a class="nav-link" href="<?= base_url('pages/sign-up'); ?>">
-            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-circle-08 text-dark text-sm opacity-10"></i>
-            </div>
-            <span class="nav-link-text ms-1">Sign Up</span>
-          </a>
-        </li>
-
-        <?php if ($this->session->userdata('logged_in')): ?>
-          <!-- Logout -->
+          <!-- Profile -->
           <li class="nav-item">
-            <a class="nav-link" href="<?= base_url('logout'); ?>">
+            <a class="nav-link" href="<?= base_url('pages/profile'); ?>">
               <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                <i class="ni ni-button-power text-danger text-sm opacity-10"></i>
+                <i class="ni ni-single-02 text-dark text-sm opacity-10"></i>
               </div>
-              <span class="nav-link-text ms-1">Logout</span>
+              <span class="nav-link-text ms-1">Profile</span>
             </a>
           </li>
-        <?php endif; ?>
+
+          <!-- Sign In -->
+          <li class="nav-item">
+            <a class="nav-link" href="<?= base_url('login'); ?>">
+              <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                <i class="ni ni-key-25 text-dark text-sm opacity-10"></i>
+              </div>
+              <span class="nav-link-text ms-1">Sign In</span>
+            </a>
+          </li>
+
+          <!-- Sign Up -->
+          <li class="nav-item">
+            <a class="nav-link" href="<?= base_url('pages/sign-up'); ?>">
+              <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                <i class="ni ni-circle-08 text-dark text-sm opacity-10"></i>
+              </div>
+              <span class="nav-link-text ms-1">Sign Up</span>
+            </a>
+          </li>
+
+          <?php if ($this->session->userdata('logged_in')): ?>
+            <!-- Logout -->
+            <li class="nav-item">
+              <a class="nav-link" href="<?= base_url('logout'); ?>">
+                <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                  <i class="ni ni-button-power text-danger text-sm opacity-10"></i>
+                </div>
+                <span class="nav-link-text ms-1">Logout</span>
+              </a>
+            </li>
+          <?php endif; ?>
 
       </ul>
     </div>
