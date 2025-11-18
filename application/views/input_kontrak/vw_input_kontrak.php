@@ -15,6 +15,13 @@
             <div class="card-header py-2 d-flex justify-content-between align-items-center bg-gradient-primary text-white rounded-top-4">
                 <h6 class="mb-0 d-flex align-items-center">Tabel Data Input Kontrak</h6>
                 <div class="d-flex align-items-center" style="padding-top: 16px;">
+                    <?php 
+                    // Debug
+                    $CI =& get_instance();
+                    $role = $CI->session->userdata('role');
+                    $module = $CI->router->fetch_class();
+                    echo "<!-- Role: $role | Module: $module | Can Create: " . (can_create() ? 'YES' : 'NO') . " -->";
+                    ?>
                     <?php if (can_create()): ?>
                         <a href="<?= base_url('Input_kontrak/tambah') ?>" class="btn btn-sm btn-light text-primary me-2 d-flex align-items-center">
                             <i class="fas fa-plus me-1"></i> Tambah

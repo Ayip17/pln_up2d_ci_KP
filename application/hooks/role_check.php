@@ -35,6 +35,7 @@ function role_check()
                                // Pustaka modules
                                'sop', 'bpm', 'ik', 'road_map', 'spln',
                                // Anggaran modules
+                               'input_kontrak', 'rekomposisi',
                                'operasi', 'investasi'];
 
         if (!in_array($controller, $allowed_controllers)) {

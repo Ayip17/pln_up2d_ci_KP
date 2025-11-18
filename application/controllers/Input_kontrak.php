@@ -7,8 +7,9 @@ class Input_kontrak extends CI_Controller
     {
         parent::__construct();
         $this->load->model('Input_kontrak_model', 'kontrak');
+        $this->load->model('Rekomposisi_model', 'rekom');
         $this->load->library('pagination');
-        $this->load->helper(['url', 'form']);
+        $this->load->helper(['url', 'form', 'authorization']);
         $this->load->library('form_validation');
     }
 
@@ -60,9 +61,21 @@ class Input_kontrak extends CI_Controller
     // Menampilkan form tambah
     public function tambah()
     {
+        $list_prk_operasi = $this->rekom->get_prk_by_jenis('Operasi');
+        $list_prk_investasi = $this->rekom->get_prk_by_jenis('Investasi');
+        
+        // Debug: uncomment untuk cek data
+        // echo "PRK Operasi: " . count($list_prk_operasi) . "<br>";
+        // echo "<pre>"; print_r($list_prk_operasi); echo "</pre>";
+        // echo "PRK Investasi: " . count($list_prk_investasi) . "<br>";
+        // echo "<pre>"; print_r($list_prk_investasi); echo "</pre>";
+        // die();
+        
         $data = [
             'page_title' => 'Tambah Input Kontrak',
-            'page_icon'  => 'fas fa-file-signature me-2'
+            'page_icon'  => 'fas fa-file-signature me-2',
+            'list_prk_operasi' => $list_prk_operasi,
+            'list_prk_investasi' => $list_prk_investasi
         ];
 
         $this->load->view('layout/header', $data);
@@ -73,14 +86,15 @@ class Input_kontrak extends CI_Controller
     // Simpan data baru
     public function store()
     {
-        $this->form_validation->set_rules('SUMBER_DANA', 'Sumber Dana', 'required');
-        $this->form_validation->set_rules('SKKO', 'SKKO', 'required');
+        $this->form_validation->set_rules('JENIS_ANGGARAN', 'Jenis Anggaran', 'required');
         $this->form_validation->set_rules('URAIAN_KONTRAK_PEKERJAAN', 'Uraian Kontrak / Pekerjaan', 'required');
         $this->form_validation->set_rules('USER', 'User', 'required');
 
         $data_header = [
             'page_title' => 'Tambah Input Kontrak',
-            'page_icon'  => 'fas fa-file-signature me-2'
+            'page_icon'  => 'fas fa-file-signature me-2',
+            'list_prk_operasi' => $this->rekom->get_prk_by_jenis('Operasi'),
+            'list_prk_investasi' => $this->rekom->get_prk_by_jenis('Investasi')
         ];
 
         if ($this->form_validation->run() == FALSE) {
@@ -88,12 +102,32 @@ class Input_kontrak extends CI_Controller
             $this->load->view('input_kontrak/vw_tambah_input_kontrak', $data_header);
             $this->load->view('layout/footer', $data_header);
         } else {
+            // Validasi RAB User vs SKK Value
+            $rab_user = (float)str_replace(',', '', $this->input->post('PAGU_ANG_RAB_USER', TRUE));
+            $skk_value = (float)str_replace(',', '', $this->input->post('SKK_VALUE', TRUE));
+            
+            if ($rab_user > 0 && $skk_value > 0 && $rab_user > $skk_value) {
+                $this->session->set_flashdata('error', 'RAB User (Rp ' . number_format($rab_user, 0, ',', '.') . ') tidak boleh melebihi Nilai SKK (Rp ' . number_format($skk_value, 0, ',', '.') . ')!');
+                $this->load->view('layout/header', $data_header);
+                $this->load->view('input_kontrak/vw_tambah_input_kontrak', $data_header);
+                $this->load->view('layout/footer', $data_header);
+                return;
+            }
+            
+            // Determine table based on Jenis Anggaran
+            $jenis_anggaran = $this->input->post('JENIS_ANGGARAN', TRUE);
+            $table = ($jenis_anggaran === 'Investasi') ? 'anggaran_inv' : 'anggaran_op';
+            
+            // Get values (field name is dynamic based on toggle)
+            $nomor_prk = $this->input->post('NOMOR_PRK', TRUE);
+            $nomor_skk = $this->input->post('SKKO', TRUE);
+            $judul_drp = $this->input->post('DRP', TRUE);
             // Data sesuai nama kolom database
             $data = [
                 'SUMBER DANA' => $this->input->post('SUMBER_DANA', TRUE),
-                'SKKO' => $this->input->post('SKKO', TRUE),
+                'SKKO' => $nomor_skk,
                 'SUB POS' => $this->input->post('SUB_POS', TRUE),
-                'DRP' => $this->input->post('DRP', TRUE),
+                'DRP' => $judul_drp,
                 'URAIAN KONTRAK / PEKERJAAN' => $this->input->post('URAIAN_KONTRAK_PEKERJAAN', TRUE),
                 'USER' => $this->input->post('USER', TRUE),
                 'PAGU ANG/RAB USER' => $this->input->post('PAGU_ANG_RAB_USER', TRUE),
@@ -123,8 +157,9 @@ class Input_kontrak extends CI_Controller
                 $data["BLN KTRK$i"] = $this->input->post("BLN_KTRK$i", TRUE);
             }
 
-            $this->kontrak->insert($data);
-            $this->session->set_flashdata('success', 'Data progress kontrak berhasil disimpan!');
+            // Insert to appropriate table
+            $this->kontrak->insert_to_table($table, $data);
+            $this->session->set_flashdata('success', 'Data kontrak ' . $jenis_anggaran . ' berhasil disimpan!');
             redirect('Input_kontrak');
         }
     }
@@ -223,5 +258,29 @@ class Input_kontrak extends CI_Controller
         $this->load->view('layout/header', $data);
         $this->load->view('Input_kontrak/vw_detail_input_kontrak', $data);
         $this->load->view('layout/footer', $data);
+    }
+
+    // AJAX: Get SKK by PRK
+    public function ajax_get_skk_by_prk()
+    {
+        $nomor_prk = $this->input->post('nomor_prk');
+        $result = $this->rekom->get_skk_by_prk($nomor_prk);
+        echo json_encode($result);
+    }
+
+    // AJAX: Get DRP by PRK
+    public function ajax_get_drp_by_prk()
+    {
+        $nomor_prk = $this->input->post('nomor_prk');
+        $result = $this->rekom->get_drp_by_prk($nomor_prk);
+        echo json_encode($result);
+    }
+
+    // AJAX: Get SKK Value
+    public function ajax_get_skk_value()
+    {
+        $nomor_skk = $this->input->post('nomor_skk');
+        $result = $this->rekom->get_skk_value($nomor_skk);
+        echo json_encode($result);
     }
 }

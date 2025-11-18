@@ -81,4 +81,25 @@ class Input_kontrak_model extends CI_Model
     {
         return $this->db->insert($this->table, $data);
     }
+
+    // Insert to specific table (anggaran_op or anggaran_inv)
+    public function insert_to_table($table_name, $data)
+    {
+        return $this->db->insert($table_name, $data);
+    }
+
+    // Get data from specific table
+    public function get_from_table($table_name, $limit = null, $offset = null)
+    {
+        if ($limit && $offset !== null) {
+            return $this->db->limit($limit, $offset)->get($table_name)->result_array();
+        }
+        return $this->db->get($table_name)->result_array();
+    }
+
+    // Count from specific table
+    public function count_from_table($table_name)
+    {
+        return $this->db->count_all($table_name);
+    }
 }

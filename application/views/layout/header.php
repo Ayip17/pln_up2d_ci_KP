@@ -358,6 +358,8 @@
 
             </ul>
           </div>
+          <?php endif; ?>
+
           <?php
           $anggaran_active = in_array($this->uri->segment(1), ['anggaran', 'input_kontrak', 'rekomposisi', 'rekap_prk']);
           ?>
@@ -418,7 +420,7 @@
 
               </ul>
             </div>
-          <?php endif; ?>
+          </li>
 
           <!-- Account Pages -->
           <li class="nav-item mt-3">

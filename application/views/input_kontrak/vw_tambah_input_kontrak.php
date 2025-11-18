@@ -21,37 +21,92 @@
     </nav>
 
     <div class="container-fluid py-4">
+        <?php if ($this->session->flashdata('error')): ?>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>Error!</strong> <?= $this->session->flashdata('error'); ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <?php endif; ?>
+        
+        <?php if (validation_errors()): ?>
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <strong>Perhatian!</strong>
+                <?= validation_errors(); ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <?php endif; ?>
+        
         <div class="card shadow border-0 rounded-4">
             <div class="card-header bg-gradient-primary text-white">
-                <h6 class="mb-0">Form Tambah Data Progress Kontrak Operasi</h6>
+                <h6 class="mb-0">Form Tambah Data Input Kontrak</h6>
             </div>
 
             <div class="card-body">
                 <form id="addProgressKontrakOpForm" action="<?= base_url('Input_kontrak/store'); ?>" method="POST">
                     <div class="row g-3">
 
+                        <!-- Jenis Anggaran -->
+                        <div class="col-md-6">
+                            <label class="form-label">Jenis Anggaran <span class="text-danger">*</span></label>
+                            <select name="JENIS_ANGGARAN" id="jenisAnggaran" class="form-control" required>
+                                <option value="">-- Pilih Jenis Anggaran --</option>
+                                <option value="Operasi">Operasi</option>
+                                <option value="Investasi">Investasi</option>
+                            </select>
+                        </div>
+
+                        <!-- Nomor PRK -->
+                        <div class="col-md-6">
+                            <label class="form-label">Nomor PRK <span class="text-danger">*</span></label>
+                            <select name="NOMOR_PRK" id="nomorPRK" class="form-control" required disabled>
+                                <option value="">-- Pilih Jenis Anggaran Terlebih Dahulu --</option>
+                            </select>
+                            <small class="text-muted">Atau <a href="#" id="inputManualPRK">input manual</a></small>
+                            <input type="text" id="nomorPRKManual" class="form-control mt-2" placeholder="Input Nomor PRK Manual" style="display:none;">
+                        </div>
+
+                        <!-- PRK Description (Auto-fill) -->
+                        <div class="col-md-6">
+                            <label class="form-label">Deskripsi PRK</label>
+                            <input type="text" name="PRK_DESCRIPTION" id="prkDescription" class="form-control" readonly>
+                        </div>
+
+                        <!-- Nomor SKK -->
+                        <div class="col-md-6">
+                            <label class="form-label">Nomor SKK/IO <span class="text-danger">*</span></label>
+                            <select name="SKKO" id="nomorSKK" class="form-control" required disabled>
+                                <option value="">-- Pilih PRK Terlebih Dahulu --</option>
+                            </select>
+                            <small class="text-muted">Atau <a href="#" id="inputManualSKK">input manual</a></small>
+                            <input type="text" id="nomorSKKManual" class="form-control mt-2" placeholder="Input Nomor SKK Manual" style="display:none;">
+                        </div>
+
+                        <!-- SKK Value (Auto-fill) -->
+                        <div class="col-md-6">
+                            <label class="form-label">Nilai SKK</label>
+                            <input type="text" name="SKK_VALUE" id="skkValue" class="form-control" readonly>
+                        </div>
+
+                        <!-- Judul DRP -->
+                        <div class="col-md-6">
+                            <label class="form-label">Judul DRP</label>
+                            <select name="DRP" id="judulDRP" class="form-control" disabled>
+                                <option value="">-- Pilih PRK Terlebih Dahulu --</option>
+                            </select>
+                            <small class="text-muted">Atau <a href="#" id="inputManualDRP">input manual</a></small>
+                            <input type="text" id="judulDRPManual" class="form-control mt-2" placeholder="Input Judul DRP Manual" style="display:none;">
+                        </div>
+
                         <!-- Sumber Dana -->
                         <div class="col-md-6">
                             <label class="form-label">Sumber Dana</label>
-                            <textarea name="SUMBER_DANA" class="form-control" rows="2" required></textarea>
-                        </div>
-
-                        <!-- SKKO -->
-                        <div class="col-md-6">
-                            <label class="form-label">SKKO</label>
-                            <input type="text" name="SKKO" class="form-control" required>
+                            <textarea name="SUMBER_DANA" class="form-control" rows="2"></textarea>
                         </div>
 
                         <!-- Sub Pos -->
                         <div class="col-md-6">
                             <label class="form-label">Sub Pos</label>
                             <input type="text" name="SUB_POS" class="form-control">
-                        </div>
-
-                        <!-- DRP -->
-                        <div class="col-md-6">
-                            <label class="form-label">DRP</label>
-                            <input type="text" name="DRP" class="form-control">
                         </div>
 
                         <!-- Uraian Kontrak/Pekerjaan -->
@@ -229,3 +284,225 @@
         </div>
     </div>
 </main>
+
+<script>
+// Data PRK dari PHP
+const listPRKOperasi = <?= json_encode($list_prk_operasi ?? []); ?>;
+const listPRKInvestasi = <?= json_encode($list_prk_investasi ?? []); ?>;
+
+console.log('PRK Operasi:', listPRKOperasi);
+console.log('PRK Investasi:', listPRKInvestasi);
+
+// Jenis Anggaran Change
+document.getElementById('jenisAnggaran').addEventListener('change', function() {
+    const jenis = this.value;
+    const prkSelect = document.getElementById('nomorPRK');
+    
+    console.log('Jenis Anggaran dipilih:', jenis);
+    
+    prkSelect.innerHTML = '<option value="">-- Pilih Nomor PRK --</option>';
+    prkSelect.disabled = !jenis;
+    
+    // Reset dependent fields
+    document.getElementById('nomorSKK').innerHTML = '<option value="">-- Pilih PRK Terlebih Dahulu --</option>';
+    document.getElementById('nomorSKK').disabled = true;
+    document.getElementById('judulDRP').innerHTML = '<option value="">-- Pilih PRK Terlebih Dahulu --</option>';
+    document.getElementById('judulDRP').disabled = true;
+    document.getElementById('prkDescription').value = '';
+    document.getElementById('skkValue').value = '';
+    
+    if (jenis) {
+        const listPRK = (jenis === 'Operasi') ? listPRKOperasi : listPRKInvestasi;
+        console.log('List PRK yang akan ditampilkan:', listPRK);
+        
+        if (listPRK && listPRK.length > 0) {
+            listPRK.forEach(prk => {
+                const option = new Option(prk.NOMOR_PRK + ' - ' + prk.PRK, prk.NOMOR_PRK);
+                prkSelect.add(option);
+            });
+        } else {
+            const option = new Option('-- Belum ada data PRK ' + jenis + ' --', '');
+            prkSelect.add(option);
+        }
+    }
+});
+
+// PRK Change - Load SKK & DRP
+document.getElementById('nomorPRK').addEventListener('change', function() {
+    const nomorPRK = this.value;
+    const selectedOption = this.options[this.selectedIndex];
+    const prkDesc = selectedOption.text.split(' - ')[1] || '';
+    
+    document.getElementById('prkDescription').value = prkDesc;
+    
+    if (nomorPRK) {
+        // Load SKK
+        fetch('<?= base_url("Input_kontrak/ajax_get_skk_by_prk"); ?>', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: 'nomor_prk=' + encodeURIComponent(nomorPRK)
+        })
+        .then(res => res.json())
+        .then(data => {
+            const skkSelect = document.getElementById('nomorSKK');
+            skkSelect.innerHTML = '<option value="">-- Pilih Nomor SKK --</option>';
+            skkSelect.disabled = false;
+            
+            data.forEach(skk => {
+                const option = new Option(
+                    skk.NOMOR_SKK_IO + ' - Rp ' + (skk.SKKI_O || '0'),
+                    skk.NOMOR_SKK_IO
+                );
+                skkSelect.add(option);
+            });
+        });
+        
+        // Load DRP
+        fetch('<?= base_url("Input_kontrak/ajax_get_drp_by_prk"); ?>', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: 'nomor_prk=' + encodeURIComponent(nomorPRK)
+        })
+        .then(res => res.json())
+        .then(data => {
+            const drpSelect = document.getElementById('judulDRP');
+            drpSelect.innerHTML = '<option value="">-- Pilih Judul DRP --</option>';
+            drpSelect.disabled = false;
+            
+            data.forEach(drp => {
+                const option = new Option(drp.JUDUL_DRP, drp.JUDUL_DRP);
+                drpSelect.add(option);
+            });
+        });
+    }
+});
+
+// SKK Change - Load SKK Value
+document.getElementById('nomorSKK').addEventListener('change', function() {
+    const nomorSKK = this.value;
+    
+    if (nomorSKK) {
+        fetch('<?= base_url("Input_kontrak/ajax_get_skk_value"); ?>', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: 'nomor_skk=' + encodeURIComponent(nomorSKK)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data) {
+                document.getElementById('skkValue').value = data.SKKI_O || '';
+            }
+        });
+    }
+});
+
+// Toggle Manual Input PRK
+document.getElementById('inputManualPRK').addEventListener('click', function(e) {
+    e.preventDefault();
+    const manualInput = document.getElementById('nomorPRKManual');
+    const dropdown = document.getElementById('nomorPRK');
+    const jenisAnggaran = document.getElementById('jenisAnggaran');
+    
+    if (manualInput.style.display === 'none' || manualInput.style.display === '') {
+        // Aktifkan manual input
+        manualInput.style.display = 'block';
+        manualInput.value = '';
+        manualInput.setAttribute('name', 'NOMOR_PRK');
+        manualInput.setAttribute('required', 'required');
+        
+        // Nonaktifkan dropdown
+        dropdown.style.display = 'none';
+        dropdown.removeAttribute('name');
+        dropdown.removeAttribute('required');
+        dropdown.disabled = true;
+        
+        this.textContent = 'gunakan dropdown';
+    } else {
+        // Aktifkan dropdown
+        dropdown.style.display = 'block';
+        dropdown.setAttribute('name', 'NOMOR_PRK');
+        dropdown.setAttribute('required', 'required');
+        dropdown.disabled = !jenisAnggaran.value;
+        
+        // Nonaktifkan manual input
+        manualInput.style.display = 'none';
+        manualInput.removeAttribute('name');
+        manualInput.removeAttribute('required');
+        manualInput.value = '';
+        
+        this.textContent = 'input manual';
+    }
+});
+
+// Toggle Manual Input SKK
+document.getElementById('inputManualSKK').addEventListener('click', function(e) {
+    e.preventDefault();
+    const manualInput = document.getElementById('nomorSKKManual');
+    const dropdown = document.getElementById('nomorSKK');
+    const nomorPRK = document.getElementById('nomorPRK').value;
+    
+    if (manualInput.style.display === 'none' || manualInput.style.display === '') {
+        // Aktifkan manual input
+        manualInput.style.display = 'block';
+        manualInput.value = '';
+        manualInput.setAttribute('name', 'SKKO');
+        manualInput.setAttribute('required', 'required');
+        
+        // Nonaktifkan dropdown
+        dropdown.style.display = 'none';
+        dropdown.removeAttribute('name');
+        dropdown.removeAttribute('required');
+        dropdown.disabled = true;
+        
+        this.textContent = 'gunakan dropdown';
+    } else {
+        // Aktifkan dropdown
+        dropdown.style.display = 'block';
+        dropdown.setAttribute('name', 'SKKO');
+        dropdown.setAttribute('required', 'required');
+        dropdown.disabled = !nomorPRK;
+        
+        // Nonaktifkan manual input
+        manualInput.style.display = 'none';
+        manualInput.removeAttribute('name');
+        manualInput.removeAttribute('required');
+        manualInput.value = '';
+        
+        this.textContent = 'input manual';
+    }
+});
+
+// Toggle Manual Input DRP
+document.getElementById('inputManualDRP').addEventListener('click', function(e) {
+    e.preventDefault();
+    const manualInput = document.getElementById('judulDRPManual');
+    const dropdown = document.getElementById('judulDRP');
+    const nomorPRK = document.getElementById('nomorPRK').value;
+    
+    if (manualInput.style.display === 'none' || manualInput.style.display === '') {
+        // Aktifkan manual input
+        manualInput.style.display = 'block';
+        manualInput.value = '';
+        manualInput.setAttribute('name', 'DRP');
+        
+        // Nonaktifkan dropdown
+        dropdown.style.display = 'none';
+        dropdown.removeAttribute('name');
+        dropdown.disabled = true;
+        
+        this.textContent = 'gunakan dropdown';
+    } else {
+        // Aktifkan dropdown
+        dropdown.style.display = 'block';
+        dropdown.setAttribute('name', 'DRP');
+        dropdown.disabled = !nomorPRK;
+        
+        // Nonaktifkan manual input
+        manualInput.style.display = 'none';
+        manualInput.removeAttribute('name');
+        manualInput.value = '';
+        
+        this.textContent = 'input manual';
+    }
+});
+</script>

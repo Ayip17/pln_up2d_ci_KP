@@ -59,6 +59,8 @@ if (!function_exists('can_create')) {
                 'road_map',
                 'spln', // Pustaka modules
                 'pengaduan', // Pengaduan module
+                'input_kontrak',
+                'rekomposisi',
                 'operasi',
                 'investasi'
             ]; // Anggaran modules
@@ -111,6 +113,8 @@ if (!function_exists('can_create')) {
                 'road_map',
                 'spln', // Pustaka modules
                 'pengaduan', // Pengaduan module
+                'input_kontrak',
+                'rekomposisi',
                 'operasi',
                 'investasi'
             ]; // Anggaran modules
@@ -154,10 +158,20 @@ if (!function_exists('can_create')) {
                 'road_map',
                 'spln', // Pustaka modules
                 'pengaduan', // Pengaduan module
+                'input_kontrak',
+                'rekomposisi',
                 'operasi',
                 'investasi'
             ]; // Anggaran modules
             return in_array(strtolower($module), $allowed);
+        }
+
+        // Har & Pengadaan Keuangan: Khusus bisa Input Kontrak
+        if (in_array(strtolower($role), ['har', 'pengadaan keuangan'])) {
+            if ($module === null) {
+                $module = $CI->router->fetch_class();
+            }
+            return strtolower($module) === 'input_kontrak';
         }
 
         // Role lain bisa create (kecuali yang spesifik di-restrict nanti)
@@ -216,6 +230,8 @@ if (!function_exists('can_edit')) {
                 'road_map',
                 'spln', // Pustaka modules
                 'pengaduan', // Pengaduan module
+                'input_kontrak',
+                'rekomposisi',
                 'operasi',
                 'investasi'
             ]; // Anggaran modules
@@ -268,6 +284,8 @@ if (!function_exists('can_edit')) {
                 'road_map',
                 'spln', // Pustaka modules
                 'pengaduan', // Pengaduan module
+                'input_kontrak',
+                'rekomposisi',
                 'operasi',
                 'investasi'
             ]; // Anggaran modules
@@ -311,10 +329,20 @@ if (!function_exists('can_edit')) {
                 'road_map',
                 'spln', // Pustaka modules
                 'pengaduan', // Pengaduan module
+                'input_kontrak',
+                'rekomposisi',
                 'operasi',
                 'investasi'
             ]; // Anggaran modules
             return in_array(strtolower($module), $allowed);
+        }
+
+        // Har & Pengadaan Keuangan: Khusus bisa Input Kontrak
+        if (in_array(strtolower($role), ['har', 'pengadaan keuangan'])) {
+            if ($module === null) {
+                $module = $CI->router->fetch_class();
+            }
+            return strtolower($module) === 'input_kontrak';
         }
 
         // Role lain bisa edit (kecuali yang spesifik di-restrict nanti)
@@ -373,6 +401,8 @@ if (!function_exists('can_delete')) {
                 'road_map',
                 'spln', // Pustaka modules
                 'pengaduan', // Pengaduan module
+                'input_kontrak',
+                'rekomposisi',
                 'operasi',
                 'investasi'
             ]; // Anggaran modules
@@ -425,6 +455,8 @@ if (!function_exists('can_delete')) {
                 'road_map',
                 'spln', // Pustaka modules
                 'pengaduan', // Pengaduan module
+                'input_kontrak',
+                'rekomposisi',
                 'operasi',
                 'investasi'
             ]; // Anggaran modules
@@ -468,10 +500,20 @@ if (!function_exists('can_delete')) {
                 'road_map',
                 'spln', // Pustaka modules
                 'pengaduan', // Pengaduan module
+                'input_kontrak',
+                'rekomposisi',
                 'operasi',
                 'investasi'
             ]; // Anggaran modules
             return in_array(strtolower($module), $allowed);
+        }
+
+        // Har & Pengadaan Keuangan: Khusus bisa Input Kontrak
+        if (in_array(strtolower($role), ['har', 'pengadaan keuangan'])) {
+            if ($module === null) {
+                $module = $CI->router->fetch_class();
+            }
+            return strtolower($module) === 'input_kontrak';
         }
 
         // Role lain bisa delete (kecuali yang spesifik di-restrict nanti)

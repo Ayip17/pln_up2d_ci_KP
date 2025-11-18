@@ -66,4 +66,47 @@ class Rekomposisi_model extends CI_Model
 
         return $this->db->get($this->table, $limit, $start)->result_array();
     }
+
+    // 🔹 Get distinct PRK by Jenis Anggaran
+    public function get_prk_by_jenis($jenis_anggaran = null)
+    {
+        $this->db->select('NOMOR_PRK, PRK');
+        $this->db->distinct();
+        
+        if ($jenis_anggaran) {
+            $this->db->where('JENIS_ANGGARAN', $jenis_anggaran);
+        }
+        
+        $this->db->order_by('NOMOR_PRK', 'ASC');
+        return $this->db->get($this->table)->result_array();
+    }
+
+    // 🔹 Get SKK by PRK
+    public function get_skk_by_prk($nomor_prk)
+    {
+        $this->db->select('NOMOR_SKK_IO, SKKI_O, PRK');
+        $this->db->where('NOMOR_PRK', $nomor_prk);
+        $this->db->order_by('NOMOR_SKK_IO', 'ASC');
+        return $this->db->get($this->table)->result_array();
+    }
+
+    // 🔹 Get DRP by PRK
+    public function get_drp_by_prk($nomor_prk)
+    {
+        $this->db->select('JUDUL_DRP');
+        $this->db->distinct();
+        $this->db->where('NOMOR_PRK', $nomor_prk);
+        $this->db->where('JUDUL_DRP IS NOT NULL');
+        $this->db->where('JUDUL_DRP !=', '');
+        $this->db->order_by('JUDUL_DRP', 'ASC');
+        return $this->db->get($this->table)->result_array();
+    }
+
+    // 🔹 Get SKK Value by Nomor SKK
+    public function get_skk_value($nomor_skk)
+    {
+        $this->db->select('SKKI_O, PRK');
+        $this->db->where('NOMOR_SKK_IO', $nomor_skk);
+        return $this->db->get($this->table)->row_array();
+    }
 }
