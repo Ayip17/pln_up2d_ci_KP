@@ -88,7 +88,7 @@ class Rekap_prk extends CI_Controller
 
         if ($this->form_validation->run() === false) {
             $this->load->view('layout/header', $data);
-            $this->load->view('rekap_prk/vw_tambah_prk', $data);
+            $this->load->view('rekap_prk/vw_tambah_rekap_prk', $data);
             $this->load->view('layout/footer', $data);
             return;
         }
@@ -136,7 +136,7 @@ class Rekap_prk extends CI_Controller
 
         if ($this->form_validation->run() === false) {
             $this->load->view('layout/header', $data);
-            $this->load->view('rekap_prk/vw_edit_prk', $data);
+            $this->load->view('rekap_prk/vw_edit_rekap_prk', $data);
             $this->load->view('layout/footer', $data);
             return;
         }
