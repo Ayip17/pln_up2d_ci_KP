@@ -3,9 +3,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class Rekap_prk_model extends CI_Model
 {
-    private $table = 'prk_data'; // nama tabel di database
+    private $table = 'prk_data'; // Nama tabel
 
-    // 🔹 Ambil semua data PRK, optional keyword untuk pencarian
+    // 🔹 Ambil semua PRK
     public function get_all_prk($keyword = null)
     {
         $this->db->order_by('ID_PRK', 'DESC');
@@ -23,13 +23,19 @@ class Rekap_prk_model extends CI_Model
         return $this->db->get($this->table)->result_array();
     }
 
-    // 🔹 Ambil data berdasarkan ID
+    // 🔹 Ambil data berdasar ID (fungsi utama)
     public function get_prk_by_id($id)
     {
         return $this->db->get_where($this->table, ['ID_PRK' => $id])->row_array();
     }
 
-    // 🔹 Tambah data baru
+    // 🔹 Alias: agar controller yang memanggil get_by_id tetap aman
+    public function get_by_id($id)
+    {
+        return $this->get_prk_by_id($id);
+    }
+
+    // 🔹 Tambah data
     public function insert_prk($data)
     {
         return $this->db->insert($this->table, $data);

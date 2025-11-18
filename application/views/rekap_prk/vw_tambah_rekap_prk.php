@@ -36,8 +36,8 @@
                             <label class="form-label fw-semibold">Jenis Anggaran</label>
                             <select name="JENIS_ANGGARAN" class="form-select modern-select" required>
                                 <option value="">-- Pilih Jenis Anggaran --</option>
-                                <option value="OPEX">INVESTASI</option>
-                                <option value="CAPEX">OPERASI</option>
+                                <option value="CAPEX">INVESTASI</option>
+                                <option value="OPEX">OPERASI</option>
                             </select>
                         </div>
 
@@ -58,7 +58,7 @@
                             <textarea name="URAIAN_PRK" class="form-control modern-input" rows="2" required></textarea>
                         </div>
 
-                        <!-- PAGU SKK-IO -->
+                        <!-- Pagu SKK-IO -->
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Pagu SKK-IO</label>
                             <input type="text" name="PAGU_SKK_IO" class="form-control modern-input money-input" required>
@@ -138,7 +138,6 @@
         box-shadow: 0 0 0 3px rgba(78, 115, 223, 0.25);
     }
 
-    /* Gradient header */
     .bg-gradient-primary {
         background: linear-gradient(90deg, #005C99, #0099CC);
     }

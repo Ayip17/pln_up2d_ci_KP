@@ -18,7 +18,6 @@
             <div class="card-body">
                 <form action="<?= base_url('rekap_prk/edit/' . $rekap['ID_PRK']); ?>" method="POST">
 
-                    <!-- Hidden original ID -->
                     <input type="hidden" name="original_id" value="<?= $rekap['ID_PRK']; ?>">
 
                     <div class="row g-4">
@@ -27,8 +26,8 @@
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Jenis Anggaran</label>
                             <select name="JENIS_ANGGARAN" class="form-select modern-select" required>
-                                <option value="OPEX" <?= $rekap['JENIS_ANGGARAN'] === 'OPEX' ? 'selected' : '' ?>>OPEX</option>
-                                <option value="CAPEX" <?= $rekap['JENIS_ANGGARAN'] === 'CAPEX' ? 'selected' : '' ?>>CAPEX</option>
+                                <option value="CAPEX" <?= $rekap['JENIS_ANGGARAN'] === 'CAPEX' ? 'selected' : '' ?>>INVESTASI</option>
+                                <option value="OPEX" <?= $rekap['JENIS_ANGGARAN'] === 'OPEX' ? 'selected' : '' ?>>OPERASI</option>
                             </select>
                         </div>
 
@@ -51,19 +50,19 @@
                             <textarea name="URAIAN_PRK" class="form-control modern-input" rows="2" required><?= $rekap['URAIAN_PRK']; ?></textarea>
                         </div>
 
-                        <!-- PAGU SKK IO -->
+                        <!-- Pagu SKK IO -->
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Pagu SKK-IO</label>
                             <input type="text" name="PAGU_SKK_IO" value="<?= $rekap['PAGU_SKK_IO']; ?>" class="form-control modern-input money-input">
                         </div>
 
-                        <!-- Renc Kontrak -->
+                        <!-- Rencana Kontrak -->
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Rencana Kontrak</label>
                             <input type="text" name="RENC_KONTRAK" value="<?= $rekap['RENC_KONTRAK']; ?>" class="form-control modern-input money-input">
                         </div>
 
-                        <!-- Nodin -->
+                        <!-- NODIN -->
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">NODIN / Surat</label>
                             <input type="text" name="NODIN_SRT" value="<?= $rekap['NODIN_SRT']; ?>" class="form-control modern-input">
