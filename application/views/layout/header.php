@@ -361,6 +361,13 @@
           <?php endif; ?>
 
           <?php
+          // Menu Anggaran untuk: Admin, Pemeliharaan (Har), Fasilitas Operasi, Perencanaan, Guest (view only)
+          $role = $this->session->userdata('user_role');
+          $is_guest = $this->session->userdata('is_guest');
+          $allowed_anggaran_roles = ['admin', 'administrator', 'pemeliharaan', 'fasilitas operasi', 'perencanaan', 'guest'];
+          if ($is_guest || in_array(strtolower($role), $allowed_anggaran_roles)):
+          ?>
+          <?php
           $anggaran_active = in_array($this->uri->segment(1), ['anggaran', 'input_kontrak', 'rekomposisi', 'rekap_prk']);
           ?>
           <li class="nav-item">
@@ -421,6 +428,7 @@
               </ul>
             </div>
           </li>
+          <?php endif; ?>
 
           <!-- Account Pages -->
           <li class="nav-item mt-3">
