@@ -14,14 +14,14 @@
                 <h6 class="mb-0 d-flex align-items-center">Tabel Data Gardu Hubung</h6>
                 <div class="d-flex align-items-center" style="padding-top: 16px;">
                     <?php if (can_create()): ?>
-                        <a href="<?= base_url('Gardu_hubung/tambah') ?>" class="btn btn-sm btn-light text-primary me-2 d-flex align-items-center">
+                        <a href="<?= base_url('Gardu_hubung/tambah') ?>" class="btn btn-sm btn-light text-primary me-2 d-flex align-items-center no-anim">
                             <i class="fas fa-plus me-1"></i> Tambah
                         </a>
-                        <a href="<?= base_url('import/gardu_hubung') ?>" class="btn btn-sm btn-light text-success d-flex align-items-center">
+                        <a href="<?= base_url('import/gardu_hubung') ?>" class="btn btn-sm btn-light text-success d-flex align-items-center no-anim">
                             <i class="fas fa-file-import me-1"></i> Import
                         </a>
                     <?php endif; ?>
-                    <a href="<?= base_url('Gardu_hubung/export_csv') ?>" class="btn btn-sm btn-light text-secondary ms-2 d-flex align-items-center">
+                    <a href="<?= base_url('Gardu_hubung/export_csv') ?>" class="btn btn-sm btn-light text-secondary ms-2 d-flex align-items-center no-anim">
                         <i class="fas fa-file-csv me-1"></i> Download CSV
                     </a>
                 </div>
@@ -197,4 +197,9 @@
     #ghTable tbody tr {
         line-height: 1.15;
     }
+
+    .no-anim,
+    .no-anim * { transition: none !important; animation: none !important; transform: none !important; box-shadow: none !important; outline: none !important; }
+    .no-anim:active, .no-anim:focus, .no-anim *:active, .no-anim *:focus { transform: none !important; box-shadow: none !important; outline: none !important; }
+    .no-anim .ripple, .no-anim .waves-ripple, .no-anim .wave, .no-anim .ink { display: none !important; }
 </style>

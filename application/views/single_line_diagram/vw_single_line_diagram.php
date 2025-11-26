@@ -16,8 +16,7 @@
                 </h6>
                 <div class="d-flex align-items-center" style="padding-top: 16px;">
                     <?php if (can_create()): ?>
-                        <a href="<?= base_url('single_line_diagram/tambah') ?>"
-                            class="btn btn-sm btn-light text-primary me-2 d-flex align-items-center">
+                        <a href="<?= base_url('Single_line_diagram/tambah') ?>" class="btn btn-sm btn-light text-primary me-2 d-flex align-items-center no-anim">
                             <i class="fas fa-plus me-1"></i> Tambah
                         </a>
                     <?php endif; ?>
@@ -224,5 +223,35 @@
 
     #sldTable tbody tr {
         line-height: 1.15;
+    }
+
+    /* Disable click/hover animations for elements with .no-anim */
+    .no-anim,
+    .no-anim * {
+        transition: none !important;
+        -webkit-transition: none !important;
+        -moz-transition: none !important;
+        -o-transition: none !important;
+        animation: none !important;
+        -webkit-animation: none !important;
+        transform: none !important;
+        -webkit-transform: none !important;
+        box-shadow: none !important;
+        outline: none !important;
+    }
+    .no-anim:active,
+    .no-anim:focus,
+    .no-anim *:active,
+    .no-anim *:focus {
+        transform: none !important;
+        -webkit-transform: none !important;
+        box-shadow: none !important;
+        outline: none !important;
+    }
+    .no-anim .ripple,
+    .no-anim .waves-ripple,
+    .no-anim .wave,
+    .no-anim .ink {
+        display: none !important;
     }
 </style>
