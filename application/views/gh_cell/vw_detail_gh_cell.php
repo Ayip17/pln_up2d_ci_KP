@@ -7,28 +7,48 @@
 						<div class="card shadow border-0 rounded-4">
 							<div class="card-header bg-gradient-primary text-white text-center rounded-top-4">
 								<h6 class="mb-0 text-white">
-									<i class="fas fa-bolt me-2 text-warning"></i> Detail Pembangkit
+									<i class="fas fa-bolt me-2 text-warning"></i> Detail GH Cell
 								</h6>
 							</div>
 
 							<div class="card-body">
 								<?php
+								// Sesuaikan dengan struktur tabel gh_cell
 								$fields = [
-									'UNIT_LAYANAN' => 'Unit Layanan',
-									'PEMBANGKIT' => 'Pembangkit',
+									'CXUNIT' => 'Unit CX',
+									'UNITNAME' => 'Nama Unit',
+									'ASSETNUM' => 'Nomor Aset',
+									'SSOTNUMBER' => 'SSOT Number',
+									'LOCATION' => 'Lokasi',
+									'DESCRIPTION' => 'Deskripsi',
+									'VENDOR' => 'Vendor',
+									'MANUFACTURER' => 'Manufacturer',
+									'INSTALLDATE' => 'Tanggal Instalasi',
+									'PRIORITY' => 'Prioritas',
+									'STATUS' => 'Status',
+									'TUJDNUMBER' => 'TUJD Number',
+									'CHANGEBY' => 'Diubah Oleh',
+									'CHANGEDATE' => 'Tanggal Diubah',
+									'CXCLASSIFICATIONDESC' => 'Klasifikasi',
+									'CXPENYULANG' => 'Penyulang',
+									'NAMA_LOCATION' => 'Nama Lokasi',
 									'LONGITUDEX' => 'Longitude (X)',
 									'LATITUDEY' => 'Latitude (Y)',
-									'STATUS_OPERASI' => 'Status Operasi',
-									'INC' => 'INC',
-									'OGF' => 'OGF',
-									'SPARE' => 'Spare',
-									'COUPLE' => 'Couple',
-									'STATUS_SCADA' => 'Status SCADA',
-									'IP_GATEWAY' => 'IP Gateway',
-									'IP_RTU' => 'IP RTU',
-									'MERK_RTU' => 'Merk RTU',
-									'SN_RTU' => 'SN RTU',
-									'THN_INTEGRASI' => 'Tahun Integrasi',
+									'ISASSET' => 'Is Asset',
+									'STATUS_KEPEMILIKAN' => 'Status Kepemilikan',
+									'BURDEN' => 'Burden',
+									'FAKTOR_KALI' => 'Faktor Kali',
+									'JENIS_CT' => 'Jenis CT',
+									'KELAS_CT' => 'Kelas CT',
+									'KELAS_PROTEKSI' => 'Kelas Proteksi',
+									'PRIMER_SEKUNDER' => 'Primer / Sekunder',
+									'TIPE_CT' => 'Tipe CT',
+									'OWNERSYSID' => 'Owner Sys ID',
+									'ISOLASI_KUBIKEL' => 'Isolasi Kubikel',
+									'JENIS_MVCELL' => 'Jenis MV Cell',
+									'TH_BUAT' => 'Tahun Buat',
+									'TYPE_MVCELL' => 'Tipe MV Cell',
+									'CELL_TYPE' => 'Cell Type',
 								];
 								?>
 
@@ -37,7 +57,7 @@
 										<div class="col-md-6 mb-3">
 											<div class="detail-item">
 												<span class="label"><?= $label; ?></span>
-												<p class="value"><?= htmlspecialchars($pembangkit[$key] ?? '-'); ?></p>
+												<p class="value"><?= htmlspecialchars($gh_cell[$key] ?? '-'); ?></p>
 											</div>
 										</div>
 									<?php endforeach; ?>
@@ -45,7 +65,7 @@
 							</div>
 
 							<div class="card-footer text-center bg-light border-top">
-								<a href="<?= base_url('Pembangkit') ?>" class="btn btn-danger px-4">
+								<a href="<?= base_url('Gh_cell') ?>" class="btn btn-danger px-4">
 									<i class="fas fa-arrow-left me-1"></i> Kembali
 								</a>
 							</div>
@@ -94,14 +114,5 @@
 
 	.btn {
 		border-radius: 10px;
-	}
-
-	.btn-secondary {
-		background-color: #6c757d;
-		border: none;
-	}
-
-	.btn-secondary:hover {
-		background-color: #5a6268;
 	}
 </style>

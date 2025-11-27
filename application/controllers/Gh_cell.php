@@ -24,7 +24,7 @@ class Gh_cell extends CI_Controller
     public function index()
     {
         $data['title'] = 'Data GH Cell';
-        
+
         // Navbar data
         $data['page_title'] = 'Data GH Cell';
         $data['page_icon'] = 'fas fa-square';
@@ -33,7 +33,7 @@ class Gh_cell extends CI_Controller
         $config['base_url'] = site_url('gh_cell/index');
         $config['total_rows'] = $this->Gh_cell_model->count_all_gh_cell();
         // per_page can be overridden via query string ?per_page=10
-        $allowed = [5,10,25,50,100,500];
+        $allowed = [5, 10, 25, 50, 100, 500];
         $per_page = (int) $this->input->get('per_page') ?: 5;
         if (!in_array($per_page, $allowed)) {
             $per_page = 5;
@@ -76,12 +76,12 @@ class Gh_cell extends CI_Controller
         // Inisialisasi paginasi
         $this->pagination->initialize($config);
 
-    // Ambil data untuk halaman saat ini
-    $data['gh_cell'] = $this->Gh_cell_model->get_gh_cell($config['per_page'], $offset);
+        // Ambil data untuk halaman saat ini
+        $data['gh_cell'] = $this->Gh_cell_model->get_gh_cell($config['per_page'], $offset);
         $data['pagination'] = $this->pagination->create_links();
         $data['start_no'] = $offset + 1;
-    $data['per_page'] = $config['per_page'];
-    $data['total_rows'] = $config['total_rows'];
+        $data['per_page'] = $config['per_page'];
+        $data['total_rows'] = $config['total_rows'];
 
         $this->load->view('layout/header');
         $this->load->view('gh_cell/vw_gh_cell', $data);
@@ -217,7 +217,10 @@ class Gh_cell extends CI_Controller
     {
         $data['gh_cell'] = $this->Gh_cell_model->get_gh_cell_by_id($id);
         if (empty($data['gh_cell'])) {
-            show_404();
+            echo "<pre>Data tidak ditemukan:";
+            print_r($id);
+            print_r($data['gh_cell']);
+            exit;
         }
 
         $data['title'] = 'Detail Data GH Cell';
