@@ -486,31 +486,27 @@
   <!-- Global Script: Better Sidebar State Management -->
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Pattern untuk action buttons
+      // Pattern untuk action buttons (hanya referensi)
       const actionPatterns = ['/tambah', '/import', '/export_csv', '/export', '/download'];
 
-      // 1. Apply target="_blank" ke action buttons
-      function applyTargetBlank() {
-        const allLinks = document.querySelectorAll('a[href]');
-        allLinks.forEach(link => {
+      // HANYA set target="_blank" untuk link yang diberi class "open-new-tab"
+      function applyTargetBlankForMarkedLinks() {
+        document.querySelectorAll('a.open-new-tab[href]').forEach(link => {
           const href = link.getAttribute('href') || '';
-          const isActionButton = actionPatterns.some(pattern => href.includes(pattern));
-          if (isActionButton && !href.startsWith('javascript:') && href !== '#') {
-            if (!link.hasAttribute('target')) {
-              link.setAttribute('target', '_blank');
-              link.setAttribute('rel', 'noopener noreferrer');
-            }
+          if (!href.startsWith('javascript:') && href !== '#') {
+            link.setAttribute('target', '_blank');
+            link.setAttribute('rel', 'noopener noreferrer');
           }
         });
       }
 
-      // 2. Maintain submenu state dan highlight item yang aktif
+      // Maintain submenu state dan highlight item yang aktif
       function restoreSubmenuState() {
         // Ambil URI segment
         const currentUri = '<?= $this->uri->segment(1); ?>';
-        const uriSegment2 = '<?= $this->uri->segment(2); ?>';
+        const currentUriLower = currentUri.toLowerCase();
         
-        // Map untuk submenu - sesuaikan dengan module yang ada
+        // Map untuk submenu
         const assetModules = ['unit', 'ulp', 'gardu_induk', 'gi_cell', 'gardu_hubung', 'gh_cell', 'pembangkit', 'kit_cell', 'pemutus', 'assets'];
         const pustakaModules = ['sop', 'bpm', 'ik', 'road_map', 'spln'];
         const operasiModules = ['operasi', 'single_line_diagram'];
@@ -520,8 +516,6 @@
         let activeModuleId = null;
         
         // Tentukan submenu dan module mana yang harus aktif
-        const currentUriLower = currentUri.toLowerCase();
-        
         if (assetModules.includes(currentUriLower)) {
           activeSubmenuId = 'menuAsset';
           activeModuleId = currentUriLower;
@@ -550,40 +544,62 @@
           }
         }
 
-        // 2b. Highlight item submenu yang aktif
+        // 2b. Highlight item submenu yang aktif - IMPROVED LOGIC
         if (activeModuleId) {
           // Hapus highlight dari semua item submenu
           document.querySelectorAll('.submenu-list .nav-link').forEach(link => {
             link.classList.remove('active', 'bg-primary', 'text-white');
           });
 
-          // Hapus highlight dari menu anggaran (yang tidak di dalam submenu-list)
+          // Hapus highlight dari menu anggaran
           document.querySelectorAll('.nav.ms-4 .nav-link').forEach(link => {
             link.classList.remove('active');
           });
 
-          // Cari dan highlight item yang sesuai dengan module saat ini
           let activeItem = null;
 
-          // Cari di .submenu-list
-          activeItem = document.querySelector(
-            '.submenu-list a[href*="' + activeModuleId + '"]'
-          );
+          // ===== IMPROVED: Loop semua link di submenu dengan flexible matching =====
+          const allSubmenuLinks = document.querySelectorAll('.submenu-list a[href]');
+          for (let link of allSubmenuLinks) {
+            const href = link.getAttribute('href') || '';
+            const hrefLower = href.toLowerCase();
+            
+            // Match dengan berbagai format:
+            // 1. Exact match: /module
+            // 2. Contains match: /module/
+            // 3. Case-insensitive match
+            if (
+              hrefLower.includes('/' + activeModuleId) ||
+              hrefLower.includes('/' + activeModuleId.replace('_', '')) ||
+              hrefLower.endsWith('/' + activeModuleId)
+            ) {
+              activeItem = link;
+              break;
+            }
+          }
 
-          // Jika tidak ketemu di submenu-list, cari di menu anggaran (nav.ms-4)
+          // Jika tidak ketemu di submenu-list, cari di menu anggaran
           if (!activeItem) {
-            activeItem = document.querySelector(
-              '.nav.ms-4 a[href*="' + activeModuleId + '"]'
-            );
+            const allAnggaranLinks = document.querySelectorAll('.nav.ms-4 a[href]');
+            for (let link of allAnggaranLinks) {
+              const href = link.getAttribute('href') || '';
+              const hrefLower = href.toLowerCase();
+              
+              if (
+                hrefLower.includes('/' + activeModuleId) ||
+                hrefLower.endsWith('/' + activeModuleId)
+              ) {
+                activeItem = link;
+                break;
+              }
+            }
           }
           
+          // Tambahkan highlight ke item yang cocok
           if (activeItem) {
-            // Jika di dalam submenu-list
             if (activeItem.closest('.submenu-list')) {
               activeItem.classList.add('active', 'bg-primary', 'text-white');
-            }
-            // Jika di menu anggaran
-            else if (activeItem.closest('.nav.ms-4')) {
+            } else if (activeItem.closest('.nav.ms-4')) {
               activeItem.classList.add('active');
             }
           }
@@ -591,11 +607,11 @@
       }
 
       // Jalankan pada page load
-      applyTargetBlank();
+      applyTargetBlankForMarkedLinks();
       restoreSubmenuState();
 
-      // Observer untuk dynamic content
-      const observer = new MutationObserver(applyTargetBlank);
+      // Observer untuk re-apply pada content dinamis
+      const observer = new MutationObserver(applyTargetBlankForMarkedLinks);
       observer.observe(document.body, { childList: true, subtree: true });
     });
   </script>
