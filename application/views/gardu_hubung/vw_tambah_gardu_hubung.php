@@ -15,11 +15,28 @@
 						<!-- Fields matching database structure (same as edit form) -->
 						<div class="col-md-4">
 							<label class="form-label">UP3_2D</label>
-							<input type="text" class="form-control" name="UP3_2D">
+							<select class="form-control" name="UP3_2D">
+								<option value="" disabled selected>-- Pilih UP3_2D --</option>
+								<option value="UP2D.6456">UP2D.6456</option>
+								<option value="UP3.6411">UP3.6411</option>
+								<option value="UP3.6412">UP3.6412</option>
+								<option value="UP3.6413">UP3.6413</option>
+								<option value="UP3.6414">UP3.6414</option>
+								<option value="UP3.6415">UP3.6415</option>
+								<option value="UPT.3217">UPT.3217</option>
+							</select>
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">UNITNAME_UP3</label>
-							<input type="text" class="form-control" name="UNITNAME_UP3">
+							<select class="form-control" name="UNITNAME_UP3">
+								<option value="" disabled selected>-- Pilih UNITNAME_UP3 --</option>
+								<option value="UP2D RIAU">UP2D RIAU</option>
+								<option value="PEKANBARU">PEKANBARU</option>
+								<option value="DUMAI">DUMAI</option>
+								<option value="TANJUNG PINANG">TANJUNG PINANG</option>
+								<option value="RENGAT">RENGAT</option>
+								<option value="BANGKINANG">BANGKINANG</option>
+							</select>
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">CXUNIT</label>
@@ -28,7 +45,45 @@
 
 						<div class="col-md-4">
 							<label class="form-label">UNITNAME</label>
-							<input type="text" class="form-control" name="UNITNAME">
+							<select class="form-control" name="UNITNAME">
+								<option value="" disabled selected>-- Pilih UNITNAME --</option>
+								<option value="UP2D RIAU">UP2D RIAU</option>
+								<option value="PANAM">PANAM</option>
+								<option value="PANGKALAN KERINCI">PANGKALAN KERINCI</option>
+								<option value="PEKANBARU KOTA BARAT">PEKANBARU KOTA BARAT</option>
+								<option value="PEKANBARU KOTA TIMUR">PEKANBARU KOTA TIMUR</option>
+								<option value="PERAWANG">PERAWANG</option>
+								<option value="RUMBAI">RUMBAI</option>
+								<option value="SIAK SRI INDRAPURA">SIAK SRI INDRAPURA</option>
+								<option value="SIMPANG TIGA">SIMPANG TIGA</option>
+								<option value="BAGAN BATU">BAGAN BATU</option>
+								<option value="BAGAN SIAPI-API">BAGAN SIAPI-API</option>
+								<option value="BENGKALIS">BENGKALIS</option>
+								<option value="DUMAI KOTA">DUMAI KOTA</option>
+								<option value="DURI">DURI</option>
+								<option value="SELATPANJANG">SELATPANJANG</option>
+								<option value="ANAMBAS">ANAMBAS</option>
+								<option value="BELAKANGPADANG">BELAKANGPADANG</option>
+								<option value="BINTAN CENTER">BINTAN CENTER</option>
+								<option value="DABO SINGKEP">DABO SINGKEP</option>
+								<option value="KIJANG">KIJANG</option>
+								<option value="RANAI">RANAI</option>
+								<option value="TANJUNG BALAI KARIMUN">TANJUNG BALAI KARIMUN</option>
+								<option value="TANJUNG BATU">TANJUNG BATU</option>
+								<option value="TANJUNG UBAN">TANJUNG UBAN</option>
+								<option value="TANJUNGPINANG KOTA">TANJUNGPINANG KOTA</option>
+								<option value="AIR MOLEK">AIR MOLEK</option>
+								<option value="KUALA ENOK">KUALA ENOK</option>
+								<option value="RENGAT">RENGAT</option>
+								<option value="RENGAT KOTA">RENGAT KOTA</option>
+								<option value="TALUK KUANTAN">TALUK KUANTAN</option>
+								<option value="TEMBILAHAN">TEMBILAHAN</option>
+								<option value="BANGKINANG">BANGKINANG</option>
+								<option value="KAMPAR">KAMPAR</option>
+								<option value="LIPAT KAIN">LIPAT KAIN</option>
+								<option value="PASIR PANGARAIAN">PASIR PANGARAIAN</option>
+								<option value="UJUNG BATU">UJUNG BATU</option>
+							</select>
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">LOCATION</label>
@@ -45,7 +100,13 @@
 						</div>
 						<div class="col-md-6">
 							<label class="form-label">STATUS</label>
-							<input type="text" class="form-control" name="STATUS">
+							<select class="form-control" name="STATUS">
+								<option value="" disabled selected>-- Pilih STATUS --</option>
+								<option value="OPERATING">OPERATING</option>
+								<option value="INACTIVE">INACTIVE</option>
+								<option value="NOT READY">NOT READY</option>
+								<option value="REQOPERATING">REQOPERATING</option>
+							</select>
 						</div>
 
 						<div class="col-md-4">
@@ -125,7 +186,11 @@
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">STATUS_KEPEMILIKAN</label>
-							<input type="text" class="form-control" name="STATUS_KEPEMILIKAN">
+							<select class="form-control" name="STATUS_KEPEMILIKAN">
+								<option value="" disabled selected>-- Pilih STATUS_KEPEMILIKAN --</option>
+								<option value="PLN">PLN</option>
+								<option value="NON PLN">NON PLN</option>
+							</select>
 						</div>
 
 						<div class="col-md-4">
@@ -134,7 +199,13 @@
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">JENIS_PELAYANAN</label>
-							<input type="text" class="form-control" name="JENIS_PELAYANAN">
+							<select class="form-control" name="JENIS_PELAYANAN">
+								<option value="" disabled selected>-- Pilih JENIS_PELAYANAN --</option>
+								<option value="Umum">Umum</option>
+								<option value="Campuran">Campuran</option>
+								<option value="Distribusi">Distribusi</option>
+								<option value="Khusus">Khusus</option>
+							</select>
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">NO_SLO</label>
@@ -151,7 +222,11 @@
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">STATUS_RC</label>
-							<input type="text" class="form-control" name="STATUS_RC">
+							<select class="form-control" name="STATUS_RC">
+								<option value="" disabled selected>-- Pilih STATUS_RC --</option>
+								<option value="ADA">ADA</option>
+								<option value="TIDAK ADA">TIDAK ADA</option>
+							</select>
 						</div>
 
 						<div class="col-md-6">

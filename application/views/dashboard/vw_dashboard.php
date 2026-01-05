@@ -1,7 +1,8 @@
 <main class="main-content position-relative border-radius-lg ">
     <?php $this->load->view('layout/navbar'); ?>
-     
+
     <div class="container-fluid py-4">
+
         <!-- Login counter widget (separate from notifications) -->
         <div class="row mb-3">
             <div class="col-12 col-md-6 col-lg-5">
@@ -18,8 +19,7 @@
                                             <path d="M3 3v18a2 2 0 0 0 2 2h8" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
                                         </svg>
                                     </div>
-                                    <?php if (isset($user_role) && $user_role): 
-                                        // Determine badge color based on role
+                                    <?php if (isset($user_role) && $user_role):
                                         $badge_color = 'bg-gradient-secondary';
                                         $role_lower = strtolower($user_role);
                                         if (strpos($role_lower, 'admin') !== false) {
@@ -63,125 +63,243 @@
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-                <div class="card">
-                    <div class="card-body p-3">
-                        <div class="row">
-                            <div class="col-8">
-                                <div class="numbers">
-                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Today's Money</p>
-                                    <h5 class="font-weight-bolder">
-                                        $53,000
-                                    </h5>
-                                    <p class="mb-0">
-                                        <span class="text-success text-sm font-weight-bolder">+55%</span>
-                                        since yesterday
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="col-4 text-end">
-                                <div class="icon icon-shape bg-gradient-primary shadow-primary text-center rounded-circle">
-                                    <i class="ni ni-money-coins text-lg opacity-10" aria-hidden="true"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-                <div class="card">
-                    <div class="card-body p-3">
-                        <div class="row">
-                            <div class="col-8">
-                                <div class="numbers">
-                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Today's Users</p>
-                                    <h5 class="font-weight-bolder">
-                                        2,300
-                                    </h5>
-                                    <p class="mb-0">
-                                        <span class="text-success text-sm font-weight-bolder">+3%</span>
-                                        since last week
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="col-4 text-end">
-                                <div class="icon icon-shape bg-gradient-danger shadow-danger text-center rounded-circle">
-                                    <i class="ni ni-world text-lg opacity-10" aria-hidden="true"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-                <div class="card">
-                    <div class="card-body p-3">
-                        <div class="row">
-                            <div class="col-8">
-                                <div class="numbers">
-                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">New Clients</p>
-                                    <h5 class="font-weight-bolder">
-                                        +3,462
-                                    </h5>
-                                    <p class="mb-0">
-                                        <span class="text-danger text-sm font-weight-bolder">-2%</span>
-                                        since last quarter
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="col-4 text-end">
-                                <div class="icon icon-shape bg-gradient-success shadow-success text-center rounded-circle">
-                                    <i class="ni ni-paper-diploma text-lg opacity-10" aria-hidden="true"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-3 col-sm-6">
-                <div class="card">
-                    <div class="card-body p-3">
-                        <div class="row">
-                            <div class="col-8">
-                                <div class="numbers">
-                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Sales</p>
-                                    <h5 class="font-weight-bolder">
-                                        $103,430
-                                    </h5>
-                                    <p class="mb-0">
-                                        <span class="text-success text-sm font-weight-bolder">+5%</span> than last month
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="col-4 text-end">
-                                <div class="icon icon-shape bg-gradient-warning shadow-warning text-center rounded-circle">
-                                    <i class="ni ni-cart text-lg opacity-10" aria-hidden="true"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- Sales overview -->
-        <div class="row mt-4">
-            <div class="col-lg-7 mb-lg-0 mb-4">
-                <div class="card z-index-2 h-100">
-                    <div class="card-header pb-0 pt-3 bg-transparent">
-                        <h6 class="text-capitalize">Sales overview</h6>
-                        <p class="text-sm mb-0">
-                            <i class="fa fa-arrow-up text-success"></i>
-                            <span class="font-weight-bold">4% more</span> in 2021
-                        </p>
+        <?php
+        /**
+         * VIEW ONLY
+         * - Terbayar tidak dibuat kartu terpisah (karena sudah representasi Realisasi Bayar)
+         * - KPI dibuat pas untuk desktop (tidak ada baris "nyisa" di bawah)
+         * - AO/AI tetap 1 card (AI atas, AO bawah) dengan bubble ukuran ideal
+         */
+
+        // Fallback aman jika controller belum kirim variabel AO/AI
+        $terkontrak_ai    = isset($terkontrak_ai) ? (float)$terkontrak_ai : null;
+        $terkontrak_ao    = isset($terkontrak_ao) ? (float)$terkontrak_ao : null;
+
+        $real_bayar_ai    = isset($real_bayar_ai) ? (float)$real_bayar_ai : null;
+        $real_bayar_ao    = isset($real_bayar_ao) ? (float)$real_bayar_ao : null;
+
+        $rencana_bayar_ai = isset($rencana_bayar_ai) ? (float)$rencana_bayar_ai : null;
+        $rencana_bayar_ao = isset($rencana_bayar_ao) ? (float)$rencana_bayar_ao : null;
+
+        $sisa_anggaran_ai = isset($sisa_anggaran_ai) ? (float)$sisa_anggaran_ai : null;
+        $sisa_anggaran_ao = isset($sisa_anggaran_ao) ? (float)$sisa_anggaran_ao : null;
+
+        // Chart AO/AI (kalau belum ada, array kosong)
+        $chart_labels_local = isset($chart_labels) ? $chart_labels : ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+        $chart_values_ao    = isset($chart_values_ao) ? $chart_values_ao : [];
+        $chart_values_ai    = isset($chart_values_ai) ? $chart_values_ai : [];
+
+        function rupiah_or_dash($val) {
+            if ($val === null) return '—';
+            return 'Rp ' . number_format((float)$val, 0, ',', '.');
+        }
+        ?>
+
+        <!-- ===== KPI GRID: dibuat 5 kartu saja supaya desktop rapih (tidak ada nyisa baris) ===== -->
+        <div class="row kpi-grid-row">
+
+            <!-- TERKONTRAK (AI/AO) -->
+            <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+                <div class="card kpi-ideal">
+                    <div class="card-body kpi-body">
+                        <div class="kpi-head">
+                            <div>
+                                <div class="kpi-title">TERKONTRAK</div>
+                                <div class="kpi-sub">AI / AO</div>
+                            </div>
+                            <div class="kpi-ic bg-gradient-primary">
+                                <i class="ni ni-money-coins"></i>
+                            </div>
+                        </div>
+
+                        <div class="kpi-duo">
+                            <div class="kpi-line">
+                                <span class="kpi-badge badge-ai">AI</span>
+                                <span class="kpi-val"><?= rupiah_or_dash($terkontrak_ai); ?></span>
+                            </div>
+                            <div class="kpi-cut"></div>
+                            <div class="kpi-line">
+                                <span class="kpi-badge badge-ao">AO</span>
+                                <span class="kpi-val"><?= rupiah_or_dash($terkontrak_ao); ?></span>
+                            </div>
+                        </div>
+
+                        <div class="kpi-footnote">AI=Investasi, AO=Operasi</div>
                     </div>
-                    <div class="card-body p-3">
-                        <div class="chart">
-                            <canvas id="chart-line" class="chart-canvas" height="300"></canvas>
+                </div>
+            </div>
+
+            <!-- PRK AKTIF (gabungan) -->
+            <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+                <div class="card kpi-ideal">
+                    <div class="card-body kpi-body">
+                        <div class="kpi-head">
+                            <div>
+                                <div class="kpi-title">PRK AKTIF</div>
+                                <div class="kpi-sub">gabungan</div>
+                            </div>
+                            <div class="kpi-ic bg-gradient-info">
+                                <i class="ni ni-collection"></i>
+                            </div>
+                        </div>
+
+                        <div class="kpi-big">
+                            <?= number_format((int)($prk_aktif ?? 0), 0, ',', '.'); ?>
+                        </div>
+
+                        <div class="kpi-footnote">kontrak / rencana / realisasi</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REALISASI BAYAR (AI/AO) -->
+            <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+                <div class="card kpi-ideal">
+                    <div class="card-body kpi-body">
+                        <div class="kpi-head">
+                            <div>
+                                <div class="kpi-title">REALISASI BAYAR</div>
+                                <div class="kpi-sub">AI / AO</div>
+                            </div>
+                            <div class="kpi-ic bg-gradient-success">
+                                <i class="ni ni-check-bold"></i>
+                            </div>
+                        </div>
+
+                        <div class="kpi-duo">
+                            <div class="kpi-line">
+                                <span class="kpi-badge badge-ai">AI</span>
+                                <span class="kpi-val"><?= rupiah_or_dash($real_bayar_ai); ?></span>
+                            </div>
+                            <div class="kpi-cut"></div>
+                            <div class="kpi-line">
+                                <span class="kpi-badge badge-ao">AO</span>
+                                <span class="kpi-val"><?= rupiah_or_dash($real_bayar_ao); ?></span>
+                            </div>
+                        </div>
+
+                        <div class="kpi-footnote">menggantikan “Terbayar”</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RENCANA BAYAR (AI/AO) -->
+            <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
+                <div class="card kpi-ideal">
+                    <div class="card-body kpi-body">
+                        <div class="kpi-head">
+                            <div>
+                                <div class="kpi-title">RENCANA BAYAR</div>
+                                <div class="kpi-sub">AI / AO</div>
+                            </div>
+                            <div class="kpi-ic bg-gradient-warning">
+                                <i class="ni ni-time-alarm"></i>
+                            </div>
+                        </div>
+
+                        <div class="kpi-duo">
+                            <div class="kpi-line">
+                                <span class="kpi-badge badge-ai">AI</span>
+                                <span class="kpi-val"><?= rupiah_or_dash($rencana_bayar_ai); ?></span>
+                            </div>
+                            <div class="kpi-cut"></div>
+                            <div class="kpi-line">
+                                <span class="kpi-badge badge-ao">AO</span>
+                                <span class="kpi-val"><?= rupiah_or_dash($rencana_bayar_ao); ?></span>
+                            </div>
+                        </div>
+
+                        <div class="kpi-footnote">plan pembayaran tahun ini</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SISA ANGGARAN (AI/AO) -->
+            <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
+                <div class="card kpi-ideal">
+                    <div class="card-body kpi-body">
+                        <div class="kpi-head">
+                            <div>
+                                <div class="kpi-title">SISA ANGGARAN</div>
+                                <div class="kpi-sub">AI / AO</div>
+                            </div>
+                            <div class="kpi-ic bg-gradient-danger">
+                                <i class="ni ni-chart-bar-32"></i>
+                            </div>
+                        </div>
+
+                        <div class="kpi-duo">
+                            <div class="kpi-line">
+                                <span class="kpi-badge badge-ai">AI</span>
+                                <span class="kpi-val"><?= rupiah_or_dash($sisa_anggaran_ai); ?></span>
+                            </div>
+                            <div class="kpi-cut"></div>
+                            <div class="kpi-line">
+                                <span class="kpi-badge badge-ao">AO</span>
+                                <span class="kpi-val"><?= rupiah_or_dash($sisa_anggaran_ao); ?></span>
+                            </div>
+                        </div>
+
+                        <div class="kpi-footnote">sisa dari pagu - terpakai</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- ===== END KPI GRID ===== -->
+
+        <!-- ====== GRAFIK: 2 CARD (AO & AI) + CAROUSEL tetap ====== -->
+        <div class="row mt-1">
+
+            <div class="col-lg-7 mb-lg-0 mb-4">
+
+                <div class="row">
+                    <div class="col-12 mb-4">
+                        <div class="card z-index-2 chart-ideal">
+                            <div class="card-header pb-0 pt-3 bg-transparent">
+                                <h6 class="text-capitalize mb-1">Sales overview - AO</h6>
+                                <p class="text-sm mb-0">
+                                    <i class="fa fa-arrow-up text-success"></i>
+                                    <span class="font-weight-bold">TERBAYAR AO</span>
+                                </p>
+                            </div>
+                            <div class="card-body p-3">
+                                <div class="chart">
+                                    <canvas id="chart-line-ao" class="chart-canvas" height="210"></canvas>
+                                </div>
+                                <?php if (empty($chart_values_ao)): ?>
+                                    <p class="text-xs text-muted mb-0 mt-2">
+                                        Data chart AO belum tersedia (belum ada <code>$chart_values_ao</code> dari controller).
+                                    </p>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="card z-index-2 chart-ideal">
+                            <div class="card-header pb-0 pt-3 bg-transparent">
+                                <h6 class="text-capitalize mb-1">Sales overview - AI</h6>
+                                <p class="text-sm mb-0">
+                                    <i class="fa fa-arrow-up text-success"></i>
+                                    <span class="font-weight-bold">TERBAYAR AI</span>
+                                </p>
+                            </div>
+                            <div class="card-body p-3">
+                                <div class="chart">
+                                    <canvas id="chart-line-ai" class="chart-canvas" height="210"></canvas>
+                                </div>
+                                <?php if (empty($chart_values_ai)): ?>
+                                    <p class="text-xs text-muted mb-0 mt-2">
+                                        Data chart AI belum tersedia (belum ada <code>$chart_values_ai</code> dari controller).
+                                    </p>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     </div>
                 </div>
+
             </div>
 
             <!-- Slide Show -->
@@ -194,36 +312,26 @@
                                     <div class="icon icon-shape icon-sm bg-white text-center border-radius-md mb-3" style="width:25px; height:25px; line-height:25px;">
                                         <i class="ni ni-camera-compact text-dark opacity-10" style="font-size:12px;"></i>
                                     </div>
-                                    <!-- <h5 class="text-white mb-1">Get started with Argon</h5>
-                                      <p>There's nothing I really wanted to do in life that I wasn't able to get good at.</p> -->
                                 </div>
                             </div>
 
                             <div class="carousel-item h-100" style="background-image: url('assets/assets/img/Pln_stop_listrik_ilegal.png'); background-size: cover;">
                                 <div class="carousel-caption d-none d-md-block bottom-0 text-start start-0 ms-5">
                                     <div class="icon icon-shape bg-white border-radius-md mb-3"
-                                        style=" width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; line-height: 0; /* penting untuk hilangkan offset bawaan */">
-                                        <!-- <i class="ni ni-bulb-61 text-dark opacity-10" style="font-size: 14px; margin: 0; padding: 0;"></i> -->
+                                        style=" width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; line-height: 0; ">
                                         <i class="ni ni-bulb-61 text-dark opacity-10"
                                             style="font-size: 14px; margin: 0; padding: 0; position: relative; top: -1px;"></i>
                                     </div>
-                                    <!-- <h5 class="text-white mb-1">Faster way to create web pages</h5>
-                                      <p>That's my skill. I'm not really specifically talented at anything except for the ability to learn.</p> -->
                                 </div>
                             </div>
 
                             <div class="carousel-item h-100" style="background-image: url('assets/assets/img/penertiban.png'); background-size: cover;">
                                 <div class="carousel-caption d-none d-md-block bottom-0 text-start start-0 ms-5">
-
                                     <div class="icon icon-shape bg-white border-radius-md mb-3"
-                                        style="width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; line-height: 1; padding-top: 1px; /* sedikit menaikkan ikon agar sejajar */">
+                                        style="width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; line-height: 1; padding-top: 1px;">
                                         <i class="ni ni-trophy text-dark opacity-10"
                                             style="font-size: 14px; margin: 0; padding: 0; position: relative; top: -1px;"></i>
                                     </div>
-
-                                    <!-- <h5 class="text-white mb-1">Share with us your design tips!</h5>
-                                      <p>Don't be afraid to be wrong because you can't learn anything from a compliment.</p> -->
-
                                 </div>
                             </div>
                         </div>
@@ -240,230 +348,223 @@
             </div>
         </div>
 
-        <!-- Sales by Country -->
+        <!-- Script Chart (AO + AI) -->
+        <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            if (typeof Chart === "undefined") return;
+
+            const labels   = <?= json_encode($chart_labels_local ?? []); ?>;
+            const valuesAO = <?= json_encode($chart_values_ao ?? []); ?>;
+            const valuesAI = <?= json_encode($chart_values_ai ?? []); ?>;
+
+            const elAO = document.getElementById("chart-line-ao");
+            if (elAO && valuesAO.length) {
+                new Chart(elAO, {
+                    type: "line",
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: "TERBAYAR AO",
+                            data: valuesAO,
+                            tension: 0.35
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { y: { beginAtZero: true } }
+                    }
+                });
+            }
+
+            const elAI = document.getElementById("chart-line-ai");
+            if (elAI && valuesAI.length) {
+                new Chart(elAI, {
+                    type: "line",
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: "TERBAYAR AI",
+                            data: valuesAI,
+                            tension: 0.35
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { y: { beginAtZero: true } }
+                    }
+                });
+            }
+        });
+        </script>
+
+        <!-- ====== Rekap Anggaran per Jenis (tetap) ====== -->
         <div class="row mt-4">
             <div class="col-lg-7 mb-lg-0 mb-4">
-                <div class="card ">
+                <div class="card">
                     <div class="card-header pb-0 p-3">
                         <div class="d-flex justify-content-between">
-                            <h6 class="mb-2">Sales by Country</h6>
+                            <h6 class="mb-2">Rekap Anggaran per Jenis</h6>
                         </div>
                     </div>
                     <div class="table-responsive">
-                        <table class="table align-items-center ">
+                        <table class="table align-items-center">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Jenis Anggaran</th>
+                                    <th class="text-end">Pagu</th>
+                                    <th class="text-end">Terkontrak</th>
+                                    <th class="text-end">Terbayar</th>
+                                    <th class="text-end">Sisa</th>
+                                </tr>
+                            </thead>
                             <tbody>
-                                <tr>
-                                    <td class="w-30">
-                                        <div class="d-flex px-2 py-1 align-items-center">
-                                            <div>
-                                                <img src="<?= base_url('assets/assets/img/icons/flags/US.png'); ?>" alt="Country flag">
-                                            </div>
-                                            <div class="ms-4">
-                                                <p class="text-xs font-weight-bold mb-0">Country:</p>
-                                                <h6 class="text-sm mb-0">United States</h6>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="text-center">
-                                            <p class="text-xs font-weight-bold mb-0">Sales:</p>
-                                            <h6 class="text-sm mb-0">2500</h6>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="text-center">
-                                            <p class="text-xs font-weight-bold mb-0">Value:</p>
-                                            <h6 class="text-sm mb-0">$230,900</h6>
-                                        </div>
-                                    </td>
-                                    <td class="align-middle text-sm">
-                                        <div class="col text-center">
-                                            <p class="text-xs font-weight-bold mb-0">Bounce:</p>
-                                            <h6 class="text-sm mb-0">29.9%</h6>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="w-30">
-                                        <div class="d-flex px-2 py-1 align-items-center">
-                                            <div>
-                                                <img src="<?= base_url('assets/assets/img/icons/flags/DE.png'); ?>" alt="Country flag">
-                                            </div>
-                                            <div class="ms-4">
-                                                <p class="text-xs font-weight-bold mb-0">Country:</p>
-                                                <h6 class="text-sm mb-0">Germany</h6>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="text-center">
-                                            <p class="text-xs font-weight-bold mb-0">Sales:</p>
-                                            <h6 class="text-sm mb-0">3.900</h6>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="text-center">
-                                            <p class="text-xs font-weight-bold mb-0">Value:</p>
-                                            <h6 class="text-sm mb-0">$440,000</h6>
-                                        </div>
-                                    </td>
-                                    <td class="align-middle text-sm">
-                                        <div class="col text-center">
-                                            <p class="text-xs font-weight-bold mb-0">Bounce:</p>
-                                            <h6 class="text-sm mb-0">40.22%</h6>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="w-30">
-                                        <div class="d-flex px-2 py-1 align-items-center">
-                                            <div>
-                                                <img src="<?= base_url('assets/assets/img/icons/flags/GB.png'); ?>" alt="Country flag">
-                                            </div>
-                                            <div class="ms-4">
-                                                <p class="text-xs font-weight-bold mb-0">Country:</p>
-                                                <h6 class="text-sm mb-0">Great Britain</h6>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="text-center">
-                                            <p class="text-xs font-weight-bold mb-0">Sales:</p>
-                                            <h6 class="text-sm mb-0">1.400</h6>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="text-center">
-                                            <p class="text-xs font-weight-bold mb-0">Value:</p>
-                                            <h6 class="text-sm mb-0">$190,700</h6>
-                                        </div>
-                                    </td>
-                                    <td class="align-middle text-sm">
-                                        <div class="col text-center">
-                                            <p class="text-xs font-weight-bold mb-0">Bounce:</p>
-                                            <h6 class="text-sm mb-0">23.44%</h6>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="w-30">
-                                        <div class="d-flex px-2 py-1 align-items-center">
-                                            <div>
-                                                <img src="<?= base_url('assets/assets/img/icons/flags/BR.png'); ?>" alt="Country flag">
-                                            </div>
-                                            <div class="ms-4">
-                                                <p class="text-xs font-weight-bold mb-0">Country:</p>
-                                                <h6 class="text-sm mb-0">Brasil</h6>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="text-center">
-                                            <p class="text-xs font-weight-bold mb-0">Sales:</p>
-                                            <h6 class="text-sm mb-0">562</h6>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="text-center">
-                                            <p class="text-xs font-weight-bold mb-0">Value:</p>
-                                            <h6 class="text-sm mb-0">$143,960</h6>
-                                        </div>
-                                    </td>
-                                    <td class="align-middle text-sm">
-                                        <div class="col text-center">
-                                            <p class="text-xs font-weight-bold mb-0">Bounce:</p>
-                                            <h6 class="text-sm mb-0">32.14%</h6>
-                                        </div>
-                                    </td>
-                                </tr>
+                                <?php if (!empty($rekap_anggaran)): ?>
+                                    <?php foreach ($rekap_anggaran as $r): ?>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex px-2 py-1 align-items-center">
+                                                    <div class="icon icon-shape bg-gradient-primary shadow-primary text-center rounded-circle"
+                                                         style="width: 28px; height: 28px;">
+                                                        <i class="ni ni-money-coins text-white opacity-10" aria-hidden="true" style="font-size: 14px;"></i>
+                                                    </div>
+                                                    <div class="ms-3">
+                                                        <p class="text-xs font-weight-bold mb-0">Jenis:</p>
+                                                        <h6 class="text-sm mb-0"><?php echo strtoupper(htmlspecialchars($r['jenis_anggaran'] ?? '—')); ?></h6>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-end">
+                                                <p class="text-xs font-weight-bold mb-0">Pagu</p>
+                                                <h6 class="text-sm mb-0">
+                                                    Rp <?php echo number_format((float)($r['pagu'] ?? 0), 0, ',', '.'); ?>
+                                                </h6>
+                                            </td>
+                                            <td class="text-end">
+                                                <p class="text-xs font-weight-bold mb-0">Terkontrak</p>
+                                                <h6 class="text-sm mb-0">
+                                                    Rp <?php echo number_format((float)($r['terkontrak'] ?? 0), 0, ',', '.'); ?>
+                                                </h6>
+                                            </td>
+                                            <td class="text-end">
+                                                <p class="text-xs font-weight-bold mb-0">Terbayar</p>
+                                                <h6 class="text-sm mb-0">
+                                                    Rp <?php echo number_format((float)($r['terbayar'] ?? 0), 0, ',', '.'); ?>
+                                                </h6>
+                                            </td>
+                                            <td class="text-end">
+                                                <p class="text-xs font-weight-bold mb-0">Sisa</p>
+                                                <h6 class="text-sm mb-0">
+                                                    Rp <?php echo number_format((float)($r['sisa'] ?? 0), 0, ',', '.'); ?>
+                                                </h6>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted py-5">
+                                            <i class="ni ni-chart-bar-32 text-muted" style="font-size: 48px;"></i>
+                                            <p class="mt-3">Belum ada data rekap dari vw_rkp_prk</p>
+                                        </td>
+                                    </tr>
+                                <?php endif; ?>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- CATEGORIES -->
+            <!-- ====== Riwayat Aktivitas (tetap) ====== -->
             <div class="col-lg-5">
                 <div class="card">
-                    <div class="card-header pb-0 p-3">
-                        <h6 class="mb-0">Categories</h6>
+                    <div class="card-header pb-0 p-3 d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">Riwayat Aktivitas</h6>
+                        <a href="<?= base_url('Notifikasi'); ?>" class="btn btn-sm btn-outline-primary mb-0">
+                            Lihat Semua
+                        </a>
                     </div>
+
                     <div class="card-body p-3">
-                        <ul class="list-group">
+                        <?php if (!empty($riwayat_aktivitas)): ?>
 
-                            <!-- Devices -->
-                            <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
-                                <div class="d-flex align-items-center">
-                                    <div class="icon bg-gradient-dark shadow text-center d-flex align-items-center justify-content-center me-3"
-                                        style="width: 25px; height: 25px; border-radius: 50%;">
-                                        <i class="ni ni-mobile-button text-white opacity-10" style="font-size: 12px;"></i>
-                                    </div>
-                                    <div class="d-flex flex-column">
-                                        <h6 class="mb-1 text-dark text-sm">Devices</h6>
-                                        <span class="text-xs">250 in stock, <span class="font-weight-bold">346+ sold</span></span>
-                                    </div>
-                                </div>
-                                <button class="btn btn-link btn-icon-only btn-rounded btn-sm text-dark icon-move-right my-auto">
-                                    <i class="ni ni-bold-right" aria-hidden="true"></i>
-                                </button>
-                            </li>
+                            <div class="activity-scroll">
+                                <ul class="list-group">
+                                    <?php foreach ($riwayat_aktivitas as $n): ?>
+                                        <?php
+                                            $jenis = strtolower($n['jenis_aktivitas'] ?? '');
+                                            $icon = 'ni ni-bell-55';
+                                            $badge = 'bg-dark';
+                                            $badgeText = ucfirst($jenis);
 
-                            <!-- Tickets -->
-                            <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
-                                <div class="d-flex align-items-center">
-                                    <div class="icon bg-gradient-dark shadow text-center d-flex align-items-center justify-content-center me-3"
-                                        style="width: 25px; height: 25px; border-radius: 50%;">
-                                        <i class="ni ni-tag text-white opacity-10" style="font-size: 12px;"></i>
-                                    </div>
-                                    <div class="d-flex flex-column">
-                                        <h6 class="mb-1 text-dark text-sm">Tickets</h6>
-                                        <span class="text-xs">123 closed, <span class="font-weight-bold">15 open</span></span>
-                                    </div>
-                                </div>
-                                <button class="btn btn-link btn-icon-only btn-rounded btn-sm text-dark icon-move-right my-auto">
-                                    <i class="ni ni-bold-right" aria-hidden="true"></i>
-                                </button>
-                            </li>
+                                            if ($jenis === 'login') { $icon = 'ni ni-check-bold'; $badge = 'bg-success'; $badgeText = 'Login'; }
+                                            else if ($jenis === 'logout') { $icon = 'ni ni-button-power'; $badge = 'bg-secondary'; $badgeText = 'Logout'; }
+                                            else if ($jenis === 'create') { $icon = 'ni ni-fat-add'; $badge = 'bg-success'; $badgeText = 'Tambah'; }
+                                            else if ($jenis === 'update') { $icon = 'ni ni-settings'; $badge = 'bg-warning text-dark'; $badgeText = 'Edit'; }
+                                            else if ($jenis === 'delete') { $icon = 'ni ni-fat-remove'; $badge = 'bg-danger'; $badgeText = 'Hapus'; }
+                                            else if ($jenis === 'import') { $icon = 'ni ni-cloud-upload-96'; $badge = 'bg-info'; $badgeText = 'Import'; }
 
-                            <!-- Error Logs -->
-                            <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
-                                <div class="d-flex align-items-center">
-                                    <div class="icon bg-gradient-dark shadow text-center d-flex align-items-center justify-content-center me-3"
-                                        style="width: 25px; height: 25px; border-radius: 50%;">
-                                        <i class="ni ni-box-2 text-white opacity-10" style="font-size: 12px;"></i>
-                                    </div>
-                                    <div class="d-flex flex-column">
-                                        <h6 class="mb-1 text-dark text-sm">Error logs</h6>
-                                        <span class="text-xs">1 is active, <span class="font-weight-bold">40 closed</span></span>
-                                    </div>
-                                </div>
-                                <button class="btn btn-link btn-icon-only btn-rounded btn-sm text-dark icon-move-right my-auto">
-                                    <i class="ni ni-bold-right" aria-hidden="true"></i>
-                                </button>
-                            </li>
+                                            $timeText = (!empty($n['tanggal_waktu'])) ? date('d M Y H:i', strtotime($n['tanggal_waktu'])) : '—';
+                                            $emailText = htmlspecialchars($n['email'] ?? '—');
+                                            $roleText = htmlspecialchars($n['role'] ?? '—');
+                                            $descText = htmlspecialchars($n['deskripsi'] ?? '—');
 
-                            <!-- Happy Users -->
-                            <li class="list-group-item border-0 d-flex justify-content-between ps-0 border-radius-lg">
-                                <div class="d-flex align-items-center">
-                                    <div class="icon bg-gradient-dark shadow text-center d-flex align-items-center justify-content-center me-3"
-                                        style="width: 25px; height: 25px; border-radius: 50%;">
-                                        <i class="ni ni-satisfied text-white opacity-10" style="font-size: 12px;"></i>
-                                    </div>
-                                    <div class="d-flex flex-column">
-                                        <h6 class="mb-1 text-dark text-sm">Happy users</h6>
-                                        <span class="text-xs font-weight-bold">+ 430</span>
-                                    </div>
-                                </div>
-                                <button class="btn btn-link btn-icon-only btn-rounded btn-sm text-dark icon-move-right my-auto">
-                                    <i class="ni ni-bold-right" aria-hidden="true"></i>
-                                </button>
-                            </li>
+                                            $link = '';
+                                            if (!empty($n['module']) && !empty($n['record_id']) && $jenis !== 'delete') {
+                                                $link = base_url('Notifikasi/read/' . $n['id']);
+                                            }
+                                        ?>
 
-                        </ul>
+                                        <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
+                                            <div class="d-flex align-items-center">
+                                                <div class="icon bg-gradient-dark shadow text-center d-flex align-items-center justify-content-center me-3"
+                                                    style="width: 28px; height: 28px; border-radius: 50%;">
+                                                    <i class="<?= $icon; ?> text-white opacity-10" style="font-size: 12px;"></i>
+                                                </div>
+
+                                                <div class="d-flex flex-column">
+                                                    <h6 class="mb-1 text-dark text-sm">
+                                                        <?= $emailText; ?>
+                                                        <span class="badge bg-info text-white ms-1" style="font-size:10px;">
+                                                            <?= $roleText; ?>
+                                                        </span>
+                                                        <span class="badge <?= $badge; ?> ms-1" style="font-size:10px;">
+                                                            <?= $badgeText; ?>
+                                                        </span>
+                                                    </h6>
+
+                                                    <?php if (!empty($link)): ?>
+                                                        <a href="<?= $link; ?>" class="text-xs text-primary text-decoration-none">
+                                                            <?= $descText; ?>
+                                                            <i class="ni ni-bold-right ms-1"></i>
+                                                        </a>
+                                                    <?php else: ?>
+                                                        <span class="text-xs"><?= $descText; ?></span>
+                                                    <?php endif; ?>
+
+                                                    <span class="text-xs text-muted"><?= $timeText; ?></span>
+                                                </div>
+                                            </div>
+
+                                            <button class="btn btn-link btn-icon-only btn-rounded btn-sm text-dark icon-move-right my-auto">
+                                                <i class="ni ni-bold-right" aria-hidden="true"></i>
+                                            </button>
+                                        </li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            </div>
+
+                        <?php else: ?>
+                            <div class="text-center text-muted py-5">
+                                <i class="ni ni-notification-70 text-muted" style="font-size: 48px;"></i>
+                                <p class="mt-3">Belum ada aktivitas terbaru</p>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
         </div>
+
     </div>
 
     <!-- Modal: Login Activity Monitor (Admin Only) -->
@@ -477,7 +578,6 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <!-- Role Selector -->
                     <div class="mb-3">
                         <label for="roleSelector" class="form-label">Select Role:</label>
                         <select class="form-select" id="roleSelector">
@@ -491,7 +591,6 @@
                         </select>
                     </div>
 
-                    <!-- Loading Spinner -->
                     <div id="loadingSpinner" class="text-center my-4" style="display:none;">
                         <div class="spinner-border text-primary" role="status">
                             <span class="visually-hidden">Loading...</span>
@@ -499,7 +598,6 @@
                         <p class="mt-2">Loading data...</p>
                     </div>
 
-                    <!-- Summary View (All Roles) -->
                     <div id="summaryView" style="display:none;">
                         <h6 class="mb-3" style="font-size: 0.95rem;">Login Summary by Role</h6>
                         <div class="table-responsive">
@@ -512,14 +610,11 @@
                                         <th style="width: 29%;">Latest</th>
                                     </tr>
                                 </thead>
-                                <tbody id="summaryTableBody">
-                                    <!-- Populated by JavaScript -->
-                                </tbody>
+                                <tbody id="summaryTableBody"></tbody>
                             </table>
                         </div>
                     </div>
 
-                    <!-- Detail View (Specific Role) -->
                     <div id="detailView" style="display:none;">
                         <h6 class="mb-3" style="font-size: 0.95rem;">Users in <span id="selectedRoleName" class="text-primary"></span> Role</h6>
                         <div class="table-responsive">
@@ -533,14 +628,11 @@
                                         <th style="width: 20%;">Last Login</th>
                                     </tr>
                                 </thead>
-                                <tbody id="detailTableBody">
-                                    <!-- Populated by JavaScript -->
-                                </tbody>
+                                <tbody id="detailTableBody"></tbody>
                             </table>
                         </div>
                     </div>
 
-                    <!-- Error Message -->
                     <div id="errorMessage" class="alert alert-danger" style="display:none;" role="alert">
                         <i class="fa fa-exclamation-triangle me-2"></i>
                         <span id="errorText"></span>
@@ -555,48 +647,139 @@
 
 </main>
 
-<!-- Global Styles for Login Count Card (All Roles) -->
 <style>
-/* Login Count Card - Professional Layout */
-.login-count-card {
-    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
-}
+/* Login Count Card */
+.login-count-card { transition: transform 0.2s ease, box-shadow 0.2s ease !important; }
+.login-count-card:hover { transform: translateY(-2px) !important; box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.15) !important; }
+.login-count-card .icon-shape { transition: transform 0.2s ease !important; }
+.login-count-card:hover .icon-shape { transform: scale(1.05) !important; }
+.login-count-card .badge { white-space: nowrap; box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); }
+@media (max-width: 768px) { .login-count-card .col-auto { margin-bottom: 0.5rem; } .login-count-card h4 { font-size: 1.5rem !important; } }
 
-.login-count-card:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.15) !important;
+/* KPI ideal: tidak terlalu besar, tidak terlalu kecil */
+.kpi-ideal{
+    height: 168px;
+    border-radius: 14px;
+    overflow: hidden;
+    transition: transform .18s ease, box-shadow .18s ease;
 }
-
-.login-count-card .icon-shape {
-    transition: transform 0.2s ease !important;
+.kpi-ideal:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(0,0,0,.08);
 }
-
-.login-count-card:hover .icon-shape {
-    transform: scale(1.05) !important;
+.kpi-body{
+    padding: 16px !important;
+    display:flex;
+    flex-direction:column;
+    height:100%;
 }
+.kpi-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom: 10px;
+}
+.kpi-title{
+    font-size: 12px;
+    letter-spacing: .6px;
+    font-weight: 900;
+    color:#344767;
+    text-transform: uppercase;
+    line-height:1.1;
+}
+.kpi-sub{
+    font-size: 11px;
+    color:#7b8ca4;
+    margin-top:3px;
+    line-height:1.1;
+}
+.kpi-ic{
+    width: 38px;
+    height: 38px;
+    border-radius: 14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow: 0 6px 14px rgba(0,0,0,.12);
+}
+.kpi-ic i{ color:#fff; font-size: 17px; }
 
-/* Badge styling for better alignment */
-.login-count-card .badge {
+/* AI/AO line */
+.kpi-duo{
+    flex: 1;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    gap: 7px;
+}
+.kpi-line{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap: 10px;
+}
+.kpi-badge{
+    font-size: 11px;
+    font-weight: 900;
+    padding: 4px 10px;
+    border-radius: 999px;
+    line-height:1;
+}
+.badge-ai{ background: rgba(17,205,239,.16); color:#11cdef; }
+.badge-ao{ background: rgba(45,206,137,.16); color:#2dce89; }
+.kpi-val{
+    font-size: 13px;
+    font-weight: 900;
+    color:#344767;
     white-space: nowrap;
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    text-align:right;
+}
+.kpi-cut{
+    height:1px;
+    width:100%;
+    background: rgba(0,0,0,.06);
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .login-count-card .col-auto {
-        margin-bottom: 0.5rem;
-    }
-    
-    .login-count-card h4 {
-        font-size: 1.5rem !important;
-    }
+/* PRK big */
+.kpi-big{
+    font-size: 30px;
+    font-weight: 900;
+    color:#344767;
+    line-height:1;
+    margin-top: 4px;
 }
+.kpi-footnote{
+    font-size: 11px;
+    color:#7b8ca4;
+    margin-top:auto;
+    line-height:1.2;
+}
+
+/* Chart ideal */
+.chart-ideal{
+    border-radius: 14px;
+}
+.chart-ideal .card-body{
+    padding: 14px 16px !important;
+}
+
+/* Activity scroll */
+.activity-scroll{
+    max-height: 355px;
+    overflow-y: auto;
+    padding-right: 6px;
+}
+.activity-scroll::-webkit-scrollbar{ width: 6px; }
+.activity-scroll::-webkit-scrollbar-thumb{ background: rgba(0,0,0,0.15); border-radius: 10px; }
+.activity-scroll::-webkit-scrollbar-track{ background: transparent; }
 </style>
 
 <?php if (isset($user_role) && strtolower($user_role) === 'admin'): ?>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const loginActivityBtn = document.getElementById('loginActivityBtn');
+    if (!loginActivityBtn) return;
+
     const loginActivityModal = new bootstrap.Modal(document.getElementById('loginActivityModal'));
     const roleSelector = document.getElementById('roleSelector');
     const loadingSpinner = document.getElementById('loadingSpinner');
@@ -604,45 +787,35 @@ document.addEventListener('DOMContentLoaded', function() {
     const detailView = document.getElementById('detailView');
     const errorMessage = document.getElementById('errorMessage');
 
-    // Open modal on button click
     loginActivityBtn.addEventListener('click', function() {
         loginActivityModal.show();
-        loadLoginStats(); // Load summary by default
+        loadLoginStats();
     });
 
-    // Handle role change
     roleSelector.addEventListener('change', function() {
         loadLoginStats();
     });
 
     function loadLoginStats() {
         const selectedRole = roleSelector.value;
-        
-        // Show loading, hide others
+
         loadingSpinner.style.display = 'block';
         summaryView.style.display = 'none';
         detailView.style.display = 'none';
         errorMessage.style.display = 'none';
 
-        // Build URL
-        const url = selectedRole 
+        const url = selectedRole
             ? '<?= base_url('dashboard/get_role_login_stats') ?>?role=' + encodeURIComponent(selectedRole)
             : '<?= base_url('dashboard/get_role_login_stats') ?>';
 
-        // Fetch data
         fetch(url)
             .then(response => response.json())
             .then(data => {
                 loadingSpinner.style.display = 'none';
-                
+
                 if (data.success) {
-                    if (data.summary) {
-                        // Show summary view
-                        displaySummary(data.summary);
-                    } else if (data.users) {
-                        // Show detail view
-                        displayDetails(data.role, data.users);
-                    }
+                    if (data.summary) displaySummary(data.summary);
+                    else if (data.users) displayDetails(data.role, data.users);
                 } else {
                     showError(data.message || 'Failed to load data');
                 }
@@ -657,7 +830,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const tbody = document.getElementById('summaryTableBody');
         tbody.innerHTML = '';
 
-        if (summary.length === 0) {
+        if (!summary || summary.length === 0) {
             tbody.innerHTML = '<tr><td colspan="4" class="text-center">No data available</td></tr>';
         } else {
             summary.forEach(item => {
@@ -681,7 +854,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const tbody = document.getElementById('detailTableBody');
         tbody.innerHTML = '';
 
-        if (users.length === 0) {
+        if (!users || users.length === 0) {
             tbody.innerHTML = '<tr><td colspan="5" class="text-center">No users found for this role</td></tr>';
         } else {
             users.forEach((user, index) => {
@@ -702,16 +875,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function formatDateTime(dateTimeString) {
-        if (!dateTimeString || dateTimeString === 'Never') {
-            return 'Never';
-        }
-        
+        if (!dateTimeString || dateTimeString === 'Never') return 'Never';
         try {
-            // Format: 2025-11-03 07:29:03 -> 03/11 07:29
             const parts = dateTimeString.split(' ');
             if (parts.length === 2) {
                 const datePart = parts[0].split('-');
-                const timePart = parts[1].substring(0, 5); // Get HH:MM only
+                const timePart = parts[1].substring(0, 5);
                 return `${datePart[2]}/${datePart[1]} ${timePart}`;
             }
             return dateTimeString;
@@ -732,179 +901,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-
-<style>
-/* Responsive Modal for Login Activity Monitor */
-#loginActivityModal .modal-dialog {
-    max-width: 700px;
-    width: 90%;
-    margin: 1.75rem auto;
-}
-
-#loginActivityModal .modal-content {
-    border-radius: 0.5rem;
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-}
-
-#loginActivityModal .modal-header {
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #dee2e6;
-    border-top-left-radius: 0.5rem;
-    border-top-right-radius: 0.5rem;
-    padding: 1rem 1.25rem;
-}
-
-#loginActivityModal .modal-header h5 {
-    font-size: 1.1rem;
-    margin: 0;
-    color: #344767;
-}
-
-#loginActivityModal .modal-body {
-    padding: 1.25rem;
-}
-
-/* Responsive breakpoints for different screen sizes */
-@media (min-width: 1400px) {
-    #loginActivityModal .modal-dialog {
-        max-width: 800px;
-    }
-}
-
-@media (max-width: 1366px) {
-    /* Common laptop resolution */
-    #loginActivityModal .modal-dialog {
-        max-width: 650px;
-        width: 85%;
-    }
-}
-
-@media (max-width: 1200px) {
-    #loginActivityModal .modal-dialog {
-        max-width: 600px;
-        width: 85%;
-    }
-}
-
-@media (max-width: 992px) {
-    #loginActivityModal .modal-dialog {
-        max-width: 90%;
-        width: 90%;
-        margin: 1rem auto;
-    }
-    
-    #loginActivityModal .table {
-        font-size: 0.875rem;
-    }
-    
-    #loginActivityModal .modal-body {
-        padding: 1rem;
-    }
-}
-
-@media (max-width: 768px) {
-    #loginActivityModal .modal-dialog {
-        max-width: 95%;
-        width: 95%;
-        margin: 0.5rem auto;
-    }
-    
-    #loginActivityModal .table {
-        font-size: 0.813rem;
-    }
-    
-    #loginActivityModal .modal-body {
-        padding: 0.75rem;
-    }
-    
-    #loginActivityModal .table th,
-    #loginActivityModal .table td {
-        padding: 0.4rem;
-    }
-}
-
-@media (max-width: 576px) {
-    #loginActivityModal .modal-dialog {
-        max-width: 98%;
-        width: 98%;
-        margin: 0.25rem auto;
-    }
-    
-    #loginActivityModal .table {
-        font-size: 0.75rem;
-    }
-    
-    #loginActivityModal .modal-header h5 {
-        font-size: 0.95rem;
-    }
-    
-    #loginActivityModal .modal-body {
-        padding: 0.5rem;
-    }
-    
-    #loginActivityModal .badge {
-        font-size: 0.7rem;
-        padding: 0.25em 0.4em;
-    }
-}
-
-/* Ensure table is always responsive */
-#loginActivityModal .table-responsive {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    margin-bottom: 0;
-}
-
-/* Better table styling */
-#loginActivityModal .table {
-    margin-bottom: 0;
-    font-size: 0.875rem;
-}
-
-#loginActivityModal .table th {
-    border-top: none;
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 0.65rem;
-    letter-spacing: 0.5px;
-    padding: 0.5rem;
-}
-
-#loginActivityModal .table td {
-    vertical-align: middle;
-    padding: 0.5rem;
-}
-
-#loginActivityModal .table-light {
-    background-color: #f6f9fc;
-}
-
-/* Small text improvements */
-#loginActivityModal small {
-    font-size: 0.875em;
-    color: #67748e;
-}
-
-/* Loading spinner centering */
-#loadingSpinner {
-    min-height: 200px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Form select styling */
-#loginActivityModal .form-select {
-    font-size: 0.875rem;
-    padding: 0.5rem 0.75rem;
-}
-
-#loginActivityModal .form-label {
-    font-size: 0.875rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-}
-
-</style>
 <?php endif; ?>

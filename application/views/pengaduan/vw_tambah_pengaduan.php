@@ -10,6 +10,18 @@
             </div>
 
             <div class="card-body">
+
+                <?php if (validation_errors()): ?>
+                    <div class="alert alert-danger">
+                        <strong>Wajib mengisi form sesuai status.</strong>
+                        <div><?= validation_errors(); ?></div>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($this->session->flashdata('error')): ?>
+                    <div class="alert alert-danger"><?= $this->session->flashdata('error'); ?></div>
+                <?php endif; ?>
+
                 <?php
                 $user_role = strtolower($this->session->userdata('user_role') ?? '');
                 $is_up3 = ($user_role === 'up3');
@@ -42,7 +54,7 @@
                         <!-- Tanggal Proses -->
                         <div class="col-md-4" id="tanggalProsesContainer" style="display:none;">
                             <label class="form-label">Tanggal Proses</label>
-                            <input type="date" name="TANGGAL_PROSES" class="form-control">
+                            <input type="date" name="TANGGAL_PROSES" id="tanggalProses" class="form-control">
                         </div>
 
                         <!-- Tanggal Selesai -->
@@ -85,6 +97,13 @@
                             </select>
                         </div>
 
+                        <!-- TITIK KOORDINAT (KOLOM BARU) - DI SAMPING PIC -->
+                        <div class="col-md-6">
+                            <label class="form-label">Titik Koordinat</label>
+                            <input type="text" name="TITIK_KOORDINAT" class="form-control" placeholder="Contoh: -6.200000,106.816666" required>
+                            <small class="text-muted">Format: latitude,longitude (contoh: -6.200000,106.816666)</small>
+                        </div>
+
                         <!-- Laporan dan Catatan -->
                         <div class="col-md-12">
                             <div class="row">
@@ -95,12 +114,12 @@
 
                                 <div class="col-md-6" id="tindakLanjutContainer" style="display:none;">
                                     <label class="form-label">Tindak Lanjut</label>
-                                    <textarea name="TINDAK_LANJUT" rows="5" class="form-control" placeholder="Masukkan tindak lanjut..."></textarea>
+                                    <textarea name="TINDAK_LANJUT" id="tindakLanjut" rows="5" class="form-control" placeholder="Masukkan tindak lanjut..."></textarea>
                                 </div>
 
                                 <div class="col-md-6" id="catatanContainer" style="display:none;">
                                     <label class="form-label">Catatan</label>
-                                    <textarea name="CATATAN" rows="5" class="form-control" placeholder="Masukkan catatan jika pengaduan sudah selesai..."></textarea>
+                                    <textarea name="CATATAN" id="catatan" rows="5" class="form-control" placeholder="Masukkan catatan jika pengaduan sudah selesai..."></textarea>
                                 </div>
                             </div>
                         </div>
@@ -110,7 +129,7 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <label class="form-label">Foto Pengaduan</label>
-                                    <input type="file" name="FOTO_PENGADUAN" class="form-control" accept="image/*" onchange="previewImage(event, 'preview_pengaduan')">
+                                    <input type="file" name="FOTO_PENGADUAN" class="form-control" accept="image/*" onchange="previewImage(event, 'preview_pengaduan')" required>
                                     <small class="text-muted">Format: JPG, PNG, maksimal 2MB</small>
                                     <div class="mt-2">
                                         <img id="preview_pengaduan" src="#" class="img-thumbnail rounded" style="max-width:200px; display:none;">
@@ -119,7 +138,7 @@
 
                                 <div class="col-md-6" id="fotoProsesContainer" style="display:none;">
                                     <label class="form-label">Foto Proses</label>
-                                    <input type="file" name="FOTO_PROSES" class="form-control" accept="image/*" onchange="previewImage(event, 'preview_proses')">
+                                    <input type="file" name="FOTO_PROSES" id="fotoProses" class="form-control" accept="image/*" onchange="previewImage(event, 'preview_proses')">
                                     <small class="text-muted">Format: JPG, PNG, maksimal 2MB</small>
                                     <div class="mt-2">
                                         <img id="preview_proses" src="#" class="img-thumbnail rounded" style="max-width:200px; display:none;">
@@ -164,12 +183,18 @@
         const jenisSelect = document.getElementById("jenis_pengaduan");
         const itemSelect = document.getElementById("item_pengaduan");
         const statusSelect = document.getElementById("statusSelect");
+
         const fotoProsesContainer = document.getElementById("fotoProsesContainer");
         const tindakLanjutContainer = document.getElementById("tindakLanjutContainer");
         const catatanContainer = document.getElementById("catatanContainer");
         const tanggalProsesContainer = document.getElementById("tanggalProsesContainer");
         const tanggalSelesaiContainer = document.getElementById("tanggalSelesaiContainer");
+
+        const tanggalProsesInput = document.getElementById("tanggalProses");
         const tanggalSelesaiInput = document.getElementById("tanggalSelesai");
+        const tindakLanjutInput = document.getElementById("tindakLanjut");
+        const catatanInput = document.getElementById("catatan");
+        const fotoProsesInput = document.getElementById("fotoProses");
 
         // Ganti isi item berdasarkan jenis pengaduan
         jenisSelect.addEventListener("change", function() {
@@ -201,22 +226,56 @@
             }
         }
 
-        // Tampilkan field dinamis berdasarkan status
-        statusSelect.addEventListener("change", function() {
-            const value = this.value;
-            fotoProsesContainer.style.display = (value === "Diproses") ? "block" : "none";
-            tindakLanjutContainer.style.display = (value === "Diproses") ? "block" : "none";
-            tanggalProsesContainer.style.display = (value === "Diproses") ? "block" : "none";
-            catatanContainer.style.display = (value === "Selesai") ? "block" : "none";
-            tanggalSelesaiContainer.style.display = (value === "Selesai") ? "block" : "none";
+        function setRequired(el, isRequired) {
+            if (!el) return;
+            if (isRequired) el.setAttribute('required', 'required');
+            else el.removeAttribute('required');
+        }
 
-            if (value === "Selesai") {
-                const today = new Date().toISOString().split('T')[0];
-                tanggalSelesaiInput.value = today;
-            } else {
-                tanggalSelesaiInput.value = "";
+        // Tampilkan field dinamis + required berdasarkan status
+        function updateStatusFields() {
+            const value = statusSelect ? statusSelect.value : 'Lapor';
+
+            const isProses  = (value === "Diproses" || value === "Selesai");
+            const isSelesai = (value === "Selesai");
+
+            fotoProsesContainer.style.display     = isProses ? "block" : "none";
+            tindakLanjutContainer.style.display   = isProses ? "block" : "none";
+            tanggalProsesContainer.style.display  = isProses ? "block" : "none";
+
+            catatanContainer.style.display        = isSelesai ? "block" : "none";
+            tanggalSelesaiContainer.style.display = isSelesai ? "block" : "none";
+
+            // required attribute (client-side) - server-side tetap yang utama
+            setRequired(tindakLanjutInput, isProses);
+            setRequired(tanggalProsesInput, isProses);
+            setRequired(fotoProsesInput, isProses);
+
+            setRequired(catatanInput, isSelesai);
+            setRequired(tanggalSelesaiInput, isSelesai);
+
+            if (!isProses) {
+                if (tindakLanjutInput) tindakLanjutInput.value = "";
+                if (tanggalProsesInput) tanggalProsesInput.value = "";
+                if (fotoProsesInput) fotoProsesInput.value = "";
             }
-        });
+
+            if (!isSelesai) {
+                if (catatanInput) catatanInput.value = "";
+                if (tanggalSelesaiInput) tanggalSelesaiInput.value = "";
+            } else {
+                // auto isi tanggal selesai jika kosong
+                if (tanggalSelesaiInput && !tanggalSelesaiInput.value) {
+                    const today = new Date().toISOString().split('T')[0];
+                    tanggalSelesaiInput.value = today;
+                }
+            }
+        }
+
+        if (statusSelect) {
+            statusSelect.addEventListener("change", updateStatusFields);
+        }
+        document.addEventListener("DOMContentLoaded", updateStatusFields);
     </script>
 
     <style>

@@ -18,8 +18,34 @@ class Single_Line_Diagram extends CI_Controller
     {
         parent::__construct();
         $this->load->model('Single_line_diagram_model', 'sldModel');
+
+        // ✅ TAMBAHAN: Notifikasi model untuk log aktivitas
+        $this->load->model('Notifikasi_model', 'notifModel');
+
         $this->load->helper(['url', 'form']);
         $this->load->library(['session', 'pagination', 'upload']);
+    }
+
+    // ✅ TAMBAHAN: LOG AKTIVITAS
+    private function _log($jenis, $module = null, $record_id = null, $record_name = null)
+    {
+        $user_id = (int) $this->session->userdata('user_id');
+        if (!$user_id) return;
+
+        $email = (string) ($this->session->userdata('email') ?? '');
+        $role  = (string) ($this->session->userdata('user_role') ?? $this->session->userdata('role') ?? '');
+
+        $this->notifModel->log_aktivitas(
+            $user_id,
+            $email,
+            $role,
+            $jenis,
+            $module,
+            $record_id,
+            $record_name,
+            $this->input->ip_address(),
+            (string) $this->input->user_agent()
+        );
     }
 
     // =======================
@@ -33,16 +59,16 @@ class Single_Line_Diagram extends CI_Controller
         $data['page_title'] = 'Data Single Line Diagram';
         $data['page_icon'] = 'fas fa-project-diagram';
 
-    // Per-page dari query string atau default (allowed values)
-    $allowedPer = [5,10,25,50,100,500];
-    $reqPer = (int) $this->input->get('per_page', TRUE);
-    $per_page = in_array($reqPer, $allowedPer) ? $reqPer : 5; // default 5
+        // Per-page dari query string atau default (allowed values)
+        $allowedPer = [5,10,25,50,100,500];
+        $reqPer = (int) $this->input->get('per_page', TRUE);
+        $per_page = in_array($reqPer, $allowedPer) ? $reqPer : 5; // default 5
 
         // Konfigurasi pagination (menggunakan query string)
         $config['base_url'] = site_url('Single_Line_Diagram/index') . '?';
         $config['total_rows'] = $this->sldModel->count_all_sld();
-    $config['per_page'] = $per_page;
-    $config['reuse_query_string'] = TRUE;
+        $config['per_page'] = $per_page;
+        $config['reuse_query_string'] = TRUE;
         $config['page_query_string'] = TRUE;
         $config['query_string_segment'] = 'page';
 
@@ -59,25 +85,25 @@ class Single_Line_Diagram extends CI_Controller
         $config['num_tag_close'] = '</li>';
         $config['attributes'] = array('class' => 'page-link');
 
-    // Hitung offset berdasarkan page query string
-    // Note: when page_query_string = TRUE and use_page_numbers is FALSE (default),
-    // the pagination links will include the offset (0, per_page, 2*per_page, ...)
-    $pageParam = $this->input->get($config['query_string_segment']);
-    if (!empty($config['use_page_numbers'])) {
-        // pageParam is a page number (1,2,3...)
-        $pageNum = (is_numeric($pageParam) && $pageParam > 0) ? (int)$pageParam : 1;
-        $offset = ($pageNum - 1) * $config['per_page'];
-    } else {
-        // pageParam is the offset (0, per_page, ...)
-        $offset = (is_numeric($pageParam) && $pageParam >= 0) ? (int)$pageParam : 0;
-    }
+        // Hitung offset berdasarkan page query string
+        // Note: when page_query_string = TRUE and use_page_numbers is FALSE (default),
+        // the pagination links will include the offset (0, per_page, 2*per_page, ...)
+        $pageParam = $this->input->get($config['query_string_segment']);
+        if (!empty($config['use_page_numbers'])) {
+            // pageParam is a page number (1,2,3...)
+            $pageNum = (is_numeric($pageParam) && $pageParam > 0) ? (int)$pageParam : 1;
+            $offset = ($pageNum - 1) * $config['per_page'];
+        } else {
+            // pageParam is the offset (0, per_page, ...)
+            $offset = (is_numeric($pageParam) && $pageParam >= 0) ? (int)$pageParam : 0;
+        }
 
         $this->pagination->initialize($config);
 
         $data['sld'] = $this->sldModel->get_sld($config['per_page'], $offset);
         $data['pagination'] = $this->pagination->create_links();
         $data['start_no'] = $offset + 1;
-    $data['total_rows'] = $config['total_rows'];
+        $data['total_rows'] = $config['total_rows'];
         $data['per_page'] = $per_page;
 
         $this->load->view('layout/header', $data);
@@ -96,8 +122,8 @@ class Single_Line_Diagram extends CI_Controller
         }
 
         $data['judul'] = 'Tambah Single Line Diagram';
-    $this->load->model('Unit_model', 'unitModel');
-    $data['unit'] = $this->unitModel->get_all_units(); // use existing model method
+        $this->load->model('Unit_model', 'unitModel');
+        $data['unit'] = $this->unitModel->get_all_units(); // use existing model method
 
         if (!$this->input->post()) {
             $this->load->view('layout/header', $data);
@@ -139,6 +165,10 @@ class Single_Line_Diagram extends CI_Controller
         ];
 
         if ($this->sldModel->insert_sld($dataInput)) {
+
+            // ✅ TAMBAHAN: log create
+            $this->_log('create', 'Single_Line_Diagram', null, $dataInput['NAMA_GI'] ?? null);
+
             $this->session->set_flashdata('success', 'Data Single Line Diagram berhasil ditambahkan.');
         } else {
             $this->session->set_flashdata('error', 'Gagal menambahkan data Single Line Diagram.');
@@ -209,6 +239,10 @@ class Single_Line_Diagram extends CI_Controller
         ];
 
         $this->sldModel->update_sld($id, $dataUpdate);
+
+        // ✅ TAMBAHAN: log update
+        $this->_log('update', 'Single_Line_Diagram', $id, $dataUpdate['NAMA_GI'] ?? null);
+
         $this->session->set_flashdata('success', 'Data Single Line Diagram berhasil diperbarui.');
         redirect('Single_Line_Diagram');
     }
@@ -233,6 +267,10 @@ class Single_Line_Diagram extends CI_Controller
         }
 
         $this->sldModel->delete_sld($id);
+
+        // ✅ TAMBAHAN: log delete
+        $this->_log('delete', 'Single_Line_Diagram', $id, $sld['NAMA_GI'] ?? null);
+
         $this->session->set_flashdata('success', 'Data Single Line Diagram berhasil dihapus.');
         redirect('Single_Line_Diagram');
     }

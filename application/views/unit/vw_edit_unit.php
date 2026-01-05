@@ -6,10 +6,12 @@
             </h6>
         </div>
     </nav>
+
     <div class="container-fluid py-4">
         <div class="card shadow border-0 rounded-4">
             <div class="card-header bg-gradient-primary text-white"><strong>Form Edit Unit</strong></div>
             <div class="card-body">
+
                 <form action="<?= base_url('Unit/edit/' . urlencode($unit['ID_UNIT'] ?? '')); ?>" method="post">
                     <div class="row g-3">
 
@@ -45,29 +47,87 @@
                             </select>
                         </div>
 
+                        <!-- Unit Layanan (Dropdown) -->
                         <div class="col-md-6">
                             <label class="form-label">Unit Layanan</label>
-                            <input type="text" class="form-control" name="UNIT_LAYANAN" value="<?= htmlentities($unit['UNIT_LAYANAN'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" required>
+                            <select class="form-control" name="UNIT_LAYANAN" required>
+                                <option value="" disabled <?= empty($unit['UNIT_LAYANAN']) ? 'selected' : '' ?>>-- Pilih Unit Layanan --</option>
+
+                                <?php
+                                $unit_layanan_list = [
+                                    "BAGAN BATU",
+                                    "DUMAI KOTA",
+                                    "DURI",
+                                    "BENGKALIS",
+                                    "SELATPANJANG",
+                                    "KUALA ENOK",
+                                    "AIR MOLEK",
+                                    "TEMBILAHAN",
+                                    "RENGAT KOTA",
+                                    "TALUK KUANTAN",
+                                    "TANJUNGPINANG KOTA",
+                                    "KIJANG",
+                                    "TANJUNG UBAN",
+                                    "TANJUNG BALAI KARIMUN",
+                                    "TANJUNG BATU",
+                                    "DABO SINGKEP",
+                                    "RANAI",
+                                    "ANAMBAS",
+                                    "PEKANBARU KOTA BARAT",
+                                    "PANAM",
+                                    "SIMPANG TIGA",
+                                    "BANGKINANG",
+                                    "KAMPAR",
+                                    "SIAK SRI INDRAPURA",
+                                    "PANGKALAN KERINCI",
+                                    "UJUNG BATU",
+                                    "PASIR PANGARAIAN",
+                                    "RUMBAI",
+                                    "PEKANBARU KOTA TIMUR",
+                                    "LIPAT KAIN",
+                                    "PERAWANG",
+                                    "BAGAN SIAPI-API",
+                                    "BELAKANGPADANG",
+                                    "BINTAN CENTER",
+                                    "NATUNA",
+                                    "BELAKANG PADANG",
+                                    "TANJUNG PINANG KOTA",
+                                    "TANJUNG PINANG KOTA",
+                                ];
+
+                                $selected_unit_layanan = $unit['UNIT_LAYANAN'] ?? '';
+                                foreach ($unit_layanan_list as $val) :
+                                    $safeVal = htmlentities($val, ENT_QUOTES, 'UTF-8');
+                                    $isSelected = ($selected_unit_layanan === $val) ? 'selected' : '';
+                                ?>
+                                    <option value="<?= $safeVal; ?>" <?= $isSelected; ?>><?= $safeVal; ?></option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
 
                         <div class="col-md-4">
                             <label class="form-label">Longitude (X)</label>
                             <input type="text" class="form-control" name="LONGITUDEX" value="<?= htmlentities($unit['LONGITUDEX'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
                         </div>
+
                         <div class="col-md-4">
                             <label class="form-label">Latitude (Y)</label>
                             <input type="text" class="form-control" name="LATITUDEY" value="<?= htmlentities($unit['LATITUDEY'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
                         </div>
+
                         <div class="col-md-4">
                             <label class="form-label">Alamat</label>
                             <input type="text" class="form-control" name="ADDRESS" value="<?= htmlentities($unit['ADDRESS'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
                         </div>
+
                     </div>
+
                     <div class="mt-4">
                         <a href="<?= base_url('Unit'); ?>" class="btn btn-secondary">Batal</a>
                         <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
                     </div>
                 </form>
+
             </div>
         </div>
     </div>

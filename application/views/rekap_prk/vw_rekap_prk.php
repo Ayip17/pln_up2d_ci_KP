@@ -1,3 +1,42 @@
+<?php
+defined('BASEPATH') or exit('No direct script access allowed');
+
+/**
+ * Helper lokal agar view kebal null & beda nama kolom (UPPERCASE/lowercase).
+ * Pakai: v($row,'KEY',default)
+ */
+if (!function_exists('v')) {
+    function v($row, $key, $default = '')
+    {
+        if (!is_array($row)) return $default;
+        if (array_key_exists($key, $row) && $row[$key] !== null) return $row[$key];
+
+        $alt = strtolower($key);
+        if (array_key_exists($alt, $row) && $row[$alt] !== null) return $row[$alt];
+
+        $alt2 = strtoupper($key);
+        if (array_key_exists($alt2, $row) && $row[$alt2] !== null) return $row[$alt2];
+
+        return $default;
+    }
+}
+
+if (!function_exists('h')) {
+    function h($val)
+    {
+        return htmlspecialchars((string)($val ?? ''), ENT_QUOTES, 'UTF-8');
+    }
+}
+
+if (!function_exists('nf')) {
+    function nf($val, $dec = 0)
+    {
+        $n = (float)($val ?? 0);
+        return number_format($n, $dec, ',', '.');
+    }
+}
+?>
+
 <main class="main-content position-relative border-radius-lg ">
     <?php $this->load->view('layout/navbar'); ?>
 
@@ -5,7 +44,13 @@
 
         <?php if ($this->session->flashdata('success')): ?>
             <div class="alert alert-success text-white">
-                <?= $this->session->flashdata('success'); ?>
+                <?= h($this->session->flashdata('success')); ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if ($this->session->flashdata('error')): ?>
+            <div class="alert alert-danger text-white">
+                <?= h($this->session->flashdata('error')); ?>
             </div>
         <?php endif; ?>
 
@@ -15,16 +60,15 @@
             <div class="card-header py-2 d-flex justify-content-between align-items-center bg-gradient-primary text-white rounded-top-4">
                 <h6 class="mb-0 d-flex align-items-center">Tabel Rekap PRK</h6>
                 <div class="d-flex align-items-center" style="padding-top: 16px;">
-                    <?php if (can_create()): ?>
-                        <a href="<?= base_url('Rekap_prk/tambah') ?>" class="btn btn-sm btn-light text-primary me-2 d-flex align-items-center no-anim">
+                    <!-- <?php if (function_exists('can_create') && can_create()): ?>
+                        <a href="<?= base_url('rekap_prk/tambah') ?>" class="btn btn-sm btn-light text-primary me-2 d-flex align-items-center no-anim">
                             <i class="fas fa-plus me-1"></i> Tambah
                         </a>
-                    <?php endif; ?>
-                    <a href="<?= base_url('Rekap_prk/export_csv') ?>" class="btn btn-sm btn-light text-secondary ms-2 d-flex align-items-center no-anim">
+                    <?php endif; ?> -->
+                    <a href="<?= base_url('rekap_prk/export_csv') ?>" class="btn btn-sm btn-light text-secondary ms-2 d-flex align-items-center no-anim">
                         <i class="fas fa-file-csv me-1"></i> Download CSV
                     </a>
                 </div>
-
             </div>
 
             <div class="card-body px-0 pt-0 pb-2 bg-white">
@@ -33,15 +77,22 @@
                 <div class="px-3 mt-3 mb-3 d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center">
                         <label class="mb-0 me-2 text-sm">Tampilkan:</label>
-                        <select id="perPageSelectPRK" class="form-select form-select-sm" style="width: 80px;" onchange="changePerPagePRK(this.value)">
-                            <option value="5" <?= ($per_page == 5) ? 'selected' : ''; ?>>5</option>
-                            <option value="10" <?= ($per_page == 10) ? 'selected' : ''; ?>>10</option>
-                            <option value="25" <?= ($per_page == 25) ? 'selected' : ''; ?>>25</option>
-                            <option value="50" <?= ($per_page == 50) ? 'selected' : ''; ?>>50</option>
+                        <select id="perPageSelectPRK" class="form-select form-select-sm" style="width: 90px;" onchange="changePerPagePRK(this.value)">
+                            <option value="5" <?= ((int)($per_page ?? 5) == 5)  ? 'selected' : ''; ?>>5</option>
+                            <option value="10" <?= ((int)($per_page ?? 5) == 10) ? 'selected' : ''; ?>>10</option>
+                            <option value="25" <?= ((int)($per_page ?? 5) == 25) ? 'selected' : ''; ?>>25</option>
+                            <option value="50" <?= ((int)($per_page ?? 5) == 50) ? 'selected' : ''; ?>>50</option>
+                            <option value="100" <?= ((int)($per_page ?? 5) == 100) ? 'selected' : ''; ?>>100</option>
                         </select>
-                        <span class="ms-3 text-sm">dari <?= $total_rows ?? 0; ?> data</span>
+                        <span class="ms-3 text-sm">dari <?= (int)($total_rows ?? 0); ?> data</span>
                     </div>
-                    <input type="text" id="searchInputPRK" onkeyup="searchTablePRK()" class="form-control form-control-sm rounded-3" style="max-width: 300px;" placeholder="Cari data...">
+
+                    <input type="text"
+                        id="searchInputPRK"
+                        onkeyup="searchTablePRK()"
+                        class="form-control form-control-sm rounded-3"
+                        style="max-width: 300px;"
+                        placeholder="Cari data...">
                 </div>
 
                 <!-- TABLE -->
@@ -53,45 +104,71 @@
                                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Jenis Anggaran</th>
                                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nomor PRK</th>
                                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Uraian PRK</th>
-                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Pagu SKK-IO</th>
-                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Renc Kontrak</th>
-                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">NODIN/SRT</th>
-                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Kontrak</th>
-                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sisa</th>
-                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Rencana Bayar</th>
-                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Terbayar</th>
-                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Ke Thn 2026</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-end">Pagu SKK-IO</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-end">Renc Kontrak</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-end">NODIN/SRT</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-end">Kontrak</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-end">Sisa</th>
+
+                                <!-- Tambahan: agar tidak error walau key tidak ada -->
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-end">Rencana Bayar</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-end">Terbayar</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-end">Ke Thn 2026</th>
+
+                                <!-- kolom yang kamu error-kan -->
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-end">Rencana Bayar Thn Ini</th>
+
                                 <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Aksi</th>
                             </tr>
                         </thead>
+
                         <tbody>
                             <?php if (empty($prk_data)): ?>
                                 <tr>
-                                    <td colspan="100" class="text-center text-secondary py-4">Belum ada data</td>
+                                    <td colspan="50" class="text-center text-secondary py-4">Belum ada data</td>
                                 </tr>
                             <?php else: ?>
-                                <?php $no = $start_no ?? 1; ?>
+                                <?php $no = (int)($start_no ?? 1); ?>
                                 <?php foreach ($prk_data as $row): ?>
                                     <tr class="<?= ($no % 2 == 0) ? 'table-row-even' : 'table-row-odd'; ?>">
                                         <td class="text-sm"><?= $no++; ?></td>
-                                        <td class="text-sm"><?= htmlentities($row['JENIS_ANGGARAN']); ?></td>
-                                        <td class="text-sm"><?= htmlentities($row['NOMOR_PRK']); ?></td>
-                                        <td class="text-sm"><?= htmlentities($row['URAIAN_PRK']); ?></td>
-                                        <td class="text-sm"><?= number_format($row['PAGU_SKK_IO'], 2, ',', '.'); ?></td>
-                                        <td class="text-sm"><?= number_format($row['RENC_KONTRAK'], 2, ',', '.'); ?></td>
-                                        <td class="text-sm"><?= number_format($row['NODIN_SRT'], 0, ',', '.'); ?></td>
-                                        <td class="text-sm"><?= number_format($row['KONTRAK'], 2, ',', '.'); ?></td>
-                                        <td class="text-sm"><?= number_format($row['SISA'], 2, ',', '.'); ?></td>
-                                        <td class="text-sm"><?= number_format($row['RENCANA_BAYAR'], 2, ',', '.'); ?></td>
-                                        <td class="text-sm"><?= number_format($row['TERBAYAR'], 2, ',', '.'); ?></td>
-                                        <td class="text-sm"><?= number_format($row['KE_TAHUN_2026'], 2, ',', '.'); ?></td>
+
+                                        <td class="text-sm"><?= h(v($row, 'JENIS_ANGGARAN', v($row, 'jenis_anggaran', ''))); ?></td>
+                                        <td class="text-sm"><?= h(v($row, 'NOMOR_PRK', v($row, 'nomor_prk', ''))); ?></td>
+                                        <td class="text-sm"><?= h(v($row, 'URAIAN_PRK', v($row, 'uraian_prk', ''))); ?></td>
+
+                                        <td class="text-sm text-end"><?= nf(v($row, 'PAGU_SKK_IO', v($row, 'pagu_skk_io', 0)), 0); ?></td>
+                                        <td class="text-sm text-end"><?= nf(v($row, 'RENC_KONTRAK', v($row, 'renc_kontrak', 0)), 0); ?></td>
+                                        <td class="text-sm text-end"><?= nf(v($row, 'NODIN_SRT', v($row, 'nodin_srt', 0)), 0); ?></td>
+                                        <td class="text-sm text-end"><?= nf(v($row, 'KONTRAK', v($row, 'kontrak', 0)), 0); ?></td>
+                                        <td class="text-sm text-end"><?= nf(v($row, 'SISA', v($row, 'sisa', 0)), 0); ?></td>
+
+                                        <td class="text-sm text-end"><?= nf(v($row, 'RENCANA_BAYAR', v($row, 'rencana_bayar', 0)), 0); ?></td>
+                                        <td class="text-sm text-end"><?= nf(v($row, 'TERBAYAR', v($row, 'terbayar', 0)), 0); ?></td>
+                                        <td class="text-sm text-end"><?= nf(v($row, 'KE_TAHUN_2026', v($row, 'ke_thn_2026', v($row, 'ke_tahun_2026', 0))), 0); ?></td>
+
+                                        <!-- FIX: tidak lagi error -->
+                                        <td class="text-sm text-end"><?= nf(v($row, 'rencana_bayar_thn_ini', 0), 0); ?></td>
+
                                         <td class="text-center">
-                                            <a href="<?= base_url('rekap_prk/detail/' . $row['ID_PRK']) ?>" class="btn btn-info btn-xs text-white me-1" title="Detail"><i class="fas fa-info-circle"></i></a>
-                                            <?php if (can_edit()): ?>
-                                                <a href="<?= base_url('rekap_prk/edit/' . $row['ID_PRK']) ?>" class="btn btn-warning btn-xs text-white me-1" title="Edit"><i class="fas fa-pen"></i></a>
+                                            <?php
+                                            $id = v($row, 'ID_PRK', v($row, 'id', ''));
+                                            ?>
+                                            <a href="<?= base_url('rekap_prk/detail/' . $id) ?>" class="btn btn-info btn-xs text-white me-1" title="Detail">
+                                                <i class="fas fa-info-circle"></i>
+                                            </a>
+
+                                            <?php if (function_exists('can_edit') && can_edit()): ?>
+                                                <a href="<?= base_url('rekap_prk/edit/' . $id) ?>" class="btn btn-warning btn-xs text-white me-1" title="Edit">
+                                                    <i class="fas fa-pen"></i>
+                                                </a>
                                             <?php endif; ?>
-                                            <?php if (can_delete()): ?>
-                                                <a href="<?= base_url('rekap_prk/hapus/' . $row['ID_PRK']) ?>" class="btn btn-danger btn-xs btn-hapus" title="Hapus"><i class="fas fa-trash"></i></a>
+
+                                            <?php if (function_exists('can_delete') && can_delete()): ?>
+                                                <a href="<?= base_url('rekap_prk/hapus/' . $id) ?>" class="btn btn-danger btn-xs btn-hapus" title="Hapus"
+                                                    onclick="return confirm('Yakin hapus data ini?')">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
                                             <?php endif; ?>
                                         </td>
                                     </tr>
@@ -110,7 +187,6 @@
     </div>
 </main>
 
-<!-- SCRIPT -->
 <script>
     function changePerPagePRK(perPage) {
         const url = new URL(window.location.href);
@@ -121,9 +197,10 @@
 
     function searchTablePRK() {
         const input = document.getElementById('searchInputPRK');
-        const filter = input.value.toUpperCase();
+        const filter = (input.value || '').toUpperCase();
         const table = document.getElementById('prkTable');
         const tr = table.getElementsByTagName('tr');
+
         for (let i = 1; i < tr.length; i++) {
             let txtValue = tr[i].textContent || tr[i].innerText;
             tr[i].style.display = (txtValue.toUpperCase().indexOf(filter) > -1) ? '' : 'none';
@@ -131,14 +208,11 @@
     }
 </script>
 
-<!-- STYLE -->
 <style>
-    /* Header gradient */
     .bg-gradient-primary {
         background: linear-gradient(90deg, #005C99, #0099CC);
     }
 
-    /* Table row warna */
     .table-row-odd {
         background-color: #ffffff;
     }
@@ -147,13 +221,11 @@
         background-color: #f5f7fa;
     }
 
-    /* Hapus animasi hover tabel */
     #prkTable tbody tr:hover {
         background-color: #e9ecef !important;
         transition: none !important;
     }
 
-    /* Hapus semua animasi dan efek tombol */
     .btn,
     .btn-xs {
         transition: none !important;
@@ -163,16 +235,13 @@
     .btn:hover,
     .btn:focus,
     .btn:active,
-    .btn:focus-visible,
     .btn-xs:hover,
     .btn-xs:focus,
-    .btn-xs:active,
-    .btn-xs:focus-visible {
+    .btn-xs:active {
         transform: none !important;
         box-shadow: none !important;
     }
 
-    /* Tombol kecil */
     .btn-xs {
         padding: 2px 6px;
         font-size: 11px;
@@ -183,22 +252,10 @@
         font-size: 12px;
     }
 
-    /* Padding dan font table */
     #prkTable tbody tr td {
         padding-top: 2px !important;
         padding-bottom: 2px !important;
         font-size: 13px !important;
-    }
-
-    #prkTable tbody td.text-center {
-        vertical-align: middle !important;
-        text-align: center !important;
-        padding-top: 6px !important;
-        padding-bottom: 6px !important;
-    }
-
-    #prkTable tbody td.text-center .btn {
-        margin: 2px 3px;
     }
 
     #prkTable thead th {
@@ -217,33 +274,12 @@
         font-weight: 600;
     }
 
-    /* Disable click/hover animations for elements with .no-anim */
     .no-anim,
     .no-anim * {
         transition: none !important;
-        -webkit-transition: none !important;
-        -moz-transition: none !important;
-        -o-transition: none !important;
         animation: none !important;
-        -webkit-animation: none !important;
         transform: none !important;
-        -webkit-transform: none !important;
         box-shadow: none !important;
         outline: none !important;
-    }
-    .no-anim:active,
-    .no-anim:focus,
-    .no-anim *:active,
-    .no-anim *:focus {
-        transform: none !important;
-        -webkit-transform: none !important;
-        box-shadow: none !important;
-        outline: none !important;
-    }
-    .no-anim .ripple,
-    .no-anim .waves-ripple,
-    .no-anim .wave,
-    .no-anim .ink {
-        display: none !important;
     }
 </style>

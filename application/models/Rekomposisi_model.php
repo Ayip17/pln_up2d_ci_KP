@@ -3,110 +3,210 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class Rekomposisi_model extends CI_Model
 {
-    private $table = 'rekomposisi';
+    protected $table = 'master_rekomposisi';
 
-    // 🔹 Ambil semua data rekomposisi, optional keyword untuk pencarian
-    public function get_all_rekomposisi($keyword = null)
+    /* =========================
+       SANITIZE ANGKA (1.234.567 -> 1234567)
+       ========================= */
+    private function _to_number($str)
     {
-        $this->db->order_by('ID_REKOMPOSISI', 'DESC');
+        if ($str === null) return 0;
+        // buang semua kecuali digit
+        $num = preg_replace('/[^\d]/', '', (string)$str);
+        return $num === '' ? 0 : (float)$num;
+    }
 
-        if ($keyword) {
-            $this->db->group_start();
-            $this->db->like('JENIS_ANGGARAN', $keyword);
-            $this->db->or_like('NOMOR_PRK', $keyword);
-            $this->db->or_like('NOMOR_SKK_IO', $keyword);
-            $this->db->or_like('PRK', $keyword);
-            $this->db->or_like('JUDUL_DRP', $keyword);
-            $this->db->group_end();
+    /* =========================
+       FILTER SEARCH
+       ========================= */
+    private function _apply_search($keyword)
+    {
+        if ($keyword && trim($keyword) !== '') {
+            $kw = trim($keyword);
+
+            $this->db->group_start()
+                ->like('jenis_anggaran', $kw)
+                ->or_like('nomor_prk', $kw)
+                ->or_like('nomor_skk_io', $kw)
+                ->or_like('uraian_prk', $kw)
+                ->or_like('judul_drp', $kw)
+                ->group_end();
         }
-
-        return $this->db->get($this->table)->result_array();
     }
 
-    // 🔹 Ambil data berdasarkan ID
-    public function get_rekomposisi_by_id($id)
+    /* =========================
+       COUNT ALL (UNTUK PAGINATION)
+       ========================= */
+    public function count_all($keyword = null)
     {
-        return $this->db->get_where($this->table, ['ID_REKOMPOSISI' => $id])->row_array();
+        $this->db->from($this->table);
+        $this->_apply_search($keyword);
+        return (int)$this->db->count_all_results();
     }
 
-    // 🔹 Tambah data baru
-    public function insert_rekomposisi($data)
+    /* =========================
+       GET PAGINATED
+       ========================= */
+    public function get_paginated($limit, $offset, $keyword = null)
     {
+        $this->db->from($this->table);
+        $this->_apply_search($keyword);
+        $this->db->order_by('id', 'DESC');
+        $this->db->limit((int)$limit, (int)$offset);
+        return $this->db->get()->result_array();
+    }
+
+    /* =========================
+       GET BY ID
+       ========================= */
+    public function get_by_id($id)
+    {
+        return $this->db
+            ->where('id', (int)$id)
+            ->get($this->table)
+            ->row_array();
+    }
+
+    /* =========================
+       INSERT
+       ========================= */
+    public function insert($data)
+    {
+        // normalize angka
+        if (isset($data['pagu_skk_io'])) {
+            $data['pagu_skk_io'] = $this->_to_number($data['pagu_skk_io']);
+        }
         return $this->db->insert($this->table, $data);
     }
 
-    // 🔹 Update data
-    public function update_rekomposisi($id, $data)
+    /* =========================
+       UPDATE
+       ========================= */
+    public function update($id, $data)
     {
-        $this->db->where('ID_REKOMPOSISI', $id);
-        return $this->db->update($this->table, $data);
+        if (isset($data['pagu_skk_io'])) {
+            $data['pagu_skk_io'] = $this->_to_number($data['pagu_skk_io']);
+        }
+        return $this->db
+            ->where('id', (int)$id)
+            ->update($this->table, $data);
     }
 
-    // 🔹 Hapus data
-    public function delete_rekomposisi($id)
+    /* =========================
+       DELETE
+       ========================= */
+    public function delete($id)
     {
-        $this->db->where('ID_REKOMPOSISI', $id);
-        return $this->db->delete($this->table);
+        return $this->db
+            ->where('id', (int)$id)
+            ->delete($this->table);
     }
 
-    // 🔹 Pagination
-    public function get_rekomposisi_paginated($limit, $start, $keyword = null)
+    /* =========================
+       VALIDASI UNIQUE (nomor_prk, judul_drp)
+       ========================= */
+    public function exists_prk_drp($nomor_prk, $judul_drp, $exclude_id = null)
     {
-        $this->db->order_by('ID_REKOMPOSISI', 'DESC');
+        $this->db->from($this->table)
+            ->where('nomor_prk', $nomor_prk)
+            ->where('judul_drp', $judul_drp);
 
-        if ($keyword) {
-            $this->db->group_start();
-            $this->db->like('JENIS_ANGGARAN', $keyword);
-            $this->db->or_like('NOMOR_PRK', $keyword);
-            $this->db->or_like('NOMOR_SKK_IO', $keyword);
-            $this->db->or_like('PRK', $keyword);
-            $this->db->or_like('JUDUL_DRP', $keyword);
-            $this->db->group_end();
+        if ($exclude_id !== null) {
+            $this->db->where('id !=', (int)$exclude_id);
         }
 
-        return $this->db->get($this->table, $limit, $start)->result_array();
+        return $this->db->count_all_results() > 0;
     }
 
-    // 🔹 Get distinct PRK by Jenis Anggaran
-    public function get_prk_by_jenis($jenis_anggaran = null)
+    /* =========================
+       CEK DIPAKAI DI ENTRY KONTRAK
+       (mengunci edit/hapus PRK+DRP)
+       ========================= */
+    public function is_used_in_kontrak($nomor_prk, $judul_drp)
     {
-        $this->db->select('NOMOR_PRK, PRK');
-        $this->db->distinct();
-        
-        if ($jenis_anggaran) {
-            $this->db->where('JENIS_ANGGARAN', $jenis_anggaran);
-        }
-        
-        $this->db->order_by('NOMOR_PRK', 'ASC');
-        return $this->db->get($this->table)->result_array();
+        return $this->db
+            ->from('entry_kontrak')
+            ->where('nomor_prk', $nomor_prk)
+            ->where('judul_drp', $judul_drp)
+            ->limit(1)
+            ->count_all_results() > 0;
     }
 
-    // 🔹 Get SKK by PRK
-    public function get_skk_by_prk($nomor_prk)
+    /* =========================
+       DROPDOWN ENTRY KONTRAK
+       ========================= */
+
+    // Jenis Anggaran
+    public function get_jenis_anggaran()
     {
-        $this->db->select('NOMOR_SKK_IO, SKKI_O, PRK');
-        $this->db->where('NOMOR_PRK', $nomor_prk);
-        $this->db->order_by('NOMOR_SKK_IO', 'ASC');
-        return $this->db->get($this->table)->result_array();
+        return $this->db
+            ->select('jenis_anggaran')
+            ->from($this->table)
+            ->group_by('jenis_anggaran')
+            ->order_by('jenis_anggaran', 'ASC')
+            ->get()
+            ->result_array();
     }
 
-    // 🔹 Get DRP by PRK
+    // PRK by Jenis (distinct nomor_prk + uraian_prk)
+    public function get_prk_by_jenis($jenis)
+    {
+        return $this->db
+            ->select('nomor_prk, uraian_prk')
+            ->from($this->table)
+            ->where('jenis_anggaran', $jenis)
+            ->group_by(['nomor_prk', 'uraian_prk'])
+            ->order_by('nomor_prk', 'ASC')
+            ->get()
+            ->result_array();
+    }
+
+    // Detail PRK (ambil data PRK utama; judul drp bisa beda-beda)
+    public function get_prk_detail($nomor_prk)
+    {
+        return $this->db
+            ->select('jenis_anggaran, nomor_prk, nomor_skk_io, uraian_prk, pagu_skk_io')
+            ->from($this->table)
+            ->where('nomor_prk', $nomor_prk)
+            ->order_by('id', 'ASC')
+            ->limit(1)
+            ->get()
+            ->row_array();
+    }
+
+    // DRP by PRK
     public function get_drp_by_prk($nomor_prk)
     {
-        $this->db->select('JUDUL_DRP');
-        $this->db->distinct();
-        $this->db->where('NOMOR_PRK', $nomor_prk);
-        $this->db->where('JUDUL_DRP IS NOT NULL');
-        $this->db->where('JUDUL_DRP !=', '');
-        $this->db->order_by('JUDUL_DRP', 'ASC');
-        return $this->db->get($this->table)->result_array();
+        return $this->db
+            ->select('judul_drp')
+            ->from($this->table)
+            ->where('nomor_prk', $nomor_prk)
+            ->group_by('judul_drp')
+            ->order_by('judul_drp', 'ASC')
+            ->get()
+            ->result_array();
     }
 
-    // 🔹 Get SKK Value by Nomor SKK
-    public function get_skk_value($nomor_skk)
+    /* =========================
+       TAMBAHAN UNTUK ENTRY KONTRAK (AMAN FK PRK+DRP)
+       ========================= */
+
+    // Alias (opsional) kalau ada controller lama yang pakai nama ini
+    public function get_prk_by_jenis_distinct($jenis)
     {
-        $this->db->select('SKKI_O, PRK');
-        $this->db->where('NOMOR_SKK_IO', $nomor_skk);
-        return $this->db->get($this->table)->row_array();
+        return $this->get_prk_by_jenis($jenis);
+    }
+
+    // Detail by PRK + DRP (paling aman untuk dropdown & FK)
+    public function get_prk_drp_detail($nomor_prk, $judul_drp)
+    {
+        return $this->db
+            ->select('jenis_anggaran, nomor_prk, nomor_skk_io, uraian_prk, pagu_skk_io, judul_drp')
+            ->from($this->table)
+            ->where('nomor_prk', $nomor_prk)
+            ->where('judul_drp', $judul_drp)
+            ->limit(1)
+            ->get()
+            ->row_array();
     }
 }

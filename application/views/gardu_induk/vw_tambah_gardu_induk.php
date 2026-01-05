@@ -33,6 +33,7 @@
                                 <option value="UP3.6413">UP3.6413</option>
                                 <option value="UP3.6414">UP3.6414</option>
                                 <option value="UP3.6415">UP3.6415</option>
+                                <option value="UPT.3217">UPT.3217</option>
                             </select>
                         </div>
 
@@ -55,7 +56,22 @@
 
                         <div class="col-md-4">
                             <label class="form-label">Unit Name</label>
-                            <input type="text" name="UNITNAME" class="form-control">
+                            <!-- DIGANTI: UNITNAME dropdown khusus GI -->
+                            <select name="UNITNAME" class="form-control">
+                                <option value="" disabled selected>-- Pilih Unit Name --</option>
+                                <option value="UP2D RIAU">UP2D RIAU</option>
+                                <option value="PEKANBARU">PEKANBARU</option>
+                                <option value="SIAK SRI INDRAPURA">SIAK SRI INDRAPURA</option>
+                                <option value="DUMAI">DUMAI</option>
+                                <option value="BELAKANGPADANG">BELAKANGPADANG</option>
+                                <option value="KIJANG">KIJANG</option>
+                                <option value="TANJUNG BALAI KARIMUN">TANJUNG BALAI KARIMUN</option>
+                                <option value="TANJUNG BATU">TANJUNG BATU</option>
+                                <option value="TANJUNG PINANG">TANJUNG PINANG</option>
+                                <option value="RENGAT">RENGAT</option>
+                                <option value="BANGKINANG">BANGKINANG</option>
+                                <option value="UNIT PELAKSANA TRANSMISI PEKANBARU">UNIT PELAKSANA TRANSMISI PEKANBARU</option>
+                            </select>
                         </div>
 
                         <div class="col-md-4">
@@ -75,7 +91,14 @@
 
                         <div class="col-md-4">
                             <label class="form-label">Status</label>
-                            <input type="text" name="STATUS" class="form-control">
+                            <!-- DIGANTI: dropdown STATUS GI -->
+                            <select name="STATUS" class="form-control">
+                                <option value="" disabled selected>-- Pilih Status --</option>
+                                <option value="OPERATING">OPERATING</option>
+                                <option value="INACTIVE">INACTIVE</option>
+                                <option value="NOT READY">NOT READY</option>
+                                <option value="REQOPERATING">REQOPERATING</option>
+                            </select>
                         </div>
 
                         <div class="col-md-4">
@@ -166,7 +189,12 @@
 
                         <div class="col-md-4">
                             <label class="form-label">Status Kepemilikan</label>
-                            <input type="text" name="STATUS_KEPEMILIKAN" class="form-control">
+                            <!-- DIGANTI: dropdown STATUS_KEPEMILIKAN -->
+                            <select name="STATUS_KEPEMILIKAN" class="form-control">
+                                <option value="" disabled selected>-- Pilih Status Kepemilikan --</option>
+                                <option value="PLN">PLN</option>
+                                <option value="NON PLN">NON PLN</option>
+                            </select>
                         </div>
 
                     </div>

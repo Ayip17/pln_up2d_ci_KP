@@ -15,11 +15,28 @@
 					<div class="row g-3">
 						<div class="col-md-4">
 							<label class="form-label">UP3_2D</label>
-							<input type="text" class="form-control" name="UP3_2D" value="<?= htmlentities($gardu_hubung['UP3_2D'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+							<select class="form-control" name="UP3_2D">
+								<option value="" disabled <?= empty($gardu_hubung['UP3_2D']) ? 'selected' : ''; ?>>-- Pilih UP3_2D --</option>
+								<option value="UP2D.6456" <?= (($gardu_hubung['UP3_2D'] ?? '') === 'UP2D.6456') ? 'selected' : ''; ?>>UP2D.6456</option>
+								<option value="UP3.6411" <?= (($gardu_hubung['UP3_2D'] ?? '') === 'UP3.6411') ? 'selected' : ''; ?>>UP3.6411</option>
+								<option value="UP3.6412" <?= (($gardu_hubung['UP3_2D'] ?? '') === 'UP3.6412') ? 'selected' : ''; ?>>UP3.6412</option>
+								<option value="UP3.6413" <?= (($gardu_hubung['UP3_2D'] ?? '') === 'UP3.6413') ? 'selected' : ''; ?>>UP3.6413</option>
+								<option value="UP3.6414" <?= (($gardu_hubung['UP3_2D'] ?? '') === 'UP3.6414') ? 'selected' : ''; ?>>UP3.6414</option>
+								<option value="UP3.6415" <?= (($gardu_hubung['UP3_2D'] ?? '') === 'UP3.6415') ? 'selected' : ''; ?>>UP3.6415</option>
+								<option value="UPT.3217" <?= (($gardu_hubung['UP3_2D'] ?? '') === 'UPT.3217') ? 'selected' : ''; ?>>UPT.3217</option>
+							</select>
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">UNITNAME_UP3</label>
-							<input type="text" class="form-control" name="UNITNAME_UP3" value="<?= htmlentities($gardu_hubung['UNITNAME_UP3'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+							<select class="form-control" name="UNITNAME_UP3">
+								<option value="" disabled <?= empty($gardu_hubung['UNITNAME_UP3']) ? 'selected' : ''; ?>>-- Pilih UNITNAME_UP3 --</option>
+								<option value="UP2D RIAU" <?= (($gardu_hubung['UNITNAME_UP3'] ?? '') === 'UP2D RIAU') ? 'selected' : ''; ?>>UP2D RIAU</option>
+								<option value="PEKANBARU" <?= (($gardu_hubung['UNITNAME_UP3'] ?? '') === 'PEKANBARU') ? 'selected' : ''; ?>>PEKANBARU</option>
+								<option value="DUMAI" <?= (($gardu_hubung['UNITNAME_UP3'] ?? '') === 'DUMAI') ? 'selected' : ''; ?>>DUMAI</option>
+								<option value="TANJUNG PINANG" <?= (($gardu_hubung['UNITNAME_UP3'] ?? '') === 'TANJUNG PINANG') ? 'selected' : ''; ?>>TANJUNG PINANG</option>
+								<option value="RENGAT" <?= (($gardu_hubung['UNITNAME_UP3'] ?? '') === 'RENGAT') ? 'selected' : ''; ?>>RENGAT</option>
+								<option value="BANGKINANG" <?= (($gardu_hubung['UNITNAME_UP3'] ?? '') === 'BANGKINANG') ? 'selected' : ''; ?>>BANGKINANG</option>
+							</select>
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">CXUNIT</label>
@@ -28,7 +45,45 @@
 
 						<div class="col-md-4">
 							<label class="form-label">UNITNAME</label>
-							<input type="text" class="form-control" name="UNITNAME" value="<?= htmlentities($gardu_hubung['UNITNAME'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+							<select class="form-control" name="UNITNAME">
+								<option value="" disabled <?= empty($gardu_hubung['UNITNAME']) ? 'selected' : ''; ?>>-- Pilih UNITNAME --</option>
+								<option value="UP2D RIAU" <?= (($gardu_hubung['UNITNAME'] ?? '') === 'UP2D RIAU') ? 'selected' : ''; ?>>UP2D RIAU</option>
+								<option value="PANAM" <?= (($gardu_hubung['UNITNAME'] ?? '') === 'PANAM') ? 'selected' : ''; ?>>PANAM</option>
+								<option value="PANGKALAN KERINCI" <?= (($gardu_hubung['UNITNAME'] ?? '') === 'PANGKALAN KERINCI') ? 'selected' : ''; ?>>PANGKALAN KERINCI</option>
+								<option value="PEKANBARU KOTA BARAT" <?= (($gardu_hubung['UNITNAME'] ?? '') === 'PEKANBARU KOTA BARAT') ? 'selected' : ''; ?>>PEKANBARU KOTA BARAT</option>
+								<option value="PEKANBARU KOTA TIMUR" <?= (($gardu_hubung['UNITNAME'] ?? '') === 'PEKANBARU KOTA TIMUR') ? 'selected' : ''; ?>>PEKANBARU KOTA TIMUR</option>
+								<option value="PERAWANG" <?= (($gardu_hubung['UNITNAME'] ?? '') === 'PERAWANG') ? 'selected' : ''; ?>>PERAWANG</option>
+								<option value="RUMBAI" <?= (($gardu_hubung['UNITNAME'] ?? '') === 'RUMBAI') ? 'selected' : ''; ?>>RUMBAI</option>
+								<option value="SIAK SRI INDRAPURA" <?= (($gardu_hubung['UNITNAME'] ?? '') === 'SIAK SRI INDRAPURA') ? 'selected' : ''; ?>>SIAK SRI INDRAPURA</option>
+								<option value="SIMPANG TIGA" <?= (($gardu_hubung['UNITNAME'] ?? '') === 'SIMPANG TIGA') ? 'selected' : ''; ?>>SIMPANG TIGA</option>
+								<option value="BAGAN BATU" <?= (($gardu_hubung['UNITNAME'] ?? '') === 'BAGAN BATU') ? 'selected' : ''; ?>>BAGAN BATU</option>
+								<option value="BAGAN SIAPI-API" <?= (($gardu_hubung['UNITNAME'] ?? '') === 'BAGAN SIAPI-API') ? 'selected' : ''; ?>>BAGAN SIAPI-API</option>
+								<option value="BENGKALIS" <?= (($gardu_hubung['UNITNAME'] ?? '') === 'BENGKALIS') ? 'selected' : ''; ?>>BENGKALIS</option>
+								<option value="DUMAI KOTA" <?= (($gardu_hubung['UNITNAME'] ?? '') === 'DUMAI KOTA') ? 'selected' : ''; ?>>DUMAI KOTA</option>
+								<option value="DURI" <?= (($gardu_hubung['UNITNAME'] ?? '') === 'DURI') ? 'selected' : ''; ?>>DURI</option>
+								<option value="SELATPANJANG" <?= (($gardu_hubung['UNITNAME'] ?? '') === 'SELATPANJANG') ? 'selected' : ''; ?>>SELATPANJANG</option>
+								<option value="ANAMBAS" <?= (($gardu_hubung['UNITNAME'] ?? '') === 'ANAMBAS') ? 'selected' : ''; ?>>ANAMBAS</option>
+								<option value="BELAKANGPADANG" <?= (($gardu_hubung['UNITNAME'] ?? '') === 'BELAKANGPADANG') ? 'selected' : ''; ?>>BELAKANGPADANG</option>
+								<option value="BINTAN CENTER" <?= (($gardu_hubung['UNITNAME'] ?? '') === 'BINTAN CENTER') ? 'selected' : ''; ?>>BINTAN CENTER</option>
+								<option value="DABO SINGKEP" <?= (($gardu_hubung['UNITNAME'] ?? '') === 'DABO SINGKEP') ? 'selected' : ''; ?>>DABO SINGKEP</option>
+								<option value="KIJANG" <?= (($gardu_hubung['UNITNAME'] ?? '') === 'KIJANG') ? 'selected' : ''; ?>>KIJANG</option>
+								<option value="RANAI" <?= (($gardu_hubung['UNITNAME'] ?? '') === 'RANAI') ? 'selected' : ''; ?>>RANAI</option>
+								<option value="TANJUNG BALAI KARIMUN" <?= (($gardu_hubung['UNITNAME'] ?? '') === 'TANJUNG BALAI KARIMUN') ? 'selected' : ''; ?>>TANJUNG BALAI KARIMUN</option>
+								<option value="TANJUNG BATU" <?= (($gardu_hubung['UNITNAME'] ?? '') === 'TANJUNG BATU') ? 'selected' : ''; ?>>TANJUNG BATU</option>
+								<option value="TANJUNG UBAN" <?= (($gardu_hubung['UNITNAME'] ?? '') === 'TANJUNG UBAN') ? 'selected' : ''; ?>>TANJUNG UBAN</option>
+								<option value="TANJUNGPINANG KOTA" <?= (($gardu_hubung['UNITNAME'] ?? '') === 'TANJUNGPINANG KOTA') ? 'selected' : ''; ?>>TANJUNGPINANG KOTA</option>
+								<option value="AIR MOLEK" <?= (($gardu_hubung['UNITNAME'] ?? '') === 'AIR MOLEK') ? 'selected' : ''; ?>>AIR MOLEK</option>
+								<option value="KUALA ENOK" <?= (($gardu_hubung['UNITNAME'] ?? '') === 'KUALA ENOK') ? 'selected' : ''; ?>>KUALA ENOK</option>
+								<option value="RENGAT" <?= (($gardu_hubung['UNITNAME'] ?? '') === 'RENGAT') ? 'selected' : ''; ?>>RENGAT</option>
+								<option value="RENGAT KOTA" <?= (($gardu_hubung['UNITNAME'] ?? '') === 'RENGAT KOTA') ? 'selected' : ''; ?>>RENGAT KOTA</option>
+								<option value="TALUK KUANTAN" <?= (($gardu_hubung['UNITNAME'] ?? '') === 'TALUK KUANTAN') ? 'selected' : ''; ?>>TALUK KUANTAN</option>
+								<option value="TEMBILAHAN" <?= (($gardu_hubung['UNITNAME'] ?? '') === 'TEMBILAHAN') ? 'selected' : ''; ?>>TEMBILAHAN</option>
+								<option value="BANGKINANG" <?= (($gardu_hubung['UNITNAME'] ?? '') === 'BANGKINANG') ? 'selected' : ''; ?>>BANGKINANG</option>
+								<option value="KAMPAR" <?= (($gardu_hubung['UNITNAME'] ?? '') === 'KAMPAR') ? 'selected' : ''; ?>>KAMPAR</option>
+								<option value="LIPAT KAIN" <?= (($gardu_hubung['UNITNAME'] ?? '') === 'LIPAT KAIN') ? 'selected' : ''; ?>>LIPAT KAIN</option>
+								<option value="PASIR PANGARAIAN" <?= (($gardu_hubung['UNITNAME'] ?? '') === 'PASIR PANGARAIAN') ? 'selected' : ''; ?>>PASIR PANGARAIAN</option>
+								<option value="UJUNG BATU" <?= (($gardu_hubung['UNITNAME'] ?? '') === 'UJUNG BATU') ? 'selected' : ''; ?>>UJUNG BATU</option>
+							</select>
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">LOCATION</label>
@@ -45,7 +100,13 @@
 						</div>
 						<div class="col-md-6">
 							<label class="form-label">STATUS</label>
-							<input type="text" class="form-control" name="STATUS" value="<?= htmlentities($gardu_hubung['STATUS'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+							<select class="form-control" name="STATUS">
+								<option value="" disabled <?= empty($gardu_hubung['STATUS']) ? 'selected' : ''; ?>>-- Pilih STATUS --</option>
+								<option value="OPERATING" <?= (($gardu_hubung['STATUS'] ?? '') === 'OPERATING') ? 'selected' : ''; ?>>OPERATING</option>
+								<option value="INACTIVE" <?= (($gardu_hubung['STATUS'] ?? '') === 'INACTIVE') ? 'selected' : ''; ?>>INACTIVE</option>
+								<option value="NOT READY" <?= (($gardu_hubung['STATUS'] ?? '') === 'NOT READY') ? 'selected' : ''; ?>>NOT READY</option>
+								<option value="REQOPERATING" <?= (($gardu_hubung['STATUS'] ?? '') === 'REQOPERATING') ? 'selected' : ''; ?>>REQOPERATING</option>
+							</select>
 						</div>
 
 						<div class="col-md-4">
@@ -125,7 +186,11 @@
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">STATUS_KEPEMILIKAN</label>
-							<input type="text" class="form-control" name="STATUS_KEPEMILIKAN" value="<?= htmlentities($gardu_hubung['STATUS_KEPEMILIKAN'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+							<select class="form-control" name="STATUS_KEPEMILIKAN">
+								<option value="" disabled <?= empty($gardu_hubung['STATUS_KEPEMILIKAN']) ? 'selected' : ''; ?>>-- Pilih STATUS_KEPEMILIKAN --</option>
+								<option value="PLN" <?= (($gardu_hubung['STATUS_KEPEMILIKAN'] ?? '') === 'PLN') ? 'selected' : ''; ?>>PLN</option>
+								<option value="NON PLN" <?= (($gardu_hubung['STATUS_KEPEMILIKAN'] ?? '') === 'NON PLN') ? 'selected' : ''; ?>>NON PLN</option>
+							</select>
 						</div>
 
 						<div class="col-md-4">
@@ -134,7 +199,13 @@
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">JENIS_PELAYANAN</label>
-							<input type="text" class="form-control" name="JENIS_PELAYANAN" value="<?= htmlentities($gardu_hubung['JENIS_PELAYANAN'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+							<select class="form-control" name="JENIS_PELAYANAN">
+								<option value="" disabled <?= empty($gardu_hubung['JENIS_PELAYANAN']) ? 'selected' : ''; ?>>-- Pilih JENIS_PELAYANAN --</option>
+								<option value="Umum" <?= (($gardu_hubung['JENIS_PELAYANAN'] ?? '') === 'Umum') ? 'selected' : ''; ?>>Umum</option>
+								<option value="Campuran" <?= (($gardu_hubung['JENIS_PELAYANAN'] ?? '') === 'Campuran') ? 'selected' : ''; ?>>Campuran</option>
+								<option value="Distribusi" <?= (($gardu_hubung['JENIS_PELAYANAN'] ?? '') === 'Distribusi') ? 'selected' : ''; ?>>Distribusi</option>
+								<option value="Khusus" <?= (($gardu_hubung['JENIS_PELAYANAN'] ?? '') === 'Khusus') ? 'selected' : ''; ?>>Khusus</option>
+							</select>
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">NO_SLO</label>
@@ -151,7 +222,11 @@
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">STATUS_RC</label>
-							<input type="text" class="form-control" name="STATUS_RC" value="<?= htmlentities($gardu_hubung['STATUS_RC'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+							<select class="form-control" name="STATUS_RC">
+								<option value="" disabled <?= empty($gardu_hubung['STATUS_RC']) ? 'selected' : ''; ?>>-- Pilih STATUS_RC --</option>
+								<option value="ADA" <?= (($gardu_hubung['STATUS_RC'] ?? '') === 'ADA') ? 'selected' : ''; ?>>ADA</option>
+								<option value="TIDAK ADA" <?= (($gardu_hubung['STATUS_RC'] ?? '') === 'TIDAK ADA') ? 'selected' : ''; ?>>TIDAK ADA</option>
+							</select>
 						</div>
 
 						<div class="col-md-6">

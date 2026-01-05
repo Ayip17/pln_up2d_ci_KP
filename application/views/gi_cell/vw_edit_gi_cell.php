@@ -20,7 +20,21 @@
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">UNITNAME</label>
-							<input type="text" class="form-control" name="UNITNAME" value="<?= htmlentities($gi_cell['UNITNAME'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+							<select class="form-control" name="UNITNAME">
+								<option value="" disabled <?= empty($gi_cell['UNITNAME']) ? 'selected' : ''; ?>>-- Pilih UNITNAME --</option>
+								<option value="UP2D RIAU" <?= (isset($gi_cell['UNITNAME']) && $gi_cell['UNITNAME'] == 'UP2D RIAU') ? 'selected' : ''; ?>>UP2D RIAU</option>
+								<option value="PEKANBARU" <?= (isset($gi_cell['UNITNAME']) && $gi_cell['UNITNAME'] == 'PEKANBARU') ? 'selected' : ''; ?>>PEKANBARU</option>
+								<option value="SIAK SRI INDRAPURA" <?= (isset($gi_cell['UNITNAME']) && $gi_cell['UNITNAME'] == 'SIAK SRI INDRAPURA') ? 'selected' : ''; ?>>SIAK SRI INDRAPURA</option>
+								<option value="DUMAI" <?= (isset($gi_cell['UNITNAME']) && $gi_cell['UNITNAME'] == 'DUMAI') ? 'selected' : ''; ?>>DUMAI</option>
+								<option value="BELAKANGPADANG" <?= (isset($gi_cell['UNITNAME']) && $gi_cell['UNITNAME'] == 'BELAKANGPADANG') ? 'selected' : ''; ?>>BELAKANGPADANG</option>
+								<option value="KIJANG" <?= (isset($gi_cell['UNITNAME']) && $gi_cell['UNITNAME'] == 'KIJANG') ? 'selected' : ''; ?>>KIJANG</option>
+								<option value="TANJUNG BALAI KARIMUN" <?= (isset($gi_cell['UNITNAME']) && $gi_cell['UNITNAME'] == 'TANJUNG BALAI KARIMUN') ? 'selected' : ''; ?>>TANJUNG BALAI KARIMUN</option>
+								<option value="TANJUNG BATU" <?= (isset($gi_cell['UNITNAME']) && $gi_cell['UNITNAME'] == 'TANJUNG BATU') ? 'selected' : ''; ?>>TANJUNG BATU</option>
+								<option value="TANJUNG PINANG" <?= (isset($gi_cell['UNITNAME']) && $gi_cell['UNITNAME'] == 'TANJUNG PINANG') ? 'selected' : ''; ?>>TANJUNG PINANG</option>
+								<option value="RENGAT" <?= (isset($gi_cell['UNITNAME']) && $gi_cell['UNITNAME'] == 'RENGAT') ? 'selected' : ''; ?>>RENGAT</option>
+								<option value="BANGKINANG" <?= (isset($gi_cell['UNITNAME']) && $gi_cell['UNITNAME'] == 'BANGKINANG') ? 'selected' : ''; ?>>BANGKINANG</option>
+								<option value="UNIT PELAKSANA TRANSMISI PEKANBARU" <?= (isset($gi_cell['UNITNAME']) && $gi_cell['UNITNAME'] == 'UNIT PELAKSANA TRANSMISI PEKANBARU') ? 'selected' : ''; ?>>UNIT PELAKSANA TRANSMISI PEKANBARU</option>
+							</select>
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">ASSETNUM</label>
@@ -56,7 +70,13 @@
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">STATUS</label>
-							<input type="text" class="form-control" name="STATUS" value="<?= htmlentities($gi_cell['STATUS'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+							<select class="form-control" name="STATUS">
+								<option value="" disabled <?= empty($gi_cell['STATUS']) ? 'selected' : ''; ?>>-- Pilih STATUS --</option>
+								<option value="OPERATING" <?= (isset($gi_cell['STATUS']) && $gi_cell['STATUS'] == 'OPERATING') ? 'selected' : ''; ?>>OPERATING</option>
+								<option value="INACTIVE" <?= (isset($gi_cell['STATUS']) && $gi_cell['STATUS'] == 'INACTIVE') ? 'selected' : ''; ?>>INACTIVE</option>
+								<option value="NOT READY" <?= (isset($gi_cell['STATUS']) && $gi_cell['STATUS'] == 'NOT READY') ? 'selected' : ''; ?>>NOT READY</option>
+								<option value="REQOPERATING" <?= (isset($gi_cell['STATUS']) && $gi_cell['STATUS'] == 'REQOPERATING') ? 'selected' : ''; ?>>REQOPERATING</option>
+							</select>
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">TUJDNUMBER</label>
@@ -96,7 +116,11 @@
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">STATUS_KEPEMILIKAN</label>
-							<input type="text" class="form-control" name="STATUS_KEPEMILIKAN" value="<?= htmlentities($gi_cell['STATUS_KEPEMILIKAN'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+							<select class="form-control" name="STATUS_KEPEMILIKAN">
+								<option value="" disabled <?= empty($gi_cell['STATUS_KEPEMILIKAN']) ? 'selected' : ''; ?>>-- Pilih STATUS_KEPEMILIKAN --</option>
+								<option value="PLN" <?= (isset($gi_cell['STATUS_KEPEMILIKAN']) && $gi_cell['STATUS_KEPEMILIKAN'] == 'PLN') ? 'selected' : ''; ?>>PLN</option>
+								<option value="NON PLN" <?= (isset($gi_cell['STATUS_KEPEMILIKAN']) && $gi_cell['STATUS_KEPEMILIKAN'] == 'NON PLN') ? 'selected' : ''; ?>>NON PLN</option>
+							</select>
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">BURDEN</label>
@@ -132,11 +156,23 @@
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">ISOLASI_KUBIKEL</label>
-							<input type="text" class="form-control" name="ISOLASI_KUBIKEL" value="<?= htmlentities($gi_cell['ISOLASI_KUBIKEL'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+							<select class="form-control" name="ISOLASI_KUBIKEL">
+								<option value="" disabled <?= empty($gi_cell['ISOLASI_KUBIKEL']) ? 'selected' : ''; ?>>-- Pilih ISOLASI_KUBIKEL --</option>
+								<option value="Full Insulated" <?= (isset($gi_cell['ISOLASI_KUBIKEL']) && $gi_cell['ISOLASI_KUBIKEL'] == 'Full Insulated') ? 'selected' : ''; ?>>Full Insulated</option>
+								<option value="Air Insulated" <?= (isset($gi_cell['ISOLASI_KUBIKEL']) && $gi_cell['ISOLASI_KUBIKEL'] == 'Air Insulated') ? 'selected' : ''; ?>>Air Insulated</option>
+							</select>
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">JENIS_MVCELL</label>
-							<input type="text" class="form-control" name="JENIS_MVCELL" value="<?= htmlentities($gi_cell['JENIS_MVCELL'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+							<select class="form-control" name="JENIS_MVCELL">
+								<option value="" disabled <?= empty($gi_cell['JENIS_MVCELL']) ? 'selected' : ''; ?>>-- Pilih JENIS_MVCELL --</option>
+								<option value="Pemutus Tenaga" <?= (isset($gi_cell['JENIS_MVCELL']) && $gi_cell['JENIS_MVCELL'] == 'Pemutus Tenaga') ? 'selected' : ''; ?>>Pemutus Tenaga</option>
+								<option value="Pemisah" <?= (isset($gi_cell['JENIS_MVCELL']) && $gi_cell['JENIS_MVCELL'] == 'Pemisah') ? 'selected' : ''; ?>>Pemisah</option>
+								<option value="Interface / Terminal Kabel" <?= (isset($gi_cell['JENIS_MVCELL']) && $gi_cell['JENIS_MVCELL'] == 'Interface / Terminal Kabel') ? 'selected' : ''; ?>>Interface / Terminal Kabel</option>
+								<option value="Pemutus" <?= (isset($gi_cell['JENIS_MVCELL']) && $gi_cell['JENIS_MVCELL'] == 'Pemutus') ? 'selected' : ''; ?>>Pemutus</option>
+								<option value="Pengaman Trafo" <?= (isset($gi_cell['JENIS_MVCELL']) && $gi_cell['JENIS_MVCELL'] == 'Pengaman Trafo') ? 'selected' : ''; ?>>Pengaman Trafo</option>
+								<option value="Pengukuran" <?= (isset($gi_cell['JENIS_MVCELL']) && $gi_cell['JENIS_MVCELL'] == 'Pengukuran') ? 'selected' : ''; ?>>Pengukuran</option>
+							</select>
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">TH_BUAT</label>

@@ -10,138 +10,158 @@
             </div>
 
             <div class="card-body">
+
+                <?php if (validation_errors()): ?>
+                    <div class="alert alert-danger">
+                        <strong>Wajib mengisi form sesuai status.</strong>
+                        <div><?= validation_errors(); ?></div>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($this->session->flashdata('error')): ?>
+                    <div class="alert alert-danger"><?= $this->session->flashdata('error'); ?></div>
+                <?php endif; ?>
+
                 <?php
                 $user_role = strtolower($this->session->userdata('user_role') ?? '');
                 $is_up3 = ($user_role === 'up3');
-                $readonly = $is_up3 ? 'readonly' : '';
                 $disabled = $is_up3 ? 'disabled' : '';
+
+                // Helper aman utk PHP 8.1 (hindari htmlentities(NULL))
+                if (!function_exists('e')) {
+                    function e($v) {
+                        return htmlentities((string)($v ?? ''), ENT_QUOTES, 'UTF-8');
+                    }
+                }
                 ?>
 
-                <form id="editPengaduanForm" action="<?= base_url('Pengaduan/edit/' . urlencode($pengaduan['ID_PENGADUAN'])); ?>" method="POST" enctype="multipart/form-data">
+                <form id="formPengaduan" action="<?= base_url('Pengaduan/edit/' . ($pengaduan['ID_PENGADUAN'] ?? '')); ?>" method="POST" enctype="multipart/form-data">
+
+                    <!-- penting untuk callback foto di controller -->
+                    <input type="hidden" name="OLD_FOTO_PENGADUAN" value="<?= e($pengaduan['FOTO_PENGADUAN'] ?? ''); ?>">
+                    <input type="hidden" name="OLD_FOTO_PROSES" value="<?= e($pengaduan['FOTO_PROSES'] ?? ''); ?>">
+
                     <div class="row g-3">
 
                         <!-- Unit Pelaksana -->
                         <div class="col-md-4">
                             <label class="form-label">Unit Pelaksana</label>
-                            <select name="NAMA_UP3" class="form-control" <?= $disabled; ?> required>
+                            <select name="NAMA_UP3" class="form-control" required>
                                 <option value="">-- Pilih UP --</option>
-                                <?php
-                                $upList = ['PEKANBARU', 'DUMAI', 'TANJUNG PINANG', 'RENGAT', 'BANGKINANG', 'UP2D_Riau'];
-                                foreach ($upList as $up) {
-                                    $selected = ($pengaduan['NAMA_UP3'] == $up) ? 'selected' : '';
-                                    echo "<option value='$up' $selected>$up</option>";
-                                }
-                                ?>
+                                <option value="PEKANBARU" <?= (($pengaduan['NAMA_UP3'] ?? '') === 'PEKANBARU') ? 'selected' : ''; ?>>PEKANBARU</option>
+                                <option value="DUMAI" <?= (($pengaduan['NAMA_UP3'] ?? '') === 'DUMAI') ? 'selected' : ''; ?>>DUMAI</option>
+                                <option value="TANJUNG PINANG" <?= (($pengaduan['NAMA_UP3'] ?? '') === 'TANJUNG PINANG') ? 'selected' : ''; ?>>TANJUNG PINANG</option>
+                                <option value="RENGAT" <?= (($pengaduan['NAMA_UP3'] ?? '') === 'RENGAT') ? 'selected' : ''; ?>>RENGAT</option>
+                                <option value="BANGKINANG" <?= (($pengaduan['NAMA_UP3'] ?? '') === 'BANGKINANG') ? 'selected' : ''; ?>>BANGKINANG</option>
+                                <option value="UP2D_Riau" <?= (($pengaduan['NAMA_UP3'] ?? '') === 'UP2D_Riau') ? 'selected' : ''; ?>>UP2D Riau</option>
                             </select>
                         </div>
 
                         <!-- Tanggal Pengaduan -->
                         <div class="col-md-4">
                             <label class="form-label">Tanggal Pengaduan</label>
-                            <input type="date" class="form-control" name="TANGGAL_PENGADUAN" value="<?= htmlentities($pengaduan['TANGGAL_PENGADUAN']); ?>" <?= $readonly; ?> required>
+                            <input type="date" class="form-control" name="TANGGAL_PENGADUAN" value="<?= e($pengaduan['TANGGAL_PENGADUAN'] ?? ''); ?>" required>
                         </div>
 
                         <!-- Tanggal Proses -->
                         <div class="col-md-4" id="tanggalProsesContainer" style="display:none;">
                             <label class="form-label">Tanggal Proses</label>
-                            <input type="date" name="TANGGAL_PROSES" class="form-control" value="<?= htmlentities($pengaduan['TANGGAL_PROSES'] ?? ''); ?>" <?= $readonly; ?>>
+                            <input type="date" name="TANGGAL_PROSES" id="tanggalProses" class="form-control" value="<?= e($pengaduan['TANGGAL_PROSES'] ?? ''); ?>">
                         </div>
 
                         <!-- Tanggal Selesai -->
                         <div class="col-md-4" id="tanggalSelesaiContainer" style="display:none;">
                             <label class="form-label">Tanggal Selesai</label>
-                            <input type="date" name="TANGGAL_SELESAI" id="tanggalSelesai" class="form-control" value="<?= htmlentities($pengaduan['TANGGAL_SELESAI'] ?? ''); ?>" <?= $readonly; ?>>
+                            <input type="date" name="TANGGAL_SELESAI" id="tanggalSelesai" class="form-control" value="<?= e($pengaduan['TANGGAL_SELESAI'] ?? ''); ?>">
                         </div>
 
                         <!-- Jenis Pengaduan -->
                         <div class="col-md-6">
                             <label class="form-label">Jenis Pengaduan</label>
-                            <select id="jenis_pengaduan" name="JENIS_PENGADUAN" class="form-control" <?= $disabled; ?> required>
+                            <select id="jenis_pengaduan" name="JENIS_PENGADUAN" class="form-control" required>
                                 <option value="">-- Pilih Jenis Pengaduan --</option>
-                                <?php
-                                $jenisList = ["Gardu Induk", "Gardu Hubung", "Recloser", "LBS", "Radio Komunikasi"];
-                                foreach ($jenisList as $jenis) {
-                                    $selected = ($pengaduan['JENIS_PENGADUAN'] == $jenis) ? 'selected' : '';
-                                    echo "<option value='$jenis' $selected>$jenis</option>";
-                                }
-                                ?>
+                                <option value="Gardu Induk" <?= (($pengaduan['JENIS_PENGADUAN'] ?? '') === 'Gardu Induk') ? 'selected' : ''; ?>>Gardu Induk</option>
+                                <option value="Gardu Hubung" <?= (($pengaduan['JENIS_PENGADUAN'] ?? '') === 'Gardu Hubung') ? 'selected' : ''; ?>>Gardu Hubung</option>
+                                <option value="Recloser" <?= (($pengaduan['JENIS_PENGADUAN'] ?? '') === 'Recloser') ? 'selected' : ''; ?>>Recloser</option>
+                                <option value="LBS" <?= (($pengaduan['JENIS_PENGADUAN'] ?? '') === 'LBS') ? 'selected' : ''; ?>>LBS</option>
+                                <option value="Radio Komunikasi" <?= (($pengaduan['JENIS_PENGADUAN'] ?? '') === 'Radio Komunikasi') ? 'selected' : ''; ?>>Radio Komunikasi</option>
                             </select>
                         </div>
 
                         <!-- Item Pengaduan -->
                         <div class="col-md-6">
                             <label class="form-label">Pilih Item Pengaduan</label>
-                            <select id="item_pengaduan" name="ITEM_PENGADUAN" class="form-control" <?= $disabled; ?> required>
+                            <select id="item_pengaduan" name="ITEM_PENGADUAN" class="form-control" required>
                                 <option value="">-- Pilih Item Pengaduan --</option>
-                                <?php if (!empty($pengaduan['ITEM_PENGADUAN'])): ?>
-                                    <option value="<?= htmlentities($pengaduan['ITEM_PENGADUAN']); ?>" selected><?= htmlentities($pengaduan['ITEM_PENGADUAN']); ?></option>
-                                <?php endif; ?>
                             </select>
                         </div>
 
                         <!-- PIC -->
                         <div class="col-md-6">
                             <label class="form-label">PIC</label>
-                            <select name="PIC" id="pic" class="form-control" <?= $disabled; ?> required>
+                            <select name="PIC" class="form-control" required>
                                 <option value="">-- Pilih PIC --</option>
-                                <?php
-                                $picList = ["Operasi Sistem Distribusi", "Fasilitas Operasi", "Pemeliharaan", "K3L & KAM", "Perencanaan"];
-                                foreach ($picList as $pic) {
-                                    $selected = ($pengaduan['PIC'] == $pic) ? 'selected' : '';
-                                    echo "<option value='$pic' $selected>$pic</option>";
-                                }
-                                ?>
+                                <option value="Operasi Sistem Distribusi" <?= (($pengaduan['PIC'] ?? '') === 'Operasi Sistem Distribusi') ? 'selected' : ''; ?>>Operasi Sistem Distribusi</option>
+                                <option value="Fasilitas Operasi" <?= (($pengaduan['PIC'] ?? '') === 'Fasilitas Operasi') ? 'selected' : ''; ?>>Fasilitas Operasi</option>
+                                <option value="Pemeliharaan" <?= (($pengaduan['PIC'] ?? '') === 'Pemeliharaan') ? 'selected' : ''; ?>>Pemeliharaan</option>
+                                <option value="K3L & KAM" <?= (($pengaduan['PIC'] ?? '') === 'K3L & KAM') ? 'selected' : ''; ?>>K3L & KAM</option>
+                                <option value="Perencanaan" <?= (($pengaduan['PIC'] ?? '') === 'Perencanaan') ? 'selected' : ''; ?>>Perencanaan</option>
                             </select>
                         </div>
 
-                        <!-- Laporan, Tindak Lanjut, Catatan -->
+                        <!-- TITIK KOORDINAT (KOLOM BARU) - DI SAMPING PIC -->
+                        <div class="col-md-6">
+                            <label class="form-label">Titik Koordinat</label>
+                            <input type="text" name="TITIK_KOORDINAT" class="form-control" value="<?= e($pengaduan['TITIK_KOORDINAT'] ?? ''); ?>" placeholder="Contoh: -6.200000,106.816666" required>
+                            <small class="text-muted">Format: latitude,longitude (contoh: -6.200000,106.816666)</small>
+                        </div>
+
+                        <!-- Laporan dan Catatan -->
                         <div class="col-md-12">
                             <div class="row">
                                 <div class="col-md-6">
                                     <label class="form-label">Laporan</label>
-                                    <textarea name="LAPORAN" rows="5" class="form-control" required><?= htmlentities($pengaduan['LAPORAN']); ?></textarea>
+                                    <textarea name="LAPORAN" rows="5" class="form-control" required><?= e($pengaduan['LAPORAN'] ?? ''); ?></textarea>
                                 </div>
 
                                 <div class="col-md-6" id="tindakLanjutContainer" style="display:none;">
                                     <label class="form-label">Tindak Lanjut</label>
-                                    <textarea name="TINDAK_LANJUT" rows="5" class="form-control" <?= $readonly; ?>><?= htmlentities($pengaduan['TINDAK_LANJUT'] ?? ''); ?></textarea>
+                                    <textarea name="TINDAK_LANJUT" id="tindakLanjut" rows="5" class="form-control"><?= e($pengaduan['TINDAK_LANJUT'] ?? ''); ?></textarea>
                                 </div>
 
                                 <div class="col-md-6" id="catatanContainer" style="display:none;">
                                     <label class="form-label">Catatan</label>
-                                    <textarea name="CATATAN" rows="5" class="form-control" <?= $readonly; ?>><?= htmlentities($pengaduan['CATATAN'] ?? ''); ?></textarea>
+                                    <textarea name="CATATAN" id="catatan" rows="5" class="form-control"><?= e($pengaduan['CATATAN'] ?? ''); ?></textarea>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Foto Pengaduan & Proses -->
+                        <!-- Foto Pengaduan dan Proses -->
                         <div class="col-md-12">
                             <div class="row">
                                 <div class="col-md-6">
                                     <label class="form-label">Foto Pengaduan</label>
-                                    <?php if (!empty($pengaduan['FOTO_PENGADUAN'])): ?>
-                                        <div class="mt-2 mb-2">
-                                            <img src="<?= base_url('uploads/pengaduan/' . $pengaduan['FOTO_PENGADUAN']); ?>" class="img-thumbnail rounded" style="max-width:200px;">
-                                        </div>
-                                    <?php endif; ?>
                                     <input type="file" name="FOTO_PENGADUAN" class="form-control" accept="image/*" onchange="previewImage(event, 'preview_pengaduan')">
                                     <small class="text-muted">Format: JPG, PNG, maksimal 2MB</small>
                                     <div class="mt-2">
-                                        <img id="preview_pengaduan" src="#" class="img-thumbnail rounded" style="max-width:200px; display:none;">
+                                        <?php if (!empty($pengaduan['FOTO_PENGADUAN'])): ?>
+                                            <img id="preview_pengaduan" src="<?= base_url('uploads/pengaduan/' . $pengaduan['FOTO_PENGADUAN']); ?>" class="img-thumbnail rounded" style="max-width:200px;">
+                                        <?php else: ?>
+                                            <img id="preview_pengaduan" src="#" class="img-thumbnail rounded" style="max-width:200px; display:none;">
+                                        <?php endif; ?>
                                     </div>
                                 </div>
 
                                 <div class="col-md-6" id="fotoProsesContainer" style="display:none;">
                                     <label class="form-label">Foto Proses</label>
-                                    <?php if (!empty($pengaduan['FOTO_PROSES'])): ?>
-                                        <div class="mt-2 mb-2">
-                                            <img src="<?= base_url('uploads/proses/' . $pengaduan['FOTO_PROSES']); ?>" class="img-thumbnail rounded" style="max-width:200px;">
-                                        </div>
-                                    <?php endif; ?>
-                                    <input type="file" name="FOTO_PROSES" class="form-control" accept="image/*" onchange="previewImage(event, 'preview_proses')" <?= $disabled; ?>>
+                                    <input type="file" name="FOTO_PROSES" id="fotoProses" class="form-control" accept="image/*" onchange="previewImage(event, 'preview_proses')">
                                     <small class="text-muted">Format: JPG, PNG, maksimal 2MB</small>
                                     <div class="mt-2">
-                                        <img id="preview_proses" src="#" class="img-thumbnail rounded" style="max-width:200px; display:none;">
+                                        <?php if (!empty($pengaduan['FOTO_PROSES'])): ?>
+                                            <img id="preview_proses" src="<?= base_url('uploads/proses/' . $pengaduan['FOTO_PROSES']); ?>" class="img-thumbnail rounded" style="max-width:200px;">
+                                        <?php else: ?>
+                                            <img id="preview_proses" src="#" class="img-thumbnail rounded" style="max-width:200px; display:none;">
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </div>
@@ -151,19 +171,20 @@
                         <div class="col-md-6">
                             <label class="form-label">Status</label>
                             <select name="STATUS" id="statusSelect" class="form-control" <?= $is_up3 ? 'disabled' : 'required'; ?>>
-                                <option value="Lapor" <?= in_array(($pengaduan['STATUS'] ?? ''), ['Lapor', 'Menunggu']) ? 'selected' : ''; ?>>Lapor</option>
-                                <option value="Diproses" <?= ($pengaduan['STATUS'] == 'Diproses') ? 'selected' : ''; ?>>Diproses</option>
-                                <option value="Selesai" <?= ($pengaduan['STATUS'] == 'Selesai') ? 'selected' : ''; ?>>Selesai</option>
+                                <option value="Lapor" <?= (($pengaduan['STATUS'] ?? '') === 'Lapor') ? 'selected' : ''; ?>>Lapor</option>
+                                <option value="Diproses" <?= (($pengaduan['STATUS'] ?? '') === 'Diproses') ? 'selected' : ''; ?>>Diproses</option>
+                                <option value="Selesai" <?= (($pengaduan['STATUS'] ?? '') === 'Selesai') ? 'selected' : ''; ?>>Selesai</option>
                             </select>
                             <?php if ($is_up3): ?>
-                                <input type="hidden" name="STATUS" value="<?= htmlentities($pengaduan['STATUS'] ?? 'Lapor', ENT_QUOTES, 'UTF-8'); ?>">
+                                <input type="hidden" name="STATUS" value="<?= e($pengaduan['STATUS'] ?? 'Lapor'); ?>">
                             <?php endif; ?>
                         </div>
+
                     </div>
 
                     <div class="mt-4 text-end">
                         <a href="<?= base_url('Pengaduan'); ?>" class="btn btn-secondary px-4">Batal</a>
-                        <button type="submit" class="btn btn-primary px-4">Simpan Perubahan</button>
+                        <button type="submit" class="btn btn-primary px-4">Simpan</button>
                     </div>
                 </form>
             </div>
@@ -171,31 +192,88 @@
     </div>
 
     <script>
+        const dataPengaduan = {
+            "Gardu Induk": ["Failed", "PMT", "Proteksi", "Kabel", "Kubikel", "lain-lain.."],
+            "Gardu Hubung": ["Failed", "PMT", "Proteksi", "Kabel", "Kubikel", "Rectifier", "Baterai", "lain-lain.."],
+            "Recloser": ["Failed", "PMT", "Proteksi", "Kabel", "VT", "Panel", "Baterai", "lain-lain.."],
+            "LBS": ["Failed", "PMT", "Proteksi", "Kabel", "VT", "Panel", "Baterai", "lain-lain.."],
+            "Radio Komunikasi": ["Failed", "Antenna", "Base Station", "HT", "lain-lain.."]
+        };
+
+        const jenisSelect = document.getElementById("jenis_pengaduan");
+        const itemSelect = document.getElementById("item_pengaduan");
         const statusSelect = document.getElementById("statusSelect");
-        const tanggalProsesContainer = document.getElementById("tanggalProsesContainer");
-        const tanggalSelesaiContainer = document.getElementById("tanggalSelesaiContainer");
+
+        const fotoProsesContainer = document.getElementById("fotoProsesContainer");
         const tindakLanjutContainer = document.getElementById("tindakLanjutContainer");
         const catatanContainer = document.getElementById("catatanContainer");
-        const fotoProsesContainer = document.getElementById("fotoProsesContainer");
+        const tanggalProsesContainer = document.getElementById("tanggalProsesContainer");
+        const tanggalSelesaiContainer = document.getElementById("tanggalSelesaiContainer");
+
+        const tanggalProsesInput = document.getElementById("tanggalProses");
         const tanggalSelesaiInput = document.getElementById("tanggalSelesai");
+        const tindakLanjutInput = document.getElementById("tindakLanjut");
+        const catatanInput = document.getElementById("catatan");
+        const fotoProsesInput = document.getElementById("fotoProses");
+
+        function setRequired(el, isRequired) {
+            if (!el) return;
+            if (isRequired) el.setAttribute('required', 'required');
+            else el.removeAttribute('required');
+        }
 
         function updateStatusFields() {
-            const value = statusSelect.value;
-            const today = new Date().toISOString().split('T')[0];
-            tanggalProsesContainer.style.display = (value === "Diproses" || value === "Selesai") ? "block" : "none";
-            tanggalSelesaiContainer.style.display = (value === "Selesai") ? "block" : "none";
-            tindakLanjutContainer.style.display = (value === "Diproses") ? "block" : "none";
-            catatanContainer.style.display = (value === "Selesai") ? "block" : "none";
-            fotoProsesContainer.style.display = (value === "Diproses") ? "block" : "none";
+            const value = statusSelect ? statusSelect.value : 'Lapor';
 
-            if (value === "Selesai" && !tanggalSelesaiInput.value) {
-                tanggalSelesaiInput.value = today;
+            const isProses  = (value === "Diproses" || value === "Selesai");
+            const isSelesai = (value === "Selesai");
+
+            fotoProsesContainer.style.display     = isProses ? "block" : "none";
+            tindakLanjutContainer.style.display   = isProses ? "block" : "none";
+            tanggalProsesContainer.style.display  = isProses ? "block" : "none";
+
+            catatanContainer.style.display        = isSelesai ? "block" : "none";
+            tanggalSelesaiContainer.style.display = isSelesai ? "block" : "none";
+
+            setRequired(tindakLanjutInput, isProses);
+            setRequired(tanggalProsesInput, isProses);
+            setRequired(fotoProsesInput, isProses);
+
+            setRequired(catatanInput, isSelesai);
+            setRequired(tanggalSelesaiInput, isSelesai);
+        }
+
+        // Ganti isi item berdasarkan jenis pengaduan + set nilai lama
+        function initItemFromOld() {
+            const selectedJenis = jenisSelect.value;
+            const oldItem = "<?= e($pengaduan['ITEM_PENGADUAN'] ?? ''); ?>";
+
+            itemSelect.innerHTML = "<option value=''>-- Pilih Item Pengaduan --</option>";
+            if (dataPengaduan[selectedJenis]) {
+                dataPengaduan[selectedJenis].forEach(item => {
+                    const opt = document.createElement("option");
+                    opt.value = item;
+                    opt.textContent = item;
+                    if (oldItem && oldItem === item) opt.selected = true;
+                    itemSelect.appendChild(opt);
+                });
             }
         }
 
-        statusSelect.addEventListener("change", updateStatusFields);
-        document.addEventListener("DOMContentLoaded", updateStatusFields);
+        jenisSelect.addEventListener("change", function() {
+            const selectedJenis = this.value;
+            itemSelect.innerHTML = "<option value=''>-- Pilih Item Pengaduan --</option>";
+            if (dataPengaduan[selectedJenis]) {
+                dataPengaduan[selectedJenis].forEach(item => {
+                    const opt = document.createElement("option");
+                    opt.value = item;
+                    opt.textContent = item;
+                    itemSelect.appendChild(opt);
+                });
+            }
+        });
 
+        // Preview gambar
         function previewImage(event, previewId) {
             const input = event.target;
             const preview = document.getElementById(previewId);
@@ -210,6 +288,15 @@
                 preview.style.display = 'none';
             }
         }
+
+        if (statusSelect) {
+            statusSelect.addEventListener("change", updateStatusFields);
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            initItemFromOld();
+            updateStatusFields();
+        });
     </script>
 
     <style>

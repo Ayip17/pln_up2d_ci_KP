@@ -25,7 +25,44 @@
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">UNITNAME</label>
-							<input type="text" class="form-control" name="UNITNAME" value="<?= htmlentities($kit_cell['UNITNAME'] ?? ''); ?>">
+							<select class="form-control" name="UNITNAME">
+								<option value="" disabled <?= empty($kit_cell['UNITNAME']) ? 'selected' : ''; ?>>-- Pilih UNITNAME --</option>
+								<option value="PEKANBARU KOTA TIMUR" <?= (isset($kit_cell['UNITNAME']) && $kit_cell['UNITNAME'] == 'PEKANBARU KOTA TIMUR') ? 'selected' : ''; ?>>PEKANBARU KOTA TIMUR</option>
+								<option value="PEKANBARU KOTA BARAT" <?= (isset($kit_cell['UNITNAME']) && $kit_cell['UNITNAME'] == 'PEKANBARU KOTA BARAT') ? 'selected' : ''; ?>>PEKANBARU KOTA BARAT</option>
+								<option value="SIMPANG TIGA" <?= (isset($kit_cell['UNITNAME']) && $kit_cell['UNITNAME'] == 'SIMPANG TIGA') ? 'selected' : ''; ?>>SIMPANG TIGA</option>
+								<option value="RUMBAI" <?= (isset($kit_cell['UNITNAME']) && $kit_cell['UNITNAME'] == 'RUMBAI') ? 'selected' : ''; ?>>RUMBAI</option>
+								<option value="PANAM" <?= (isset($kit_cell['UNITNAME']) && $kit_cell['UNITNAME'] == 'PANAM') ? 'selected' : ''; ?>>PANAM</option>
+								<option value="PERAWANG" <?= (isset($kit_cell['UNITNAME']) && $kit_cell['UNITNAME'] == 'PERAWANG') ? 'selected' : ''; ?>>PERAWANG</option>
+								<option value="SIAK SRI INDRAPURA" <?= (isset($kit_cell['UNITNAME']) && $kit_cell['UNITNAME'] == 'SIAK SRI INDRAPURA') ? 'selected' : ''; ?>>SIAK SRI INDRAPURA</option>
+								<option value="PANGKALAN KERINCI" <?= (isset($kit_cell['UNITNAME']) && $kit_cell['UNITNAME'] == 'PANGKALAN KERINCI') ? 'selected' : ''; ?>>PANGKALAN KERINCI</option>
+								<option value="DURI" <?= (isset($kit_cell['UNITNAME']) && $kit_cell['UNITNAME'] == 'DURI') ? 'selected' : ''; ?>>DURI</option>
+								<option value="BAGAN SIAPI-API" <?= (isset($kit_cell['UNITNAME']) && $kit_cell['UNITNAME'] == 'BAGAN SIAPI-API') ? 'selected' : ''; ?>>BAGAN SIAPI-API</option>
+								<option value="BENGKALIS" <?= (isset($kit_cell['UNITNAME']) && $kit_cell['UNITNAME'] == 'BENGKALIS') ? 'selected' : ''; ?>>BENGKALIS</option>
+								<option value="SELATPANJANG" <?= (isset($kit_cell['UNITNAME']) && $kit_cell['UNITNAME'] == 'SELATPANJANG') ? 'selected' : ''; ?>>SELATPANJANG</option>
+								<option value="DUMAI KOTA" <?= (isset($kit_cell['UNITNAME']) && $kit_cell['UNITNAME'] == 'DUMAI KOTA') ? 'selected' : ''; ?>>DUMAI KOTA</option>
+								<option value="BAGAN BATU" <?= (isset($kit_cell['UNITNAME']) && $kit_cell['UNITNAME'] == 'BAGAN BATU') ? 'selected' : ''; ?>>BAGAN BATU</option>
+								<option value="KIJANG" <?= (isset($kit_cell['UNITNAME']) && $kit_cell['UNITNAME'] == 'KIJANG') ? 'selected' : ''; ?>>KIJANG</option>
+								<option value="TANJUNG UBAN" <?= (isset($kit_cell['UNITNAME']) && $kit_cell['UNITNAME'] == 'TANJUNG UBAN') ? 'selected' : ''; ?>>TANJUNG UBAN</option>
+								<option value="TANJUNG BALAI KARIMUN" <?= (isset($kit_cell['UNITNAME']) && $kit_cell['UNITNAME'] == 'TANJUNG BALAI KARIMUN') ? 'selected' : ''; ?>>TANJUNG BALAI KARIMUN</option>
+								<option value="TANJUNG BATU" <?= (isset($kit_cell['UNITNAME']) && $kit_cell['UNITNAME'] == 'TANJUNG BATU') ? 'selected' : ''; ?>>TANJUNG BATU</option>
+								<option value="DABO SINGKEP" <?= (isset($kit_cell['UNITNAME']) && $kit_cell['UNITNAME'] == 'DABO SINGKEP') ? 'selected' : ''; ?>>DABO SINGKEP</option>
+								<option value="RANAI" <?= (isset($kit_cell['UNITNAME']) && $kit_cell['UNITNAME'] == 'RANAI') ? 'selected' : ''; ?>>RANAI</option>
+								<option value="TANJUNGPINANG KOTA" <?= (isset($kit_cell['UNITNAME']) && $kit_cell['UNITNAME'] == 'TANJUNGPINANG KOTA') ? 'selected' : ''; ?>>TANJUNGPINANG KOTA</option>
+								<option value="ANAMBAS" <?= (isset($kit_cell['UNITNAME']) && $kit_cell['UNITNAME'] == 'ANAMBAS') ? 'selected' : ''; ?>>ANAMBAS</option>
+								<option value="RENGAT KOTA" <?= (isset($kit_cell['UNITNAME']) && $kit_cell['UNITNAME'] == 'RENGAT KOTA') ? 'selected' : ''; ?>>RENGAT KOTA</option>
+								<option value="TALUK KUANTAN" <?= (isset($kit_cell['UNITNAME']) && $kit_cell['UNITNAME'] == 'TALUK KUANTAN') ? 'selected' : ''; ?>>TALUK KUANTAN</option>
+								<option value="KUALA ENOK" <?= (isset($kit_cell['UNITNAME']) && $kit_cell['UNITNAME'] == 'KUALA ENOK') ? 'selected' : ''; ?>>KUALA ENOK</option>
+								<option value="TEMBILAHAN" <?= (isset($kit_cell['UNITNAME']) && $kit_cell['UNITNAME'] == 'TEMBILAHAN') ? 'selected' : ''; ?>>TEMBILAHAN</option>
+								<option value="AIR MOLEK" <?= (isset($kit_cell['UNITNAME']) && $kit_cell['UNITNAME'] == 'AIR MOLEK') ? 'selected' : ''; ?>>AIR MOLEK</option>
+								<option value="BANGKINANG" <?= (isset($kit_cell['UNITNAME']) && $kit_cell['UNITNAME'] == 'BANGKINANG') ? 'selected' : ''; ?>>BANGKINANG</option>
+								<option value="KAMPAR" <?= (isset($kit_cell['UNITNAME']) && $kit_cell['UNITNAME'] == 'KAMPAR') ? 'selected' : ''; ?>>KAMPAR</option>
+								<option value="LIPAT KAIN" <?= (isset($kit_cell['UNITNAME']) && $kit_cell['UNITNAME'] == 'LIPAT KAIN') ? 'selected' : ''; ?>>LIPAT KAIN</option>
+								<option value="PASIR PANGARAIAN" <?= (isset($kit_cell['UNITNAME']) && $kit_cell['UNITNAME'] == 'PASIR PANGARAIAN') ? 'selected' : ''; ?>>PASIR PANGARAIAN</option>
+								<option value="UJUNG BATU" <?= (isset($kit_cell['UNITNAME']) && $kit_cell['UNITNAME'] == 'UJUNG BATU') ? 'selected' : ''; ?>>UJUNG BATU</option>
+								<option value="UP2D RIAU" <?= (isset($kit_cell['UNITNAME']) && $kit_cell['UNITNAME'] == 'UP2D RIAU') ? 'selected' : ''; ?>>UP2D RIAU</option>
+								<option value="BELAKANGPADANG" <?= (isset($kit_cell['UNITNAME']) && $kit_cell['UNITNAME'] == 'BELAKANGPADANG') ? 'selected' : ''; ?>>BELAKANGPADANG</option>
+								<option value="DUMAI" <?= (isset($kit_cell['UNITNAME']) && $kit_cell['UNITNAME'] == 'DUMAI') ? 'selected' : ''; ?>>DUMAI</option>
+							</select>
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">ASSETNUM</label>
@@ -61,7 +98,13 @@
 						</div>
 						<div class="col-md-3">
 							<label class="form-label">STATUS</label>
-							<input type="text" class="form-control" name="STATUS" value="<?= htmlentities($kit_cell['STATUS'] ?? ''); ?>">
+							<select class="form-control" name="STATUS">
+								<option value="" disabled <?= empty($kit_cell['STATUS']) ? 'selected' : ''; ?>>-- Pilih STATUS --</option>
+								<option value="OPERATING" <?= (isset($kit_cell['STATUS']) && $kit_cell['STATUS'] == 'OPERATING') ? 'selected' : ''; ?>>OPERATING</option>
+								<option value="INACTIVE" <?= (isset($kit_cell['STATUS']) && $kit_cell['STATUS'] == 'INACTIVE') ? 'selected' : ''; ?>>INACTIVE</option>
+								<option value="NOT READY" <?= (isset($kit_cell['STATUS']) && $kit_cell['STATUS'] == 'NOT READY') ? 'selected' : ''; ?>>NOT READY</option>
+								<option value="REQOPERATING" <?= (isset($kit_cell['STATUS']) && $kit_cell['STATUS'] == 'REQOPERATING') ? 'selected' : ''; ?>>REQOPERATING</option>
+							</select>
 						</div>
 						<div class="col-md-3">
 							<label class="form-label">TUJDNUMBER</label>
@@ -101,7 +144,11 @@
 						</div>
 						<div class="col-md-3">
 							<label class="form-label">STATUS_KEPEMILIKAN</label>
-							<input type="text" class="form-control" name="STATUS_KEPEMILIKAN" value="<?= htmlentities($kit_cell['STATUS_KEPEMILIKAN'] ?? ''); ?>">
+							<select class="form-control" name="STATUS_KEPEMILIKAN">
+								<option value="" disabled <?= empty($kit_cell['STATUS_KEPEMILIKAN']) ? 'selected' : ''; ?>>-- Pilih STATUS_KEPEMILIKAN --</option>
+								<option value="PLN" <?= (isset($kit_cell['STATUS_KEPEMILIKAN']) && $kit_cell['STATUS_KEPEMILIKAN'] == 'PLN') ? 'selected' : ''; ?>>PLN</option>
+								<option value="NON PLN" <?= (isset($kit_cell['STATUS_KEPEMILIKAN']) && $kit_cell['STATUS_KEPEMILIKAN'] == 'NON PLN') ? 'selected' : ''; ?>>NON PLN</option>
+							</select>
 						</div>
 						<div class="col-md-3">
 							<label class="form-label">BURDEN</label>
@@ -137,11 +184,23 @@
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">ISOLASI_KUBIKEL</label>
-							<input type="text" class="form-control" name="ISOLASI_KUBIKEL" value="<?= htmlentities($kit_cell['ISOLASI_KUBIKEL'] ?? ''); ?>">
+							<select class="form-control" name="ISOLASI_KUBIKEL">
+								<option value="" disabled <?= empty($kit_cell['ISOLASI_KUBIKEL']) ? 'selected' : ''; ?>>-- Pilih ISOLASI_KUBIKEL --</option>
+								<option value="Full Insulated" <?= (isset($kit_cell['ISOLASI_KUBIKEL']) && $kit_cell['ISOLASI_KUBIKEL'] == 'Full Insulated') ? 'selected' : ''; ?>>Full Insulated</option>
+								<option value="Air Insulated" <?= (isset($kit_cell['ISOLASI_KUBIKEL']) && $kit_cell['ISOLASI_KUBIKEL'] == 'Air Insulated') ? 'selected' : ''; ?>>Air Insulated</option>
+							</select>
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">JENIS_MVCELL</label>
-							<input type="text" class="form-control" name="JENIS_MVCELL" value="<?= htmlentities($kit_cell['JENIS_MVCELL'] ?? ''); ?>">
+							<select class="form-control" name="JENIS_MVCELL">
+								<option value="" disabled <?= empty($kit_cell['JENIS_MVCELL']) ? 'selected' : ''; ?>>-- Pilih JENIS_MVCELL --</option>
+								<option value="Pemutus Tenaga" <?= (isset($kit_cell['JENIS_MVCELL']) && $kit_cell['JENIS_MVCELL'] == 'Pemutus Tenaga') ? 'selected' : ''; ?>>Pemutus Tenaga</option>
+								<option value="Pemisah" <?= (isset($kit_cell['JENIS_MVCELL']) && $kit_cell['JENIS_MVCELL'] == 'Pemisah') ? 'selected' : ''; ?>>Pemisah</option>
+								<option value="Interface / Terminal Kabel" <?= (isset($kit_cell['JENIS_MVCELL']) && $kit_cell['JENIS_MVCELL'] == 'Interface / Terminal Kabel') ? 'selected' : ''; ?>>Interface / Terminal Kabel</option>
+								<option value="Pemutus" <?= (isset($kit_cell['JENIS_MVCELL']) && $kit_cell['JENIS_MVCELL'] == 'Pemutus') ? 'selected' : ''; ?>>Pemutus</option>
+								<option value="Pengaman Trafo" <?= (isset($kit_cell['JENIS_MVCELL']) && $kit_cell['JENIS_MVCELL'] == 'Pengaman Trafo') ? 'selected' : ''; ?>>Pengaman Trafo</option>
+								<option value="Pengukuran" <?= (isset($kit_cell['JENIS_MVCELL']) && $kit_cell['JENIS_MVCELL'] == 'Pengukuran') ? 'selected' : ''; ?>>Pengukuran</option>
+							</select>
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">TH_BUAT</label>

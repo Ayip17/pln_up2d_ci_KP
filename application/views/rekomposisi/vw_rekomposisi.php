@@ -1,3 +1,6 @@
+<?php
+defined('BASEPATH') or exit('No direct script access allowed');
+?>
 <main class="main-content position-relative border-radius-lg ">
     <?php $this->load->view('layout/navbar'); ?>
 
@@ -9,18 +12,35 @@
             </div>
         <?php endif; ?>
 
+        <?php if ($this->session->flashdata('error')): ?>
+            <div class="alert alert-danger text-white">
+                <?= $this->session->flashdata('error'); ?>
+            </div>
+        <?php endif; ?>
+
         <div class="card mb-4 shadow border-0 rounded-4">
 
             <!-- HEADER -->
             <div class="card-header py-2 d-flex justify-content-between align-items-center bg-gradient-primary text-white rounded-top-4">
                 <h6 class="mb-0 d-flex align-items-center">Tabel Data Rekomposisi</h6>
+
                 <div class="d-flex align-items-center" style="padding-top: 16px;">
-                    <?php if (can_create()): ?>
-                        <a href="<?= base_url('Rekomposisi/tambah') ?>" class="btn btn-sm btn-light text-primary me-2 d-flex align-items-center no-anim">
+
+                    <?php if (function_exists('can_create') && can_create()): ?>
+                        <a href="<?= base_url('rekomposisi/tambah') ?>"
+                            class="btn btn-sm btn-light text-primary me-2 d-flex align-items-center no-anim">
                             <i class="fas fa-plus me-1"></i> Tambah
                         </a>
+
+                        <!-- ✅ TAMBAHAN: tombol Import (mengarah ke controller Import) -->
+                        <a href="<?= base_url('import/rekomposisi') ?>"
+                            class="btn btn-sm btn-light text-success d-flex align-items-center no-anim">
+                            <i class="fas fa-file-import me-1"></i> Import
+                        </a>
                     <?php endif; ?>
-                    <a href="<?= base_url('Rekomposisi/export_csv') ?>" class="btn btn-sm btn-light text-secondary ms-2 d-flex align-items-center no-anim">
+
+                    <a href="<?= base_url('rekomposisi/export_csv') ?>"
+                        class="btn btn-sm btn-light text-secondary ms-2 d-flex align-items-center no-anim">
                         <i class="fas fa-file-csv me-1"></i> Download CSV
                     </a>
                 </div>
@@ -29,18 +49,43 @@
             <div class="card-body px-0 pt-0 pb-2 bg-white">
 
                 <!-- CONTROLS -->
-                <div class="px-3 mt-3 mb-3 d-flex justify-content-between align-items-center">
-                    <div class="d-flex align-items-center">
+                <div class="px-3 mt-3 mb-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div class="d-flex align-items-center flex-wrap gap-2">
                         <label class="mb-0 me-2 text-sm">Tampilkan:</label>
-                        <select id="perPageSelectRekomposisi" class="form-select form-select-sm" style="width: 80px;" onchange="changePerPageRekomposisi(this.value)">
-                            <option value="5" <?= ($per_page == 5) ? 'selected' : ''; ?>>5</option>
-                            <option value="10" <?= ($per_page == 10) ? 'selected' : ''; ?>>10</option>
-                            <option value="25" <?= ($per_page == 25) ? 'selected' : ''; ?>>25</option>
-                            <option value="50" <?= ($per_page == 50) ? 'selected' : ''; ?>>50</option>
+
+                        <select id="perPageSelect"
+                            class="form-select form-select-sm"
+                            style="width: 90px; padding-right: 2rem;"
+                            onchange="changePerPage(this.value)">
+                            <option value="5" <?= ((int)$per_page === 5) ? 'selected' : ''; ?>>5</option>
+                            <option value="10" <?= ((int)$per_page === 10) ? 'selected' : ''; ?>>10</option>
+                            <option value="25" <?= ((int)$per_page === 25) ? 'selected' : ''; ?>>25</option>
+                            <option value="50" <?= ((int)$per_page === 50) ? 'selected' : ''; ?>>50</option>
+                            <option value="100" <?= ((int)$per_page === 100) ? 'selected' : ''; ?>>100</option>
                         </select>
-                        <span class="ms-3 text-sm">dari <?= $total_rows ?? 0; ?> data</span>
+
+                        <span class="ms-2 text-sm">dari <?= (int)$total_rows; ?> data</span>
                     </div>
-                    <input type="text" id="searchInputRekomposisi" onkeyup="searchTableRekomposisi()" class="form-control form-control-sm rounded-3" style="max-width: 300px;" placeholder="Cari data...">
+
+                    <!-- SERVER-SIDE SEARCH -->
+                    <div class="d-flex align-items-center gap-2">
+                        <input type="text"
+                            id="searchInput"
+                            class="form-control form-control-sm rounded-3"
+                            style="max-width: 320px;"
+                            placeholder="Cari: jenis anggaran / PRK / SKK IO / judul DRP..."
+                            value="<?= htmlentities($this->input->get('keyword', true) ?? '') ?>">
+
+                        <button type="button" class="btn btn-sm btn-secondary" onclick="applySearch()">
+                            <i class="fas fa-search"></i>
+                        </button>
+
+                        <?php if (!empty($this->input->get('keyword', true))): ?>
+                            <a class="btn btn-sm btn-light" href="<?= base_url('rekomposisi'); ?>">
+                                Reset
+                            </a>
+                        <?php endif; ?>
+                    </div>
                 </div>
 
                 <!-- TABLE -->
@@ -53,43 +98,56 @@
                                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nomor PRK</th>
                                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nomor SKK IO</th>
                                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">PRK</th>
-                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">SKKI O</th>
-                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Rekomposisi</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Pagu SKK IO</th>
                                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Judul DRP</th>
-                                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Aksi</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
+
                             <?php if (empty($rekomposisi)): ?>
                                 <tr>
-                                    <td colspan="100" class="text-center text-secondary py-4">Belum ada data</td>
+                                    <td colspan="8" class="text-center text-secondary py-4">
+                                        Belum ada data / data tidak ditemukan.
+                                    </td>
                                 </tr>
                             <?php else: ?>
-                                <?php $no = $start_no; ?>
+                                <?php $no = (int)$start_no; ?>
                                 <?php foreach ($rekomposisi as $row): ?>
-                                    <tr class="<?= ($no % 2 == 0) ? 'table-row-even' : 'table-row-odd'; ?>">
+                                    <tr>
                                         <td class="text-sm"><?= $no++; ?></td>
-                                        <td class="text-sm"><?= htmlentities($row['JENIS_ANGGARAN'] ?? ''); ?></td>
-                                        <td class="text-sm"><?= htmlentities($row['NOMOR_PRK'] ?? ''); ?></td>
-                                        <td class="text-sm"><?= htmlentities($row['NOMOR_SKK_IO'] ?? ''); ?></td>
-                                        <td class="text-sm"><?= htmlentities($row['PRK'] ?? ''); ?></td>
-                                        <td class="text-sm"><?= htmlentities($row['SKKI_O'] ?? ''); ?></td>
-                                        <td class="text-sm"><?= htmlentities($row['REKOMPOSISI'] ?? ''); ?></td>
-                                        <td class="text-sm"><?= htmlentities($row['JUDUL_DRP'] ?? ''); ?></td>
+                                        <td class="text-sm"><?= htmlentities($row['jenis_anggaran']); ?></td>
+                                        <td class="text-sm"><?= htmlentities($row['nomor_prk']); ?></td>
+                                        <td class="text-sm"><?= htmlentities($row['nomor_skk_io']); ?></td>
+                                        <td class="text-sm"><?= htmlentities($row['uraian_prk']); ?></td>
+                                        <td class="text-sm"><?= number_format((float)$row['pagu_skk_io'], 0, ',', '.'); ?></td>
+                                        <td class="text-sm"><?= htmlentities($row['judul_drp']); ?></td>
                                         <td class="text-center">
-                                            <a href="<?= base_url('Rekomposisi/detail/' . $row['ID_REKOMPOSISI']) ?>" class="btn btn-info btn-xs text-white me-1" title="Detail"><i class="fas fa-info-circle"></i></a>
-                                            <?php if (can_edit()): ?>
-                                                <a href="<?= base_url('Rekomposisi/edit/' . $row['ID_REKOMPOSISI']) ?>" class="btn btn-warning btn-xs text-white me-1" title="Edit"><i class="fas fa-pen"></i></a>
+                                            <a href="<?= base_url('rekomposisi/detail/' . $row['id']); ?>"
+                                                class="btn btn-info btn-xs text-white me-1" title="Detail">
+                                                <i class="fas fa-info-circle"></i>
+                                            </a>
+
+                                            <?php if (function_exists('can_edit') && can_edit()): ?>
+                                                <a href="<?= base_url('rekomposisi/edit/' . $row['id']); ?>"
+                                                    class="btn btn-warning btn-xs text-white me-1" title="Edit">
+                                                    <i class="fas fa-pen"></i>
+                                                </a>
                                             <?php endif; ?>
-                                            <?php if (can_delete()): ?>
-                                                <a href="<?= base_url('Rekomposisi/hapus/' . $row['ID_REKOMPOSISI']) ?>" class="btn btn-danger btn-xs btn-hapus" title="Hapus"><i class="fas fa-trash"></i></a>
+
+                                            <?php if (function_exists('can_delete') && can_delete()): ?>
+                                                <a href="<?= base_url('rekomposisi/hapus/' . $row['id']); ?>"
+                                                    class="btn btn-danger btn-xs btn-hapus" title="Hapus"
+                                                    onclick="return confirm('Yakin hapus data ini?');">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
                                             <?php endif; ?>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php endif; ?>
-                        </tbody>
 
+                        </tbody>
                     </table>
                 </div>
 
@@ -97,149 +155,37 @@
                 <div class="card-footer d-flex justify-content-end">
                     <?= $pagination; ?>
                 </div>
+
             </div>
         </div>
     </div>
 </main>
 
-<!-- Script -->
 <script>
-    function changePerPageRekomposisi(perPage) {
+    function changePerPage(perPage) {
         const url = new URL(window.location.href);
         url.searchParams.set('per_page', perPage);
-        url.searchParams.set('page', '1');
+        url.searchParams.set('page', '0');
         window.location.href = url.toString();
     }
 
-    function searchTableRekomposisi() {
-        const input = document.getElementById('searchInputRekomposisi');
-        const filter = input.value.toUpperCase();
-        const table = document.getElementById('rekomposisiTable');
-        const tr = table.getElementsByTagName('tr');
-        for (let i = 1; i < tr.length; i++) {
-            let txtValue = tr[i].textContent || tr[i].innerText;
-            tr[i].style.display = (txtValue.toUpperCase().indexOf(filter) > -1) ? '' : 'none';
-        }
+    function applySearch() {
+        const input = document.getElementById('searchInput');
+        const url = new URL(window.location.href);
+        url.searchParams.set('keyword', (input.value || '').trim());
+        url.searchParams.set('page', '0');
+        window.location.href = url.toString();
     }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const input = document.getElementById('searchInput');
+        if (!input) return;
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                applySearch();
+            }
+        });
+    });
 </script>
-
-<!-- Style -->
-<style>
-    /* Header gradient */
-    .bg-gradient-primary {
-        background: linear-gradient(90deg, #005C99, #0099CC);
-    }
-
-    /* Table row warna */
-    .table-row-odd {
-        background-color: #ffffff;
-    }
-
-    .table-row-even {
-        background-color: #f5f7fa;
-    }
-
-    /* Hapus animasi hover tabel */
-    #rekomposisiTable tbody tr:hover {
-        background-color: #e9ecef !important;
-        transition: none !important;
-    }
-
-    /* Hapus semua animasi dan efek tombol */
-    .btn,
-    .btn-xs {
-        transition: none !important;
-        /* hapus animasi hover/focus */
-        transform: none !important;
-        /* hapus efek scale */
-    }
-
-    /* Hapus efek saat hover, focus, active */
-    .btn:hover,
-    .btn:focus,
-    .btn:active,
-    .btn:focus-visible,
-    .btn-xs:hover,
-    .btn-xs:focus,
-    .btn-xs:active,
-    .btn-xs:focus-visible {
-        transform: none !important;
-        box-shadow: none !important;
-        /* hilangkan shadow klik/fokus */
-    }
-
-    /* Tombol kecil */
-    .btn-xs {
-        padding: 2px 6px;
-        font-size: 11px;
-        border-radius: 4px;
-    }
-
-    .btn-xs i {
-        font-size: 12px;
-    }
-
-    /* Padding dan font table */
-    #rekomposisiTable tbody tr td {
-        padding-top: 2px !important;
-        padding-bottom: 2px !important;
-        font-size: 13px !important;
-    }
-
-    #rekomposisiTable tbody td.text-center {
-        vertical-align: middle !important;
-        text-align: center !important;
-        padding-top: 6px !important;
-        padding-bottom: 6px !important;
-    }
-
-    #rekomposisiTable tbody td.text-center .btn {
-        margin: 2px 3px;
-    }
-
-    #rekomposisiTable thead th {
-        padding-top: 8px !important;
-        padding-bottom: 8px !important;
-        font-size: 12px !important;
-    }
-
-    #rekomposisiTable tbody tr {
-        line-height: 1.15;
-    }
-
-    .card-header h6 {
-        color: #fff;
-        margin: 0;
-        font-weight: 600;
-    }
-
-    /* Disable click/hover animations for elements with .no-anim */
-    .no-anim,
-    .no-anim * {
-        transition: none !important;
-        -webkit-transition: none !important;
-        -moz-transition: none !important;
-        -o-transition: none !important;
-        animation: none !important;
-        -webkit-animation: none !important;
-        transform: none !important;
-        -webkit-transform: none !important;
-        box-shadow: none !important;
-        outline: none !important;
-    }
-    .no-anim:active,
-    .no-anim:focus,
-    .no-anim *:active,
-    .no-anim *:focus {
-        transform: none !important;
-        -webkit-transform: none !important;
-        box-shadow: none !important;
-        outline: none !important;
-    }
-    .no-anim .ripple,
-    .no-anim .waves-ripple,
-    .no-anim .wave,
-    .no-anim .ink {
-        display: none !important;
-    }
-</style>

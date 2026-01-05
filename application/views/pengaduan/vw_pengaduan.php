@@ -67,25 +67,25 @@
                                 foreach ($pengaduan as $row): ?>
                                     <tr class="<?= ($no % 2 == 0) ? 'table-row-even' : 'table-row-odd'; ?>">
                                         <td class="text-sm"><?= $no++; ?></td>
-                                        <td class="text-sm"><?= htmlentities($row['NAMA_UP3']); ?></td>
-                                        <td class="text-sm"><?= htmlentities($row['TANGGAL_PENGADUAN']); ?></td>
-                                        <td class="text-sm"><?= htmlentities($row['JENIS_PENGADUAN']); ?></td>
-                                        <td class="text-sm"><?= htmlentities($row['ITEM_PENGADUAN']); ?></td>
+                                        <td class="text-sm"><?= htmlentities((string)($row['NAMA_UP3'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></td>
+                                        <td class="text-sm"><?= htmlentities((string)($row['TANGGAL_PENGADUAN'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></td>
+                                        <td class="text-sm"><?= htmlentities((string)($row['JENIS_PENGADUAN'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></td>
+                                        <td class="text-sm"><?= htmlentities((string)($row['ITEM_PENGADUAN'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></td>
                                         <td class="text-sm">
                                             <span class="badge 
-                                                <?= ($row['STATUS'] == 'Selesai') ? 'bg-success' : (($row['STATUS'] == 'Diproses') ? 'bg-warning text-dark' : 'bg-secondary'); ?>">
-                                                <?= ($row['STATUS'] == 'Menunggu' || $row['STATUS'] == 'Lapor') ? 'Lapor' : htmlentities($row['STATUS']); ?>
+                                                <?= (($row['STATUS'] ?? '') == 'Selesai') ? 'bg-success' : ((($row['STATUS'] ?? '') == 'Diproses') ? 'bg-warning text-dark' : 'bg-secondary'); ?>">
+                                                <?= ((($row['STATUS'] ?? '') == 'Menunggu') || (($row['STATUS'] ?? '') == 'Lapor')) ? 'Lapor' : htmlentities((string)($row['STATUS'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>
                                             </span>
                                         </td>
-                                        <td class="text-sm"><?= htmlentities($row['PIC']); ?></td>
-                                        <td class="text-sm"><?= htmlentities($row['CATATAN']); ?></td>
+                                        <td class="text-sm"><?= htmlentities((string)($row['PIC'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></td>
+                                        <td class="text-sm"><?= htmlentities((string)($row['CATATAN'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></td>
                                         <td class="text-center">
-                                            <a href="<?= base_url('Pengaduan/detail/' . $row['ID_PENGADUAN']); ?>" class="btn btn-info btn-xs text-white me-1" title="Detail"><i class="fas fa-info-circle"></i></a>
+                                            <a href="<?= base_url('Pengaduan/detail/' . ($row['ID_PENGADUAN'] ?? '')); ?>" class="btn btn-info btn-xs text-white me-1" title="Detail"><i class="fas fa-info-circle"></i></a>
                                             <?php if (can_edit()): ?>
-                                                <a href="<?= base_url('Pengaduan/edit/' . $row['ID_PENGADUAN']); ?>" class="btn btn-warning btn-xs text-white me-1" title="Edit"><i class="fas fa-pen"></i></a>
+                                                <a href="<?= base_url('Pengaduan/edit/' . ($row['ID_PENGADUAN'] ?? '')); ?>" class="btn btn-warning btn-xs text-white me-1" title="Edit"><i class="fas fa-pen"></i></a>
                                             <?php endif; ?>
                                             <?php if (can_delete()): ?>
-                                                <a href="javascript:void(0);" onclick="confirmDelete('<?= base_url('Pengaduan/hapus/' . $row['ID_PENGADUAN']); ?>')" class="btn btn-danger btn-xs" title="Hapus"><i class="fas fa-trash"></i></a>
+                                                <a href="javascript:void(0);" onclick="confirmDelete('<?= base_url('Pengaduan/hapus/' . ($row['ID_PENGADUAN'] ?? '')); ?>')" class="btn btn-danger btn-xs" title="Hapus"><i class="fas fa-trash"></i></a>
                                             <?php endif; ?>
                                         </td>
                                     </tr>

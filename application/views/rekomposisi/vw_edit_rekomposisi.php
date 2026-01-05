@@ -1,70 +1,65 @@
 <main class="main-content position-relative border-radius-lg">
-    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur" data-scroll="false">
-        <div class="container-fluid py-1 px-3">
-            <h6 class="font-weight-bolder text-white mb-0">
-                <i class="fas fa-random me-2 text-info"></i> Edit Data Rekomposisi
-            </h6>
-        </div>
-    </nav>
+    <?php $this->load->view('layout/navbar'); ?>
 
     <div class="container-fluid py-4">
         <div class="card shadow border-0 rounded-4">
+
             <div class="card-header bg-gradient-primary text-white">
-                <strong>Form Edit Data Rekomposisi</strong>
+                <h6 class="mb-0">Form Edit Data Rekomposisi</h6>
             </div>
+
             <div class="card-body">
-                <form action="<?= base_url('rekomposisi/edit/' . urlencode($rekomposisi['ID_REKOMPOSISI'] ?? '')); ?>" method="post">
-                    <input type="hidden" name="original_id" value="<?= htmlentities($rekomposisi['ID_REKOMPOSISI'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                <form action="<?= base_url('rekomposisi/edit/' . $rekomposisi['id']); ?>" method="post">
 
                     <div class="row g-3">
 
-                        <!-- Jenis Anggaran -->
                         <div class="col-md-6">
-                            <label class="form-label">Jenis Anggaran</label>
-                            <input type="text" class="form-control" name="JENIS_ANGGARAN" value="<?= htmlentities($rekomposisi['JENIS_ANGGARAN'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" required>
+                            <label>Jenis Anggaran</label>
+                            <select name="JENIS_ANGGARAN" class="form-control" required>
+                                <option value="OPERASI" <?= $rekomposisi['jenis_anggaran'] == 'OPERASI' ? 'selected' : ''; ?>>OPERASI</option>
+                                <option value="INVESTASI" <?= $rekomposisi['jenis_anggaran'] == 'INVESTASI' ? 'selected' : ''; ?>>INVESTASI</option>
+                            </select>
                         </div>
 
-                        <!-- Nomor PRK -->
+
                         <div class="col-md-6">
-                            <label class="form-label">Nomor PRK</label>
-                            <input type="text" class="form-control" name="NOMOR_PRK" value="<?= htmlentities($rekomposisi['NOMOR_PRK'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" required>
+                            <label>Nomor PRK</label>
+                            <input type="text" name="NOMOR_PRK" class="form-control"
+                                value="<?= htmlentities($rekomposisi['nomor_prk']); ?>" required>
                         </div>
 
-                        <!-- Nomor SKK IO -->
                         <div class="col-md-6">
-                            <label class="form-label">Nomor SKK IO</label>
-                            <input type="text" class="form-control" name="NOMOR_SKK_IO" value="<?= htmlentities($rekomposisi['NOMOR_SKK_IO'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" required>
+                            <label>Nomor SKK IO</label>
+                            <input type="text" name="NOMOR_SKK_IO" class="form-control"
+                                value="<?= htmlentities($rekomposisi['nomor_skk_io']); ?>" required>
                         </div>
 
-                        <!-- PRK -->
                         <div class="col-md-6">
-                            <label class="form-label">PRK</label>
-                            <input type="text" class="form-control" name="PRK" value="<?= htmlentities($rekomposisi['PRK'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                            <label>PRK</label>
+                            <input type="text" name="PRK" class="form-control"
+                                value="<?= htmlentities($rekomposisi['uraian_prk']); ?>" required>
                         </div>
 
-                        <!-- SKKI O -->
                         <div class="col-md-6">
-                            <label class="form-label">SKKI O</label>
-                            <input type="text" class="form-control" name="SKKI_O" value="<?= htmlentities($rekomposisi['SKKI_O'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                            <label>Pagu SKK IO</label>
+                            <input type="number" name="SKKI_O" class="form-control"
+                                value="<?= $rekomposisi['pagu_skk_io']; ?>" required>
                         </div>
 
-                        <!-- Rekomposisi -->
+                        <div class="col-md-6">
+                            <label>Judul DRP</label>
+                            <input type="text" name="JUDUL_DRP" class="form-control"
+                                value="<?= htmlentities($rekomposisi['judul_drp']); ?>">
+                        </div>
+
                         <div class="col-md-12">
-                            <label class="form-label">Rekomposisi</label>
-                            <textarea name="REKOMPOSISI" class="form-control" rows="3"><?= htmlentities($rekomposisi['REKOMPOSISI'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
+                            <label>LKAO Usulan</label>
+                            <input type="text" name="LKAO_USULAN" class="form-control"
+                                value="<?= htmlentities($rekomposisi['lkao_usulan']); ?>">
                         </div>
 
-                        <!-- Judul DRP -->
-                        <div class="col-md-12">
-                            <label class="form-label">Judul DRP</label>
-                            <input type="text" name="JUDUL_DRP" class="form-control" value="<?= htmlentities($rekomposisi['JUDUL_DRP'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-                        </div>
-
-                        <!-- Tombol Submit -->
                         <div class="col-12 mt-4">
-                            <a href="<?= base_url('rekomposisi'); ?>" class="btn btn-secondary">
-                                <i class="fas fa-times me-2"></i>Batal
-                            </a>
+                            <a href="<?= base_url('rekomposisi'); ?>" class="btn btn-secondary">Batal</a>
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save me-2"></i>Simpan Perubahan
                             </button>

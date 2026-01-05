@@ -7,27 +7,49 @@ class Rekomposisi extends CI_Controller
     {
         parent::__construct();
         $this->load->model('Rekomposisi_model', 'rekom');
-        $this->load->helper(['form', 'url']);
-        $this->load->library(['form_validation', 'session', 'pagination']);
+
+        // ✅ TAMBAHAN: Notifikasi model untuk log aktivitas
+        $this->load->model('Notifikasi_model', 'notifModel');
+
+        $this->load->library(['pagination', 'form_validation', 'session']);
+        $this->load->helper(['url', 'form', 'authorization_helper']); // <-- TAMBAHAN: pastikan helper ini terload
     }
 
-    // Halaman list rekomposisi
+    // ✅ TAMBAHAN: LOG AKTIVITAS
+    private function _log($jenis, $module = null, $record_id = null, $record_name = null)
+    {
+        $user_id = (int) $this->session->userdata('user_id');
+        if (!$user_id) return;
+
+        $email = (string) ($this->session->userdata('email') ?? '');
+        $role  = (string) ($this->session->userdata('user_role') ?? $this->session->userdata('role') ?? '');
+
+        $this->notifModel->log_aktivitas(
+            $user_id,
+            $email,
+            $role,
+            $jenis,
+            $module,
+            $record_id,
+            $record_name,
+            $this->input->ip_address(),
+            (string) $this->input->user_agent()
+        );
+    }
+
     public function index()
     {
-        // Ambil per_page dari query string, default 5
-        $per_page = $this->input->get('per_page') ? (int)$this->input->get('per_page') : 5; // ✅ PERBAIKAN
+        $per_page = (int)($this->input->get('per_page') ?? 5);
+        if ($per_page <= 0) $per_page = 5;
 
-        // Ambil offset dari query string 'page'. CI pagination mengirim offset langsung
-        $offset = $this->input->get('page') ? (int)$this->input->get('page') : 0; // ✅ PERBAIKAN
+        // offset (bukan nomor halaman)
+        $page_offset = (int)($this->input->get('page') ?? 0);
+        if ($page_offset < 0) $page_offset = 0;
 
-        // Keyword pencarian
         $keyword = $this->input->get('keyword', true);
 
-        // Hitung total rows
-        $total_rows = $keyword ? count($this->rekom->get_all_rekomposisi($keyword))
-            : $this->db->count_all('rekomposisi');
+        $total_rows = $this->rekom->count_all($keyword);
 
-        // Konfigurasi pagination
         $config['base_url'] = base_url('rekomposisi');
         $config['total_rows'] = $total_rows;
         $config['per_page'] = $per_page;
@@ -35,8 +57,8 @@ class Rekomposisi extends CI_Controller
         $config['query_string_segment'] = 'page';
         $config['reuse_query_string'] = TRUE;
 
-        // Tag HTML pagination
-        $config['full_tag_open'] = '<nav><ul class="pagination pagination-sm">';
+        // Bootstrap pagination
+        $config['full_tag_open'] = '<nav><ul class="pagination pagination-sm mb-0">';
         $config['full_tag_close'] = '</ul></nav>';
         $config['cur_tag_open'] = '<li class="page-item active"><span class="page-link">';
         $config['cur_tag_close'] = '</span></li>';
@@ -49,166 +71,145 @@ class Rekomposisi extends CI_Controller
 
         $this->pagination->initialize($config);
 
-        // Ambil data paginated
-        $rekomposisi = $this->rekom->get_rekomposisi_paginated($per_page, $offset, $keyword); // ✅ PERBAIKAN
-
-        // Nomor urut tabel
-        $start_no = $offset + 1; // ✅ PERBAIKAN
-
         $data = [
-            'rekomposisi' => $rekomposisi,
+            'rekomposisi' => $this->rekom->get_paginated($per_page, $page_offset, $keyword),
+            'pagination'  => $this->pagination->create_links(),
             'total_rows'  => $total_rows,
             'per_page'    => $per_page,
-            'start_no'    => $start_no,
-            'pagination'  => $this->pagination->create_links(),
-            'keyword'     => $keyword,
-            'page_title'  => 'Data Rekomposisi',
-            'page_icon'   => 'fas fa-random me-2'
+            'start_no'    => $page_offset + 1
         ];
 
         $this->load->view('layout/header', $data);
         $this->load->view('rekomposisi/vw_rekomposisi', $data);
-        $this->load->view('layout/footer', $data);
+        $this->load->view('layout/footer');
     }
 
-    // Form tambah
     public function tambah()
     {
-        if (!can_create()) {
-            $this->session->set_flashdata('error', 'Anda tidak memiliki akses untuk menambah data');
-            redirect('rekomposisi');
-        }
+        require_rekomposisi_create(); // <-- TAMBAHAN: kunci role admin & perencanaan
 
-        $data = [
-            'page_title' => 'Tambah Rekomposisi',
-            'page_icon'  => 'fas fa-random me-2'
-        ];
-
-        $this->_set_rules();
+        $this->_rules();
 
         if ($this->form_validation->run() === false) {
-            $this->load->view('layout/header', $data);
-            $this->load->view('rekomposisi/vw_tambah_rekomposisi', $data);
-            $this->load->view('layout/footer', $data);
+            $this->load->view('layout/header');
+            $this->load->view('rekomposisi/vw_tambah_rekomposisi');
+            $this->load->view('layout/footer');
             return;
         }
 
-        $insert_data = [
-            'JENIS_ANGGARAN' => $this->input->post('JENIS_ANGGARAN', true),
-            'NOMOR_PRK'      => $this->input->post('NOMOR_PRK', true),
-            'NOMOR_SKK_IO'   => $this->input->post('NOMOR_SKK_IO', true),
-            'PRK'            => $this->input->post('PRK', true),
-            'SKKI_O'         => $this->input->post('SKKI_O', true),
-            'REKOMPOSISI'    => $this->input->post('REKOMPOSISI', true),
-            'JUDUL_DRP'      => $this->input->post('JUDUL_DRP', true)
+        $pagu = $this->_to_number($this->input->post('SKKI_O', true));
+
+        $data = [
+            'jenis_anggaran' => $this->input->post('JENIS_ANGGARAN', true),
+            'nomor_prk'      => $this->input->post('NOMOR_PRK', true),
+            'nomor_skk_io'   => $this->input->post('NOMOR_SKK_IO', true),
+            'uraian_prk'     => $this->input->post('PRK', true),
+            'pagu_skk_io'    => $pagu,
+            'judul_drp'      => $this->input->post('JUDUL_DRP', true),
+            'lkao_usulan'    => $this->input->post('LKAO_USULAN', true),
+            'created_at'     => date('Y-m-d H:i:s')
         ];
 
-        $this->rekom->insert_rekomposisi($insert_data);
-        $this->session->set_flashdata('success', 'Data rekomposisi berhasil ditambahkan!');
+        if ($this->rekom->exists_prk_drp($data['nomor_prk'], $data['judul_drp'])) {
+            $this->session->set_flashdata('error', 'Judul DRP sudah ada untuk PRK ini.');
+            redirect('rekomposisi/tambah');
+        }
+
+        $this->rekom->insert($data);
+
+        // ✅ TAMBAHAN: log create
+        $this->_log('create', 'rekomposisi', null, $data['judul_drp'] ?? null);
+
+        $this->session->set_flashdata('success', 'Data rekomposisi berhasil ditambahkan.');
         redirect('rekomposisi');
     }
 
-    // Form edit
     public function edit($id)
     {
-        if (!can_edit()) {
-            $this->session->set_flashdata('error', 'Anda tidak memiliki akses untuk mengubah data');
-            redirect('rekomposisi');
-        }
+        require_rekomposisi_edit(); // <-- TAMBAHAN: kunci role admin & perencanaan
 
-        $rekom = $this->rekom->get_rekomposisi_by_id($id);
-        if (!$rekom) {
-            $this->session->set_flashdata('error', 'Data tidak ditemukan!');
-            redirect('rekomposisi');
-        }
+        $row = $this->rekom->get_by_id($id);
+        if (!$row) show_404();
 
-        $data = [
-            'rekomposisi' => $rekom,
-            'page_title'  => 'Edit Rekomposisi',
-            'page_icon'   => 'fas fa-random me-2'
-        ];
-
-        $this->_set_rules();
+        $this->_rules();
 
         if ($this->form_validation->run() === false) {
+            $data['rekomposisi'] = $row;
             $this->load->view('layout/header', $data);
             $this->load->view('rekomposisi/vw_edit_rekomposisi', $data);
-            $this->load->view('layout/footer', $data);
+            $this->load->view('layout/footer');
             return;
         }
 
-        $update_data = [
-            'JENIS_ANGGARAN' => $this->input->post('JENIS_ANGGARAN', true),
-            'NOMOR_PRK'      => $this->input->post('NOMOR_PRK', true),
-            'NOMOR_SKK_IO'   => $this->input->post('NOMOR_SKK_IO', true),
-            'PRK'            => $this->input->post('PRK', true),
-            'SKKI_O'         => $this->input->post('SKKI_O', true),
-            'REKOMPOSISI'    => $this->input->post('REKOMPOSISI', true),
-            'JUDUL_DRP'      => $this->input->post('JUDUL_DRP', true)
+        $pagu = $this->_to_number($this->input->post('SKKI_O', true));
+
+        $update = [
+            'jenis_anggaran' => $this->input->post('JENIS_ANGGARAN', true),
+            'nomor_prk'      => $this->input->post('NOMOR_PRK', true),
+            'nomor_skk_io'   => $this->input->post('NOMOR_SKK_IO', true),
+            'uraian_prk'     => $this->input->post('PRK', true),
+            'pagu_skk_io'    => $pagu,
+            'judul_drp'      => $this->input->post('JUDUL_DRP', true),
+            'lkao_usulan'    => $this->input->post('LKAO_USULAN', true),
+            'updated_at'     => date('Y-m-d H:i:s')
         ];
 
-        $this->rekom->update_rekomposisi($id, $update_data);
-        $this->session->set_flashdata('success', 'Data rekomposisi berhasil diperbarui!');
+        // jika sudah dipakai entry_kontrak -> kunci nomor_prk & judul_drp
+        if ($this->rekom->is_used_in_kontrak($row['nomor_prk'], $row['judul_drp'])) {
+            unset($update['nomor_prk'], $update['judul_drp']);
+        } else {
+            // validasi unik saat boleh edit nomor_prk & judul_drp
+            if ($this->rekom->exists_prk_drp($update['nomor_prk'], $update['judul_drp'], $id)) {
+                $this->session->set_flashdata('error', 'Judul DRP sudah digunakan untuk PRK tersebut.');
+                redirect('rekomposisi/edit/' . $id);
+            }
+        }
+
+        $this->rekom->update($id, $update);
+
+        // ✅ TAMBAHAN: log update
+        $this->_log('update', 'rekomposisi', $id, $row['judul_drp'] ?? null);
+
+        $this->session->set_flashdata('success', 'Data berhasil diperbarui.');
         redirect('rekomposisi');
     }
 
-    // Hapus
     public function hapus($id)
     {
-        if (!can_delete()) {
-            $this->session->set_flashdata('error', 'Anda tidak memiliki akses untuk menghapus data');
+        require_rekomposisi_delete(); // <-- TAMBAHAN: kunci role admin & perencanaan
+
+        $row = $this->rekom->get_by_id($id);
+        if (!$row) show_404();
+
+        if ($this->rekom->is_used_in_kontrak($row['nomor_prk'], $row['judul_drp'])) {
+            $this->session->set_flashdata('error', 'Data tidak bisa dihapus karena sudah dipakai kontrak.');
             redirect('rekomposisi');
         }
 
-        $rekom = $this->rekom->get_rekomposisi_by_id($id);
-        if (!$rekom) {
-            $this->session->set_flashdata('error', 'Data tidak ditemukan!');
-            redirect('rekomposisi');
-        }
+        $this->rekom->delete($id);
 
-        $this->rekom->delete_rekomposisi($id);
-        $this->session->set_flashdata('success', 'Data rekomposisi berhasil dihapus!');
+        // ✅ TAMBAHAN: log delete
+        $this->_log('delete', 'rekomposisi', $id, $row['judul_drp'] ?? null);
+
+        $this->session->set_flashdata('success', 'Data berhasil dihapus.');
         redirect('rekomposisi');
     }
 
-    // Rules form validation
-    private function _set_rules()
+    private function _rules()
     {
-        $this->form_validation->set_rules('JENIS_ANGGARAN', 'Jenis Anggaran', 'required');
-        $this->form_validation->set_rules('NOMOR_PRK', 'Nomor PRK', 'required');
-        $this->form_validation->set_rules('NOMOR_SKK_IO', 'Nomor SKK IO', 'required');
+        $this->form_validation->set_rules('JENIS_ANGGARAN', 'Jenis Anggaran', 'required|trim');
+        $this->form_validation->set_rules('NOMOR_PRK', 'Nomor PRK', 'required|trim');
+        $this->form_validation->set_rules('NOMOR_SKK_IO', 'Nomor SKK IO', 'required|trim');
+        // jangan numeric karena input bisa pakai titik
+        $this->form_validation->set_rules('SKKI_O', 'Pagu SKK IO', 'required|trim');
+        $this->form_validation->set_rules('JUDUL_DRP', 'Judul DRP', 'required|trim');
+        $this->form_validation->set_rules('PRK', 'PRK', 'required|trim');
     }
 
-    // Export CSV
-    public function export_csv()
+    private function _to_number($str)
     {
-        $this->load->dbutil();
-        $this->load->helper(['file', 'download']);
-
-        $query = $this->db->query("SELECT * FROM rekomposisi");
-        $csv = $this->dbutil->csv_from_result($query);
-
-        force_download('rekomposisi.csv', $csv);
-    }
-
-    // Detail rekomposisi
-    public function detail($id)
-    {
-        $rekom = $this->rekom->get_rekomposisi_by_id($id);
-
-        if (!$rekom) {
-            $this->session->set_flashdata('error', 'Data tidak ditemukan!');
-            redirect('rekomposisi');
-        }
-
-        $data = [
-            'rekomposisi' => $rekom,
-            'page_title'  => 'Detail Rekomposisi',
-            'page_icon'   => 'fas fa-random me-2'
-        ];
-
-        $this->load->view('layout/header', $data);
-        $this->load->view('rekomposisi/vw_detail_rekomposisi', $data);
-        $this->load->view('layout/footer', $data);
+        if ($str === null) return 0;
+        $num = preg_replace('/[^\d]/', '', (string)$str);
+        return $num === '' ? 0 : (float)$num;
     }
 }

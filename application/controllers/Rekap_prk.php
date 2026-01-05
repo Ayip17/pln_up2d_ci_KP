@@ -6,53 +6,61 @@ class Rekap_prk extends CI_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->load->model('Rekap_prk_model', 'prk');
-        $this->load->helper(['form', 'url']);
-        $this->load->library(['form_validation', 'session', 'pagination']);
-    }
 
-    // ====================================================
-    // LIST DATA + PAGINATION
-    // ====================================================
-    public function index()
-    {
-        $per_page = (int) ($this->input->get('per_page') ?? 5);
-        $offset   = (int) ($this->input->get('page') ?? 0);
-        $keyword  = $this->input->get('keyword', true);
-
-        if ($keyword) {
-            $total_rows = count($this->prk->get_all_prk($keyword));
-        } else {
-            $total_rows = $this->db->count_all('prk_data');
+        if (!$this->session->userdata('logged_in')) {
+            redirect('login');
         }
 
-        $config = [
-            'base_url'             => base_url('rekap_prk'),
-            'total_rows'           => $total_rows,
-            'per_page'             => $per_page,
-            'page_query_string'    => true,
-            'query_string_segment' => 'page',
-            'reuse_query_string'   => true,
-            'full_tag_open'        => '<nav><ul class="pagination pagination-sm">',
-            'full_tag_close'       => '</ul></nav>',
-            'cur_tag_open'         => '<li class="page-item active"><span class="page-link">',
-            'cur_tag_close'        => '</span></li>',
-            'num_tag_open'         => '<li class="page-item"><span class="page-link">',
-            'num_tag_close'        => '</span></li>',
-        ];
+        $this->load->model('Rekap_prk_model', 'prk');
+        $this->load->helper(['url']);
+        $this->load->library(['session', 'pagination']);
+    }
+
+    public function index()
+    {
+        $per_page = (int)($this->input->get('per_page') ?? 5);
+        if ($per_page <= 0) $per_page = 5;
+
+        $offset  = (int)($this->input->get('page') ?? 0);
+        if ($offset < 0) $offset = 0;
+
+        $keyword = $this->input->get('keyword', true);
+        $jenis   = $this->input->get('jenis_anggaran', true); // filter optional
+
+        $total_rows = $this->prk->count_all($keyword, $jenis);
+
+        $config['base_url'] = base_url('rekap_prk');
+        $config['total_rows'] = $total_rows;
+        $config['per_page'] = $per_page;
+        $config['page_query_string'] = TRUE;
+        $config['query_string_segment'] = 'page';
+        $config['reuse_query_string'] = TRUE;
+
+        // pagination bootstrap
+        $config['full_tag_open'] = '<nav><ul class="pagination pagination-sm mb-0">';
+        $config['full_tag_close'] = '</ul></nav>';
+        $config['cur_tag_open'] = '<li class="page-item active"><span class="page-link">';
+        $config['cur_tag_close'] = '</span></li>';
+        $config['num_tag_open'] = '<li class="page-item"><span class="page-link">';
+        $config['num_tag_close'] = '</span></li>';
+        $config['prev_tag_open'] = '<li class="page-item"><span class="page-link">';
+        $config['prev_tag_close'] = '</span></li>';
+        $config['next_tag_open'] = '<li class="page-item"><span class="page-link">';
+        $config['next_tag_close'] = '</span></li>';
+
         $this->pagination->initialize($config);
 
-        $prk_data = $this->prk->get_prk_paginated($per_page, $offset, $keyword);
-
         $data = [
-            'prk_data'  => $prk_data,
-            'per_page'  => $per_page,
+            'page_title' => 'Rekap PRK',
+            'page_icon'  => 'fas fa-clipboard-list me-2',
+            'per_page'   => $per_page,
             'total_rows' => $total_rows,
+            'keyword'    => $keyword,
+            'jenis_anggaran' => $jenis,
+            'jenis_list' => $this->prk->get_jenis_anggaran_list(),
             'pagination' => $this->pagination->create_links(),
-            'keyword'   => $keyword,
-            'start_no'  => $offset + 1,
-            'page_title' => 'Data PRK',
-            'page_icon' => 'fas fa-clipboard-list me-2'
+            'start_no'   => $offset + 1,
+            'prk_data'   => $this->prk->get_paginated($per_page, $offset, $keyword, $jenis),
         ];
 
         $this->load->view('layout/header', $data);
@@ -60,116 +68,31 @@ class Rekap_prk extends CI_Controller
         $this->load->view('layout/footer');
     }
 
-    // ====================================================
-    // FORM TAMBAH DATA
-    // ====================================================
-    public function tambah()
+    /**
+     * detail pakai parameter URL:
+     * /rekap_prk/detail?jenis=OPERASI&nomor_prk=...&uraian_prk=...
+     */
+    public function detail()
     {
-        if (!can_create()) {
-            $this->session->set_flashdata('error', 'Anda tidak memiliki akses.');
+        $jenis = $this->input->get('jenis', true);
+        $nomor = $this->input->get('nomor_prk', true);
+        $uraian = $this->input->get('uraian_prk', true);
+
+        if (!$jenis || !$nomor || !$uraian) {
+            $this->session->set_flashdata('error', 'Parameter detail tidak lengkap.');
             redirect('rekap_prk');
         }
 
-        $this->_set_rules();
-
-        $data = [
-            'page_title' => 'Tambah PRK',
-            'page_icon'  => 'fas fa-file-invoice-dollar',
-            'prk_list'   => $this->prk->get_all_rekomposisi_prk() // ⬅️ PERBAIKAN UTAMA
-        ];
-
-        if ($this->form_validation->run() === false) {
-            $this->load->view('layout/header', $data);
-            $this->load->view('rekap_prk/vw_tambah_rekap_prk', $data);
-            $this->load->view('layout/footer');
-            return;
-        }
-
-        $insert_data = $this->_collect_prk_post();
-        $this->prk->insert_prk($insert_data);
-
-        $this->session->set_flashdata('success', 'Data PRK berhasil ditambahkan!');
-        redirect('rekap_prk');
-    }
-
-    // ====================================================
-    // FORM EDIT DATA
-    // ====================================================
-    public function edit($id)
-    {
-        if (!can_edit()) {
-            $this->session->set_flashdata('error', 'Anda tidak memiliki akses.');
-            redirect('rekap_prk');
-        }
-
-        $rekap = $this->prk->get_prk_by_id($id);
-
-        if (!$rekap) {
-            $this->session->set_flashdata('error', 'Data tidak ditemukan!');
-            redirect('rekap_prk');
-        }
-
-        $this->_set_rules();
-
-        $data = [
-            'rekap'     => $rekap,
-            'page_title' => 'Edit PRK',
-            'page_icon' => 'fas fa-file-invoice-dollar',
-            'prk_list'  => $this->prk->get_all_rekomposisi_prk() // ⬅️ PERBAIKAN UNTUK EDIT
-        ];
-
-        if ($this->form_validation->run() === false) {
-            $this->load->view('layout/header', $data);
-            $this->load->view('rekap_prk/vw_edit_rekap_prk', $data);
-            $this->load->view('layout/footer');
-            return;
-        }
-
-        $update_data = $this->_collect_prk_post();
-        $this->prk->update_prk($id, $update_data);
-
-        $this->session->set_flashdata('success', 'Data PRK berhasil diperbarui!');
-        redirect('rekap_prk');
-    }
-
-    // ====================================================
-    // HAPUS DATA
-    // ====================================================
-    public function hapus($id)
-    {
-        if (!can_delete()) {
-            $this->session->set_flashdata('error', 'Anda tidak memiliki akses.');
-            redirect('rekap_prk');
-        }
-
-        $rekap = $this->prk->get_prk_by_id($id);
-
-        if (!$rekap) {
-            $this->session->set_flashdata('error', 'Data tidak ditemukan!');
-            redirect('rekap_prk');
-        }
-
-        $this->prk->delete_prk($id);
-        $this->session->set_flashdata('success', 'Data berhasil dihapus!');
-        redirect('rekap_prk');
-    }
-
-    // ====================================================
-    // DETAIL DATA
-    // ====================================================
-    public function detail($id)
-    {
-        $rekap = $this->prk->get_prk_by_id($id);
-
-        if (!$rekap) {
-            $this->session->set_flashdata('error', 'Data tidak ditemukan!');
+        $row = $this->prk->get_detail($jenis, $nomor, $uraian);
+        if (!$row) {
+            $this->session->set_flashdata('error', 'Data tidak ditemukan.');
             redirect('rekap_prk');
         }
 
         $data = [
-            'rekap'     => $rekap,
-            'page_title' => 'Detail PRK',
-            'page_icon' => 'fas fa-file-invoice-dollar'
+            'page_title' => 'Detail Rekap PRK',
+            'page_icon'  => 'fas fa-info-circle me-2',
+            'row' => $row
         ];
 
         $this->load->view('layout/header', $data);
@@ -177,65 +100,31 @@ class Rekap_prk extends CI_Controller
         $this->load->view('layout/footer');
     }
 
-    // ====================================================
-    // EXPORT CSV
-    // ====================================================
     public function export_csv()
     {
-        $this->load->dbutil();
-        $this->load->helper(['file', 'download']);
+        $keyword = $this->input->get('keyword', true);
+        $jenis   = $this->input->get('jenis_anggaran', true);
 
-        $query = $this->db->query("SELECT * FROM prk_data");
+        $this->load->dbutil();
+        $this->load->helper(['download']);
+
+        $query = $this->prk->export_all($keyword, $jenis);
         $csv   = $this->dbutil->csv_from_result($query);
 
         force_download('rekap_prk.csv', $csv);
     }
 
-    // ====================================================
-    // RULES FORM
-    // ====================================================
-    private function _set_rules()
+    // ❌ Tambah/Edit/Hapus dimatikan karena sumber data adalah VIEW hasil rumus ERD
+    public function tambah()
     {
-        $this->form_validation->set_rules('JENIS_ANGGARAN', 'Jenis Anggaran', 'required');
-        $this->form_validation->set_rules('NOMOR_PRK', 'Nomor PRK', 'required');
-        $this->form_validation->set_rules('URAIAN_PRK', 'Uraian PRK', 'required');
+        show_error('Rekap PRK berasal dari VIEW (otomatis). Tambah manual dinonaktifkan.', 403);
     }
-
-    // ====================================================
-    // AMBIL POST DATA
-    // ====================================================
-    private function _collect_prk_post()
+    public function edit()
     {
-        return [
-            'JENIS_ANGGARAN' => $this->input->post('JENIS_ANGGARAN'),
-            'NOMOR_PRK'      => $this->input->post('NOMOR_PRK'),
-            'URAIAN_PRK'     => $this->input->post('URAIAN_PRK'),
-            'PAGU_SKK_IO'    => $this->input->post('PAGU_SKK_IO'),
-            'RENC_KONTRAK'   => $this->input->post('RENC_KONTRAK'),
-            'NODIN_SRT'      => $this->input->post('NODIN_SRT'),
-            'KONTRAK'        => $this->input->post('KONTRAK'),
-            'SISA'           => $this->input->post('SISA'),
-            'RENCANA_BAYAR'  => $this->input->post('RENCANA_BAYAR'),
-            'TERBAYAR'       => $this->input->post('TERBAYAR'),
-            'KE_TAHUN_2026'  => $this->input->post('KE_TAHUN_2026'),
-        ];
+        show_error('Rekap PRK berasal dari VIEW (otomatis). Edit manual dinonaktifkan.', 403);
     }
-
-
-    public function get_prk()
+    public function hapus()
     {
-        $jenis = $this->input->post('jenis');
-
-        $data = $this->prk->get_prk_by_jenis($jenis);
-
-        echo json_encode($data);
-    }
-
-    public function get_uraian()
-    {
-        $nomor = $this->input->post('nomor_prk');
-        $data = $this->prk->get_uraian_prk($nomor);
-
-        echo json_encode($data);
+        show_error('Rekap PRK berasal dari VIEW (otomatis). Hapus manual dinonaktifkan.', 403);
     }
 }

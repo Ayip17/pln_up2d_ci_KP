@@ -19,7 +19,21 @@
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">UNITNAME</label>
-							<input type="text" class="form-control" name="UNITNAME">
+							<select class="form-control" name="UNITNAME">
+								<option value="" disabled selected>-- Pilih UNITNAME --</option>
+								<option value="UP2D RIAU">UP2D RIAU</option>
+								<option value="PEKANBARU">PEKANBARU</option>
+								<option value="SIAK SRI INDRAPURA">SIAK SRI INDRAPURA</option>
+								<option value="DUMAI">DUMAI</option>
+								<option value="BELAKANGPADANG">BELAKANGPADANG</option>
+								<option value="KIJANG">KIJANG</option>
+								<option value="TANJUNG BALAI KARIMUN">TANJUNG BALAI KARIMUN</option>
+								<option value="TANJUNG BATU">TANJUNG BATU</option>
+								<option value="TANJUNG PINANG">TANJUNG PINANG</option>
+								<option value="RENGAT">RENGAT</option>
+								<option value="BANGKINANG">BANGKINANG</option>
+								<option value="UNIT PELAKSANA TRANSMISI PEKANBARU">UNIT PELAKSANA TRANSMISI PEKANBARU</option>
+							</select>
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">ASSETNUM</label>
@@ -55,7 +69,13 @@
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">STATUS</label>
-							<input type="text" class="form-control" name="STATUS">
+							<select class="form-control" name="STATUS">
+								<option value="" disabled selected>-- Pilih STATUS --</option>
+								<option value="OPERATING">OPERATING</option>
+								<option value="INACTIVE">INACTIVE</option>
+								<option value="NOT READY">NOT READY</option>
+								<option value="REQOPERATING">REQOPERATING</option>
+							</select>
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">TUJDNUMBER</label>
@@ -95,7 +115,11 @@
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">STATUS_KEPEMILIKAN</label>
-							<input type="text" class="form-control" name="STATUS_KEPEMILIKAN">
+							<select class="form-control" name="STATUS_KEPEMILIKAN">
+								<option value="" disabled selected>-- Pilih STATUS_KEPEMILIKAN --</option>
+								<option value="PLN">PLN</option>
+								<option value="NON PLN">NON PLN</option>
+							</select>
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">BURDEN</label>
@@ -131,11 +155,23 @@
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">ISOLASI_KUBIKEL</label>
-							<input type="text" class="form-control" name="ISOLASI_KUBIKEL">
+							<select class="form-control" name="ISOLASI_KUBIKEL">
+								<option value="" disabled selected>-- Pilih ISOLASI_KUBIKEL --</option>
+								<option value="Full Insulated">Full Insulated</option>
+								<option value="Air Insulated">Air Insulated</option>
+							</select>
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">JENIS_MVCELL</label>
-							<input type="text" class="form-control" name="JENIS_MVCELL">
+							<select class="form-control" name="JENIS_MVCELL">
+								<option value="" disabled selected>-- Pilih JENIS_MVCELL --</option>
+								<option value="Pemutus Tenaga">Pemutus Tenaga</option>
+								<option value="Pemisah">Pemisah</option>
+								<option value="Interface / Terminal Kabel">Interface / Terminal Kabel</option>
+								<option value="Pemutus">Pemutus</option>
+								<option value="Pengaman Trafo">Pengaman Trafo</option>
+								<option value="Pengukuran">Pengukuran</option>
+							</select>
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">TH_BUAT</label>

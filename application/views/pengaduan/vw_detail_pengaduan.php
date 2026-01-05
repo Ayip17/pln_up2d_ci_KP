@@ -2,7 +2,7 @@
     <section class="section">
         <div class="section-body">
             <div class="container-fluid py-4">
-                <h1 class="h3 mb-4 text-gray-800"><?= $judul; ?></h1>
+                <h1 class="h3 mb-4 text-gray-800"><?= htmlspecialchars((string)($judul ?? ''), ENT_QUOTES, 'UTF-8'); ?></h1>
 
                 <div class="row justify-content-center">
                     <div class="col-lg-10">
@@ -19,13 +19,13 @@
                                     <div class="col-md-6">
                                         <div class="detail-item">
                                             <span class="label">ID Pengaduan</span>
-                                            <p class="value"><?= htmlspecialchars($pengaduan['ID_PENGADUAN'] ?? '-'); ?></p>
+                                            <p class="value"><?= htmlspecialchars((string)($pengaduan['ID_PENGADUAN'] ?? '-'), ENT_QUOTES, 'UTF-8'); ?></p>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="detail-item">
                                             <span class="label">Nama UP3</span>
-                                            <p class="value"><?= htmlspecialchars($pengaduan['NAMA_UP3'] ?? '-'); ?></p>
+                                            <p class="value"><?= htmlspecialchars((string)($pengaduan['NAMA_UP3'] ?? '-'), ENT_QUOTES, 'UTF-8'); ?></p>
                                         </div>
                                     </div>
                                 </div>
@@ -35,19 +35,19 @@
                                     <div class="col-md-4">
                                         <div class="detail-item">
                                             <span class="label">Tanggal Pengaduan</span>
-                                            <p class="value"><?= htmlspecialchars($pengaduan['TANGGAL_PENGADUAN'] ?? '-'); ?></p>
+                                            <p class="value"><?= htmlspecialchars((string)($pengaduan['TANGGAL_PENGADUAN'] ?? '-'), ENT_QUOTES, 'UTF-8'); ?></p>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="detail-item">
                                             <span class="label">Tanggal Proses</span>
-                                            <p class="value"><?= htmlspecialchars($pengaduan['TANGGAL_PROSES'] ?? '-'); ?></p>
+                                            <p class="value"><?= htmlspecialchars((string)($pengaduan['TANGGAL_PROSES'] ?? '-'), ENT_QUOTES, 'UTF-8'); ?></p>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="detail-item">
                                             <span class="label">Tanggal Selesai</span>
-                                            <p class="value"><?= htmlspecialchars($pengaduan['TANGGAL_SELESAI'] ?? '-'); ?></p>
+                                            <p class="value"><?= htmlspecialchars((string)($pengaduan['TANGGAL_SELESAI'] ?? '-'), ENT_QUOTES, 'UTF-8'); ?></p>
                                         </div>
                                     </div>
                                 </div>
@@ -57,13 +57,13 @@
                                     <div class="col-md-6">
                                         <div class="detail-item">
                                             <span class="label">Jenis Pengaduan</span>
-                                            <p class="value"><?= htmlspecialchars($pengaduan['JENIS_PENGADUAN'] ?? '-'); ?></p>
+                                            <p class="value"><?= htmlspecialchars((string)($pengaduan['JENIS_PENGADUAN'] ?? '-'), ENT_QUOTES, 'UTF-8'); ?></p>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="detail-item">
                                             <span class="label">Item Pengaduan</span>
-                                            <p class="value"><?= htmlspecialchars($pengaduan['ITEM_PENGADUAN'] ?? '-'); ?></p>
+                                            <p class="value"><?= htmlspecialchars((string)($pengaduan['ITEM_PENGADUAN'] ?? '-'), ENT_QUOTES, 'UTF-8'); ?></p>
                                         </div>
                                     </div>
                                 </div>
@@ -73,7 +73,7 @@
                                     <div class="col-md-12">
                                         <div class="detail-item">
                                             <span class="label">Laporan</span>
-                                            <p class="value"><?= nl2br(htmlspecialchars($pengaduan['LAPORAN'] ?? '-')); ?></p>
+                                            <p class="value"><?= nl2br(htmlspecialchars((string)($pengaduan['LAPORAN'] ?? '-'), ENT_QUOTES, 'UTF-8')); ?></p>
                                         </div>
                                     </div>
                                 </div>
@@ -84,7 +84,7 @@
                                         <div class="col-md-12">
                                             <div class="detail-item">
                                                 <span class="label">Tindak Lanjut</span>
-                                                <p class="value"><?= nl2br(htmlspecialchars($pengaduan['TINDAK_LANJUT'])); ?></p>
+                                                <p class="value"><?= nl2br(htmlspecialchars((string)($pengaduan['TINDAK_LANJUT'] ?? ''), ENT_QUOTES, 'UTF-8')); ?></p>
                                             </div>
                                         </div>
                                     </div>
@@ -115,16 +115,16 @@
                                         <div class="detail-item">
                                             <span class="label">Status</span>
                                             <?php
-                                            $rawStatus = $pengaduan['STATUS'] ?? '-';
+                                            $rawStatus = (string)($pengaduan['STATUS'] ?? '-');
                                             $displayStatus = ($rawStatus === 'Menunggu') ? 'Lapor' : $rawStatus;
                                             ?>
-                                            <p class="value"><?= htmlspecialchars($displayStatus); ?></p>
+                                            <p class="value"><?= htmlspecialchars((string)$displayStatus, ENT_QUOTES, 'UTF-8'); ?></p>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="detail-item">
                                             <span class="label">PIC</span>
-                                            <p class="value"><?= htmlspecialchars($pengaduan['PIC'] ?? '-'); ?></p>
+                                            <p class="value"><?= htmlspecialchars((string)($pengaduan['PIC'] ?? '-'), ENT_QUOTES, 'UTF-8'); ?></p>
                                         </div>
                                     </div>
                                 </div>
@@ -135,7 +135,7 @@
                                         <div class="col-md-12">
                                             <div class="detail-item note-box">
                                                 <span class="label text-primary">Catatan</span>
-                                                <p class="value"><?= nl2br(htmlspecialchars($pengaduan['CATATAN'])); ?></p>
+                                                <p class="value"><?= nl2br(htmlspecialchars((string)($pengaduan['CATATAN'] ?? ''), ENT_QUOTES, 'UTF-8')); ?></p>
                                             </div>
                                         </div>
                                     </div>

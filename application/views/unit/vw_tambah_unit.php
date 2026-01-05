@@ -34,10 +34,59 @@
 							</select>
 						</div>
 
-						<!-- Unit Layanan -->
+						<!-- Unit Layanan (Dropdown) -->
 						<div class="col-md-6">
 							<label class="form-label">Unit Layanan</label>
-							<input type="text" name="UNIT_LAYANAN" class="form-control" required>
+							<select name="UNIT_LAYANAN" class="form-control" required>
+								<option value="" disabled selected>-- Pilih Unit Layanan --</option>
+								<?php
+								$unit_layanan_list = [
+									"BAGAN BATU",
+									"DUMAI KOTA",
+									"DURI",
+									"BENGKALIS",
+									"SELATPANJANG",
+									"KUALA ENOK",
+									"AIR MOLEK",
+									"TEMBILAHAN",
+									"RENGAT KOTA",
+									"TALUK KUANTAN",
+									"TANJUNGPINANG KOTA",
+									"KIJANG",
+									"TANJUNG UBAN",
+									"TANJUNG BALAI KARIMUN",
+									"TANJUNG BATU",
+									"DABO SINGKEP",
+									"RANAI",
+									"ANAMBAS",
+									"PEKANBARU KOTA BARAT",
+									"PANAM",
+									"SIMPANG TIGA",
+									"BANGKINANG",
+									"KAMPAR",
+									"SIAK SRI INDRAPURA",
+									"PANGKALAN KERINCI",
+									"UJUNG BATU",
+									"PASIR PANGARAIAN",
+									"RUMBAI",
+									"PEKANBARU KOTA TIMUR",
+									"LIPAT KAIN",
+									"PERAWANG",
+									"BAGAN SIAPI-API",
+									"BELAKANGPADANG",
+									"BINTAN CENTER",
+									"NATUNA",
+									"BELAKANG PADANG",
+									"TANJUNG PINANG KOTA",
+									"TANJUNG PINANG KOTA",
+								];
+
+								foreach ($unit_layanan_list as $val) :
+									$safeVal = htmlentities($val, ENT_QUOTES, 'UTF-8');
+								?>
+									<option value="<?= $safeVal; ?>"><?= $safeVal; ?></option>
+								<?php endforeach; ?>
+							</select>
 						</div>
 
 						<!-- Longitude -->

@@ -72,3 +72,16 @@ $route['import/process/(:any)'] = 'import/process/$1';
 $route['import/status/(:num)'] = 'import/status/$1';
 $route['import/download-error/(:num)'] = 'import/download_error/$1';
 $route['import/commit/(:num)'] = 'import/commit/$1';
+
+// Rekomposisi routes
+$route['entry_kontrak'] = 'entry_kontrak/index';
+$route['entry_kontrak/tambah'] = 'entry_kontrak/tambah';
+$route['entry_kontrak/store'] = 'entry_kontrak/store';
+
+$route['entry_kontrak/prk_by_jenis'] = 'entry_kontrak/prk_by_jenis';
+$route['entry_kontrak/drp_by_prk'] = 'entry_kontrak/drp_by_prk';
+$route['entry_kontrak/detail_prk_drp'] = 'entry_kontrak/detail_prk_drp';
+$route['prognosa'] = 'prognosa/index';
+$route['prognosa/detail'] = 'prognosa/detail';
+$route['prognosa/export_csv'] = 'prognosa/export_csv';
+$route['entry_kontrak/export_gsheet'] = 'entry_kontrak/export_gsheet';

@@ -20,11 +20,57 @@
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">UNITNAME</label>
-							<input type="text" class="form-control" name="UNITNAME" value="<?= htmlentities($pemutus['UNITNAME'] ?? ''); ?>">
+							<select class="form-select" name="UNITNAME">
+								<option value="">-- Pilih UNITNAME --</option>
+								<option value="PEKANBARU KOTA TIMUR" <?= (isset($pemutus['UNITNAME']) && $pemutus['UNITNAME'] == 'PEKANBARU KOTA TIMUR') ? 'selected' : ''; ?>>PEKANBARU KOTA TIMUR</option>
+								<option value="PEKANBARU KOTA BARAT" <?= (isset($pemutus['UNITNAME']) && $pemutus['UNITNAME'] == 'PEKANBARU KOTA BARAT') ? 'selected' : ''; ?>>PEKANBARU KOTA BARAT</option>
+								<option value="SIMPANG TIGA" <?= (isset($pemutus['UNITNAME']) && $pemutus['UNITNAME'] == 'SIMPANG TIGA') ? 'selected' : ''; ?>>SIMPANG TIGA</option>
+								<option value="RUMBAI" <?= (isset($pemutus['UNITNAME']) && $pemutus['UNITNAME'] == 'RUMBAI') ? 'selected' : ''; ?>>RUMBAI</option>
+								<option value="PANAM" <?= (isset($pemutus['UNITNAME']) && $pemutus['UNITNAME'] == 'PANAM') ? 'selected' : ''; ?>>PANAM</option>
+								<option value="PERAWANG" <?= (isset($pemutus['UNITNAME']) && $pemutus['UNITNAME'] == 'PERAWANG') ? 'selected' : ''; ?>>PERAWANG</option>
+								<option value="SIAK SRI INDRAPURA" <?= (isset($pemutus['UNITNAME']) && $pemutus['UNITNAME'] == 'SIAK SRI INDRAPURA') ? 'selected' : ''; ?>>SIAK SRI INDRAPURA</option>
+								<option value="PANGKALAN KERINCI" <?= (isset($pemutus['UNITNAME']) && $pemutus['UNITNAME'] == 'PANGKALAN KERINCI') ? 'selected' : ''; ?>>PANGKALAN KERINCI</option>
+								<option value="DURI" <?= (isset($pemutus['UNITNAME']) && $pemutus['UNITNAME'] == 'DURI') ? 'selected' : ''; ?>>DURI</option>
+								<option value="BAGAN SIAPI-API" <?= (isset($pemutus['UNITNAME']) && $pemutus['UNITNAME'] == 'BAGAN SIAPI-API') ? 'selected' : ''; ?>>BAGAN SIAPI-API</option>
+								<option value="BENGKALIS" <?= (isset($pemutus['UNITNAME']) && $pemutus['UNITNAME'] == 'BENGKALIS') ? 'selected' : ''; ?>>BENGKALIS</option>
+								<option value="SELATPANJANG" <?= (isset($pemutus['UNITNAME']) && $pemutus['UNITNAME'] == 'SELATPANJANG') ? 'selected' : ''; ?>>SELATPANJANG</option>
+								<option value="DUMAI KOTA" <?= (isset($pemutus['UNITNAME']) && $pemutus['UNITNAME'] == 'DUMAI KOTA') ? 'selected' : ''; ?>>DUMAI KOTA</option>
+								<option value="BAGAN BATU" <?= (isset($pemutus['UNITNAME']) && $pemutus['UNITNAME'] == 'BAGAN BATU') ? 'selected' : ''; ?>>BAGAN BATU</option>
+								<option value="KIJANG" <?= (isset($pemutus['UNITNAME']) && $pemutus['UNITNAME'] == 'KIJANG') ? 'selected' : ''; ?>>KIJANG</option>
+								<option value="TANJUNG UBAN" <?= (isset($pemutus['UNITNAME']) && $pemutus['UNITNAME'] == 'TANJUNG UBAN') ? 'selected' : ''; ?>>TANJUNG UBAN</option>
+								<option value="TANJUNG BALAI KARIMUN" <?= (isset($pemutus['UNITNAME']) && $pemutus['UNITNAME'] == 'TANJUNG BALAI KARIMUN') ? 'selected' : ''; ?>>TANJUNG BALAI KARIMUN</option>
+								<option value="TANJUNG BATU" <?= (isset($pemutus['UNITNAME']) && $pemutus['UNITNAME'] == 'TANJUNG BATU') ? 'selected' : ''; ?>>TANJUNG BATU</option>
+								<option value="DABO SINGKEP" <?= (isset($pemutus['UNITNAME']) && $pemutus['UNITNAME'] == 'DABO SINGKEP') ? 'selected' : ''; ?>>DABO SINGKEP</option>
+								<option value="RANAI" <?= (isset($pemutus['UNITNAME']) && $pemutus['UNITNAME'] == 'RANAI') ? 'selected' : ''; ?>>RANAI</option>
+								<option value="TANJUNGPINANG KOTA" <?= (isset($pemutus['UNITNAME']) && $pemutus['UNITNAME'] == 'TANJUNGPINANG KOTA') ? 'selected' : ''; ?>>TANJUNGPINANG KOTA</option>
+								<option value="ANAMBAS" <?= (isset($pemutus['UNITNAME']) && $pemutus['UNITNAME'] == 'ANAMBAS') ? 'selected' : ''; ?>>ANAMBAS</option>
+								<option value="RENGAT KOTA" <?= (isset($pemutus['UNITNAME']) && $pemutus['UNITNAME'] == 'RENGAT KOTA') ? 'selected' : ''; ?>>RENGAT KOTA</option>
+								<option value="TALUK KUANTAN" <?= (isset($pemutus['UNITNAME']) && $pemutus['UNITNAME'] == 'TALUK KUANTAN') ? 'selected' : ''; ?>>TALUK KUANTAN</option>
+								<option value="KUALA ENOK" <?= (isset($pemutus['UNITNAME']) && $pemutus['UNITNAME'] == 'KUALA ENOK') ? 'selected' : ''; ?>>KUALA ENOK</option>
+								<option value="TEMBILAHAN" <?= (isset($pemutus['UNITNAME']) && $pemutus['UNITNAME'] == 'TEMBILAHAN') ? 'selected' : ''; ?>>TEMBILAHAN</option>
+								<option value="AIR MOLEK" <?= (isset($pemutus['UNITNAME']) && $pemutus['UNITNAME'] == 'AIR MOLEK') ? 'selected' : ''; ?>>AIR MOLEK</option>
+								<option value="BANGKINANG" <?= (isset($pemutus['UNITNAME']) && $pemutus['UNITNAME'] == 'BANGKINANG') ? 'selected' : ''; ?>>BANGKINANG</option>
+								<option value="KAMPAR" <?= (isset($pemutus['UNITNAME']) && $pemutus['UNITNAME'] == 'KAMPAR') ? 'selected' : ''; ?>>KAMPAR</option>
+								<option value="LIPAT KAIN" <?= (isset($pemutus['UNITNAME']) && $pemutus['UNITNAME'] == 'LIPAT KAIN') ? 'selected' : ''; ?>>LIPAT KAIN</option>
+								<option value="PASIR PANGARAIAN" <?= (isset($pemutus['UNITNAME']) && $pemutus['UNITNAME'] == 'PASIR PANGARAIAN') ? 'selected' : ''; ?>>PASIR PANGARAIAN</option>
+								<option value="UJUNG BATU" <?= (isset($pemutus['UNITNAME']) && $pemutus['UNITNAME'] == 'UJUNG BATU') ? 'selected' : ''; ?>>UJUNG BATU</option>
+								<option value="UP2D RIAU" <?= (isset($pemutus['UNITNAME']) && $pemutus['UNITNAME'] == 'UP2D RIAU') ? 'selected' : ''; ?>>UP2D RIAU</option>
+								<option value="BELAKANGPADANG" <?= (isset($pemutus['UNITNAME']) && $pemutus['UNITNAME'] == 'BELAKANGPADANG') ? 'selected' : ''; ?>>BELAKANGPADANG</option>
+								<option value="DUMAI" <?= (isset($pemutus['UNITNAME']) && $pemutus['UNITNAME'] == 'DUMAI') ? 'selected' : ''; ?>>DUMAI</option>
+							</select>
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">UP3_2D</label>
-							<input type="text" class="form-control" name="UP3_2D" value="<?= htmlentities($pemutus['UP3_2D'] ?? ''); ?>">
+							<select class="form-select" name="UP3_2D">
+								<option value="">-- Pilih UP3_2D --</option>
+								<option value="UP2D.6456" <?= (isset($pemutus['UP3_2D']) && $pemutus['UP3_2D'] == 'UP2D.6456') ? 'selected' : ''; ?>>UP2D.6456</option>
+								<option value="UP3.6411" <?= (isset($pemutus['UP3_2D']) && $pemutus['UP3_2D'] == 'UP3.6411') ? 'selected' : ''; ?>>UP3.6411</option>
+								<option value="UP3.6412" <?= (isset($pemutus['UP3_2D']) && $pemutus['UP3_2D'] == 'UP3.6412') ? 'selected' : ''; ?>>UP3.6412</option>
+								<option value="UP3.6413" <?= (isset($pemutus['UP3_2D']) && $pemutus['UP3_2D'] == 'UP3.6413') ? 'selected' : ''; ?>>UP3.6413</option>
+								<option value="UP3.6414" <?= (isset($pemutus['UP3_2D']) && $pemutus['UP3_2D'] == 'UP3.6414') ? 'selected' : ''; ?>>UP3.6414</option>
+								<option value="UP3.6415" <?= (isset($pemutus['UP3_2D']) && $pemutus['UP3_2D'] == 'UP3.6415') ? 'selected' : ''; ?>>UP3.6415</option>
+								<option value="UPT.3217" <?= (isset($pemutus['UP3_2D']) && $pemutus['UP3_2D'] == 'UPT.3217') ? 'selected' : ''; ?>>UPT.3217</option>
+							</select>
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">ASSETNUM</label>
@@ -64,7 +110,13 @@
 						</div>
 						<div class="col-md-3">
 							<label class="form-label">STATUS</label>
-							<input type="text" class="form-control" name="STATUS" value="<?= htmlentities($pemutus['STATUS'] ?? ''); ?>">
+							<select class="form-select" name="STATUS">
+								<option value="">-- Pilih STATUS --</option>
+								<option value="OPERATING" <?= (isset($pemutus['STATUS']) && $pemutus['STATUS'] == 'OPERATING') ? 'selected' : ''; ?>>OPERATING</option>
+								<option value="INACTIVE" <?= (isset($pemutus['STATUS']) && $pemutus['STATUS'] == 'INACTIVE') ? 'selected' : ''; ?>>INACTIVE</option>
+								<option value="NOT READY" <?= (isset($pemutus['STATUS']) && $pemutus['STATUS'] == 'NOT READY') ? 'selected' : ''; ?>>NOT READY</option>
+								<option value="REQOPERATING" <?= (isset($pemutus['STATUS']) && $pemutus['STATUS'] == 'REQOPERATING') ? 'selected' : ''; ?>>REQOPERATING</option>
+							</select>
 						</div>
 						<div class="col-md-3">
 							<label class="form-label">TUJDNUMBER</label>
@@ -109,7 +161,11 @@
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">STATUS_KEPEMILIKAN</label>
-							<input type="text" class="form-control" name="STATUS_KEPEMILIKAN" value="<?= htmlentities($pemutus['STATUS_KEPEMILIKAN'] ?? ''); ?>">
+							<select class="form-select" name="STATUS_KEPEMILIKAN">
+								<option value="">-- Pilih STATUS_KEPEMILIKAN --</option>
+								<option value="PLN" <?= (isset($pemutus['STATUS_KEPEMILIKAN']) && $pemutus['STATUS_KEPEMILIKAN'] == 'PLN') ? 'selected' : ''; ?>>PLN</option>
+								<option value="NON PLN" <?= (isset($pemutus['STATUS_KEPEMILIKAN']) && $pemutus['STATUS_KEPEMILIKAN'] == 'NON PLN') ? 'selected' : ''; ?>>NON PLN</option>
+							</select>
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">CXPENYULANG</label>

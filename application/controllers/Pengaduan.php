@@ -19,15 +19,41 @@ class Pengaduan extends CI_Controller
     {
         parent::__construct();
         $this->load->model('Pengaduan_model');
+
+        // ✅ TAMBAHAN: Notifikasi model untuk log aktivitas
+        $this->load->model('Notifikasi_model', 'notifModel');
+
         $this->load->helper(['form', 'url']);
         $this->load->library(['form_validation', 'upload', 'session', 'pagination']);
+    }
+
+    // ✅ TAMBAHAN: LOG AKTIVITAS
+    private function _log($jenis, $module = null, $record_id = null, $record_name = null)
+    {
+        $user_id = (int) $this->session->userdata('user_id');
+        if (!$user_id) return;
+
+        $email = (string) ($this->session->userdata('email') ?? '');
+        $role  = (string) ($this->session->userdata('user_role') ?? $this->session->userdata('role') ?? '');
+
+        $this->notifModel->log_aktivitas(
+            $user_id,
+            $email,
+            $role,
+            $jenis,
+            $module,
+            $record_id,
+            $record_name,
+            $this->input->ip_address(),
+            (string) $this->input->user_agent()
+        );
     }
 
     // 🔹 Halaman utama
     public function index()
     {
         $data['judul'] = 'Data Pengaduan';
-        
+
         // Navbar data
         $data['page_title'] = 'Data Pengaduan';
         $data['page_icon'] = 'fas fa-file-alt';
@@ -99,7 +125,7 @@ class Pengaduan extends CI_Controller
 
         // Upload foto
         $foto_pengaduan = $this->_upload_file('FOTO_PENGADUAN', './uploads/pengaduan/');
-        $foto_proses = $this->_upload_file('FOTO_PROSES', './uploads/proses/');
+        $foto_proses    = $this->_upload_file('FOTO_PROSES', './uploads/proses/');
 
         // Default status "Lapor" bila kosong
         $status = $this->input->post('STATUS', true);
@@ -113,15 +139,24 @@ class Pengaduan extends CI_Controller
             'JENIS_PENGADUAN'   => $this->input->post('JENIS_PENGADUAN', true),
             'ITEM_PENGADUAN'    => $this->input->post('ITEM_PENGADUAN', true),
             'LAPORAN'           => $this->input->post('LAPORAN', true),
+            'TINDAK_LANJUT'     => $this->input->post('TINDAK_LANJUT', true),
             'FOTO_PENGADUAN'    => $foto_pengaduan,
             'TANGGAL_PROSES'    => $this->input->post('TANGGAL_PROSES', true),
+            'TANGGAL_SELESAI'   => $this->input->post('TANGGAL_SELESAI', true),
             'FOTO_PROSES'       => $foto_proses,
             'STATUS'            => $status,
             'PIC'               => $this->input->post('PIC', true),
             'CATATAN'           => $this->input->post('CATATAN', true),
+
+            // ✅ KOLOM BARU
+            'TITIK_KOORDINAT'   => $this->input->post('TITIK_KOORDINAT', true),
         ];
 
         $this->Pengaduan_model->insert_pengaduan($insert_data);
+
+        // ✅ TAMBAHAN: log create
+        $this->_log('create', 'pengaduan', null, $insert_data['ITEM_PENGADUAN'] ?? null);
+
         $this->session->set_flashdata('success', 'Data pengaduan berhasil ditambahkan!');
         redirect('pengaduan');
     }
@@ -167,7 +202,7 @@ class Pengaduan extends CI_Controller
 
         // Upload ulang foto jika ada
         $foto_pengaduan = $this->_upload_file('FOTO_PENGADUAN', './uploads/pengaduan/', $data['pengaduan']['FOTO_PENGADUAN']);
-        $foto_proses = $this->_upload_file('FOTO_PROSES', './uploads/proses/', $data['pengaduan']['FOTO_PROSES']);
+        $foto_proses    = $this->_upload_file('FOTO_PROSES', './uploads/proses/', $data['pengaduan']['FOTO_PROSES']);
 
         // Jika status kosong, tetap pertahankan atau set default "Lapor"
         $status = $this->input->post('STATUS', true);
@@ -181,15 +216,24 @@ class Pengaduan extends CI_Controller
             'JENIS_PENGADUAN'   => $this->input->post('JENIS_PENGADUAN', true),
             'ITEM_PENGADUAN'    => $this->input->post('ITEM_PENGADUAN', true),
             'LAPORAN'           => $this->input->post('LAPORAN', true),
+            'TINDAK_LANJUT'     => $this->input->post('TINDAK_LANJUT', true),
             'FOTO_PENGADUAN'    => $foto_pengaduan,
             'TANGGAL_PROSES'    => $this->input->post('TANGGAL_PROSES', true),
+            'TANGGAL_SELESAI'   => $this->input->post('TANGGAL_SELESAI', true),
             'FOTO_PROSES'       => $foto_proses,
             'STATUS'            => $status,
             'PIC'               => $this->input->post('PIC', true),
             'CATATAN'           => $this->input->post('CATATAN', true),
+
+            // ✅ KOLOM BARU
+            'TITIK_KOORDINAT'   => $this->input->post('TITIK_KOORDINAT', true),
         ];
 
         $this->Pengaduan_model->update_pengaduan($id, $update_data);
+
+        // ✅ TAMBAHAN: log update
+        $this->_log('update', 'pengaduan', $id, $update_data['ITEM_PENGADUAN'] ?? null);
+
         $this->session->set_flashdata('success', 'Data pengaduan berhasil diperbarui!');
         redirect('pengaduan');
     }
@@ -212,6 +256,10 @@ class Pengaduan extends CI_Controller
         $this->_delete_file('./uploads/proses/', $pengaduan['FOTO_PROSES']);
 
         $this->Pengaduan_model->delete_pengaduan($id);
+
+        // ✅ TAMBAHAN: log delete
+        $this->_log('delete', 'pengaduan', $id, $pengaduan['ITEM_PENGADUAN'] ?? null);
+
         $this->session->set_flashdata('success', 'Data pengaduan berhasil dihapus!');
         redirect('pengaduan');
     }
@@ -222,10 +270,88 @@ class Pengaduan extends CI_Controller
 
     private function _set_rules()
     {
-        $this->form_validation->set_rules('NAMA_UP3', 'Nama UP3', 'required');
+        // Pesan error
+        $this->form_validation->set_message('required', '{field} wajib diisi.');
+        $this->form_validation->set_error_delimiters('<div class="text-danger small mt-1">', '</div>');
+
+        // Ambil status (kalau UP3: select disabled -> ada hidden STATUS)
+        $status = $this->input->post('STATUS', true);
+        if (empty($status)) {
+            $status = 'Lapor';
+        }
+
+        // ✅ WAJIB UNTUK SEMUA STATUS (Lapor/Diproses/Selesai)
+        $this->form_validation->set_rules('NAMA_UP3', 'Nama UP3', 'required|trim');
         $this->form_validation->set_rules('TANGGAL_PENGADUAN', 'Tanggal Pengaduan', 'required');
-        $this->form_validation->set_rules('JENIS_PENGADUAN', 'Jenis Pengaduan', 'required');
-        $this->form_validation->set_rules('LAPORAN', 'Laporan', 'required');
+        $this->form_validation->set_rules('JENIS_PENGADUAN', 'Jenis Pengaduan', 'required|trim');
+        $this->form_validation->set_rules('ITEM_PENGADUAN', 'Item Pengaduan', 'required|trim');
+        $this->form_validation->set_rules('LAPORAN', 'Laporan', 'required|trim');
+        $this->form_validation->set_rules('STATUS', 'Status', 'required|trim');
+        $this->form_validation->set_rules('PIC', 'PIC', 'required|trim');
+
+        // ✅ KOLOM BARU: dibuat required agar data baru wajib isi
+        $this->form_validation->set_rules('TITIK_KOORDINAT', 'Titik Koordinat', 'required|trim');
+
+        // FOTO_PENGADUAN selalu wajib (tambah wajib upload, edit boleh pakai foto lama)
+        $this->form_validation->set_rules('FOTO_PENGADUAN', 'Foto Pengaduan', 'callback_foto_pengaduan_required');
+
+        // ✅ KONDISI: DIPROSES atau SELESAI -> wajib isi field proses
+        if ($status === 'Diproses' || $status === 'Selesai') {
+            $this->form_validation->set_rules('TINDAK_LANJUT', 'Tindak Lanjut', 'required|trim');
+            $this->form_validation->set_rules('TANGGAL_PROSES', 'Tanggal Proses', 'required');
+            // Foto proses wajib hanya saat diproses/selesai (edit boleh pakai foto lama)
+            $this->form_validation->set_rules('FOTO_PROSES', 'Foto Proses', 'callback_foto_proses_required_if_needed');
+        }
+
+        // ✅ KONDISI: SELESAI -> wajib isi field selesai
+        if ($status === 'Selesai') {
+            $this->form_validation->set_rules('CATATAN', 'Catatan', 'required|trim');
+            $this->form_validation->set_rules('TANGGAL_SELESAI', 'Tanggal Selesai', 'required');
+        }
+    }
+
+    // FOTO_PENGADUAN: wajib upload saat tambah, edit boleh pakai foto lama
+    public function foto_pengaduan_required()
+    {
+        $old = $this->input->post('OLD_FOTO_PENGADUAN', true);
+
+        if (!empty($_FILES['FOTO_PENGADUAN']['name'])) {
+            return true;
+        }
+
+        if (!empty($old)) {
+            return true;
+        }
+
+        $this->form_validation->set_message('foto_pengaduan_required', '{field} wajib diupload.');
+        return false;
+    }
+
+    // FOTO_PROSES: wajib jika STATUS Diproses/Selesai, edit boleh pakai foto lama
+    public function foto_proses_required_if_needed()
+    {
+        $status = $this->input->post('STATUS', true);
+        if (empty($status)) {
+            $status = 'Lapor';
+        }
+
+        // Kalau masih Lapor, foto proses tidak wajib
+        if ($status !== 'Diproses' && $status !== 'Selesai') {
+            return true;
+        }
+
+        $old = $this->input->post('OLD_FOTO_PROSES', true);
+
+        if (!empty($_FILES['FOTO_PROSES']['name'])) {
+            return true;
+        }
+
+        if (!empty($old)) {
+            return true;
+        }
+
+        $this->form_validation->set_message('foto_proses_required_if_needed', '{field} wajib diupload.');
+        return false;
     }
 
     private function _upload_file($field_name, $path, $old_file = null)
