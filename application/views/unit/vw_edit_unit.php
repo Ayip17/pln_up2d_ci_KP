@@ -18,32 +18,22 @@
                         <div class="col-md-6">
                             <label class="form-label">Unit Pelaksana</label>
                             <select class="form-control" name="UNIT_PELAKSANA" required>
-                                <option value="" disabled>-- Pilih Unit Pelaksana --</option>
+                                <?php
+                                $selected_unit_pelaksana = trim((string)($unit['UNIT_PELAKSANA'] ?? ''));
+                                $opts = $unit_pelaksana_options ?? [];
+                                // Pastikan nilai existing tetap ada di dropdown
+                                if ($selected_unit_pelaksana !== '' && !in_array($selected_unit_pelaksana, $opts, true)) {
+                                    array_unshift($opts, $selected_unit_pelaksana);
+                                }
+                                ?>
 
-                                <option value="TANJUNG PINANG"
-                                    <?= (isset($unit['UNIT_PELAKSANA']) && $unit['UNIT_PELAKSANA'] == 'TANJUNG PINANG') ? 'selected' : '' ?>>
-                                    TANJUNG PINANG
-                                </option>
-
-                                <option value="PEKANBARU"
-                                    <?= (isset($unit['UNIT_PELAKSANA']) && $unit['UNIT_PELAKSANA'] == 'PEKANBARU') ? 'selected' : '' ?>>
-                                    PEKANBARU
-                                </option>
-
-                                <option value="DUMAI"
-                                    <?= (isset($unit['UNIT_PELAKSANA']) && $unit['UNIT_PELAKSANA'] == 'DUMAI') ? 'selected' : '' ?>>
-                                    DUMAI
-                                </option>
-
-                                <option value="RENGAT"
-                                    <?= (isset($unit['UNIT_PELAKSANA']) && $unit['UNIT_PELAKSANA'] == 'RENGAT') ? 'selected' : '' ?>>
-                                    RENGAT
-                                </option>
-
-                                <option value="BANGKINANG"
-                                    <?= (isset($unit['UNIT_PELAKSANA']) && $unit['UNIT_PELAKSANA'] == 'BANGKINANG') ? 'selected' : '' ?>>
-                                    BANGKINANG
-                                </option>
+                                <option value="" disabled <?= ($selected_unit_pelaksana === '') ? 'selected' : '' ?>>-- Pilih Unit Pelaksana --</option>
+                                <?php foreach ($opts as $val):
+                                    $safeVal = htmlentities((string)$val, ENT_QUOTES, 'UTF-8');
+                                    $isSelected = ($selected_unit_pelaksana === (string)$val) ? 'selected' : '';
+                                ?>
+                                    <option value="<?= $safeVal; ?>" <?= $isSelected; ?>><?= $safeVal; ?></option>
+                                <?php endforeach; ?>
                             </select>
                         </div>
 
@@ -51,54 +41,19 @@
                         <div class="col-md-6">
                             <label class="form-label">Unit Layanan</label>
                             <select class="form-control" name="UNIT_LAYANAN" required>
-                                <option value="" disabled <?= empty($unit['UNIT_LAYANAN']) ? 'selected' : '' ?>>-- Pilih Unit Layanan --</option>
-
                                 <?php
-                                $unit_layanan_list = [
-                                    "BAGAN BATU",
-                                    "DUMAI KOTA",
-                                    "DURI",
-                                    "BENGKALIS",
-                                    "SELATPANJANG",
-                                    "KUALA ENOK",
-                                    "AIR MOLEK",
-                                    "TEMBILAHAN",
-                                    "RENGAT KOTA",
-                                    "TALUK KUANTAN",
-                                    "TANJUNGPINANG KOTA",
-                                    "KIJANG",
-                                    "TANJUNG UBAN",
-                                    "TANJUNG BALAI KARIMUN",
-                                    "TANJUNG BATU",
-                                    "DABO SINGKEP",
-                                    "RANAI",
-                                    "ANAMBAS",
-                                    "PEKANBARU KOTA BARAT",
-                                    "PANAM",
-                                    "SIMPANG TIGA",
-                                    "BANGKINANG",
-                                    "KAMPAR",
-                                    "SIAK SRI INDRAPURA",
-                                    "PANGKALAN KERINCI",
-                                    "UJUNG BATU",
-                                    "PASIR PANGARAIAN",
-                                    "RUMBAI",
-                                    "PEKANBARU KOTA TIMUR",
-                                    "LIPAT KAIN",
-                                    "PERAWANG",
-                                    "BAGAN SIAPI-API",
-                                    "BELAKANGPADANG",
-                                    "BINTAN CENTER",
-                                    "NATUNA",
-                                    "BELAKANG PADANG",
-                                    "TANJUNG PINANG KOTA",
-                                    "TANJUNG PINANG KOTA",
-                                ];
+                                $selected_unit_layanan = trim((string)($unit['UNIT_LAYANAN'] ?? ''));
+                                $opts = $unit_layanan_options ?? [];
+                                // Pastikan nilai existing tetap ada di dropdown
+                                if ($selected_unit_layanan !== '' && !in_array($selected_unit_layanan, $opts, true)) {
+                                    array_unshift($opts, $selected_unit_layanan);
+                                }
+                                ?>
 
-                                $selected_unit_layanan = $unit['UNIT_LAYANAN'] ?? '';
-                                foreach ($unit_layanan_list as $val) :
-                                    $safeVal = htmlentities($val, ENT_QUOTES, 'UTF-8');
-                                    $isSelected = ($selected_unit_layanan === $val) ? 'selected' : '';
+                                <option value="" disabled <?= ($selected_unit_layanan === '') ? 'selected' : '' ?>>-- Pilih Unit Layanan --</option>
+                                <?php foreach ($opts as $val):
+                                    $safeVal = htmlentities((string)$val, ENT_QUOTES, 'UTF-8');
+                                    $isSelected = ($selected_unit_layanan === (string)$val) ? 'selected' : '';
                                 ?>
                                     <option value="<?= $safeVal; ?>" <?= $isSelected; ?>><?= $safeVal; ?></option>
                                 <?php endforeach; ?>

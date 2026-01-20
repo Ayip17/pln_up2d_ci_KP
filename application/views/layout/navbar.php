@@ -25,32 +25,6 @@
     <div class="d-flex align-items-center ms-auto">
       <ul class="navbar-nav flex-row align-items-center mb-0">
 
-        <!-- Profile / Sign In -->
-        <li class="nav-item d-flex align-items-center me-3">
-          <a href="<?= base_url('pages/profile'); ?>"
-             class="nav-link text-white font-weight-bold px-0 d-flex align-items-center"
-             title="Profile">
-            <i class="fas fa-user text-white me-2"></i>
-
-            <span class="navbar-username">
-              <?php
-                if ($this->session->userdata('logged_in')) {
-                  echo $this->session->userdata('username') ?: 'User';
-                } else {
-                  echo 'Sign In';
-                }
-              ?>
-            </span>
-          </a>
-        </li>
-
-        <!-- Settings -->
-        <li class="nav-item px-2 d-flex align-items-center me-3">
-          <a href="javascript:;" class="nav-link text-white p-0" title="Settings">
-            <i class="fas fa-cog text-white fixed-plugin-button-nav cursor-pointer"></i>
-          </a>
-        </li>
-
         <?php
           $user_role = $this->session->userdata('user_role');
           $is_admin = $user_role && (strpos(strtolower($user_role), 'admin') !== false);
@@ -81,14 +55,6 @@
   </div>
 </nav>
 <!-- End Navbar -->
-
-<!-- Username display fix -->
-<style>
-  .navbar-username { color: #fff; display: inline; }
-  @media (max-width: 575.98px) {
-    .navbar-username { display: none; }
-  }
-</style>
 
 <script>
   // Fetch notification count on page load

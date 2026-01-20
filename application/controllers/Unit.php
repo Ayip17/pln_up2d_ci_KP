@@ -168,6 +168,8 @@ class Unit extends CI_Controller
             redirect('Unit');
         } else {
             $data['title'] = 'Tambah Data Unit';
+            $data['unit_pelaksana_options'] = $this->Unit_model->get_unit_pelaksana_options();
+            $data['unit_layanan_options'] = $this->Unit_model->get_unit_layanan_options();
             $this->load->view('layout/header');
             $this->load->view('unit/vw_tambah_unit', $data);
             $this->load->view('layout/footer');
@@ -208,6 +210,8 @@ class Unit extends CI_Controller
             redirect('Unit');
         } else {
             $data['title'] = 'Edit Data Unit';
+            $data['unit_pelaksana_options'] = $this->Unit_model->get_unit_pelaksana_options();
+            $data['unit_layanan_options'] = $this->Unit_model->get_unit_layanan_options();
             $this->load->view('layout/header');
             $this->load->view('unit/vw_edit_unit', $data);
             $this->load->view('layout/footer');

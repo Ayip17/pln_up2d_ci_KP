@@ -26,11 +26,13 @@
 							<label class="form-label">Unit Pelaksana</label>
 							<select name="UNIT_PELAKSANA" class="form-control" required>
 								<option value="" disabled selected>-- Pilih Unit Pelaksana --</option>
-								<option value="TANJUNG PINANG">TANJUNG PINANG</option>
-								<option value="PEKANBARU">PEKANBARU</option>
-								<option value="DUMAI">DUMAI</option>
-								<option value="RENGAT">RENGAT</option>
-								<option value="BANGKINANG">BANGKINANG</option>
+								<?php
+								$opts = $unit_pelaksana_options ?? [];
+								foreach ($opts as $val) {
+									$safeVal = htmlentities((string)$val, ENT_QUOTES, 'UTF-8');
+									echo '<option value="' . $safeVal . '">' . $safeVal . '</option>';
+								}
+								?>
 							</select>
 						</div>
 
@@ -40,52 +42,12 @@
 							<select name="UNIT_LAYANAN" class="form-control" required>
 								<option value="" disabled selected>-- Pilih Unit Layanan --</option>
 								<?php
-								$unit_layanan_list = [
-									"BAGAN BATU",
-									"DUMAI KOTA",
-									"DURI",
-									"BENGKALIS",
-									"SELATPANJANG",
-									"KUALA ENOK",
-									"AIR MOLEK",
-									"TEMBILAHAN",
-									"RENGAT KOTA",
-									"TALUK KUANTAN",
-									"TANJUNGPINANG KOTA",
-									"KIJANG",
-									"TANJUNG UBAN",
-									"TANJUNG BALAI KARIMUN",
-									"TANJUNG BATU",
-									"DABO SINGKEP",
-									"RANAI",
-									"ANAMBAS",
-									"PEKANBARU KOTA BARAT",
-									"PANAM",
-									"SIMPANG TIGA",
-									"BANGKINANG",
-									"KAMPAR",
-									"SIAK SRI INDRAPURA",
-									"PANGKALAN KERINCI",
-									"UJUNG BATU",
-									"PASIR PANGARAIAN",
-									"RUMBAI",
-									"PEKANBARU KOTA TIMUR",
-									"LIPAT KAIN",
-									"PERAWANG",
-									"BAGAN SIAPI-API",
-									"BELAKANGPADANG",
-									"BINTAN CENTER",
-									"NATUNA",
-									"BELAKANG PADANG",
-									"TANJUNG PINANG KOTA",
-									"TANJUNG PINANG KOTA",
-								];
-
-								foreach ($unit_layanan_list as $val) :
-									$safeVal = htmlentities($val, ENT_QUOTES, 'UTF-8');
+								$opts = $unit_layanan_options ?? [];
+								foreach ($opts as $val) {
+									$safeVal = htmlentities((string)$val, ENT_QUOTES, 'UTF-8');
+									echo '<option value="' . $safeVal . '">' . $safeVal . '</option>';
+								}
 								?>
-									<option value="<?= $safeVal; ?>"><?= $safeVal; ?></option>
-								<?php endforeach; ?>
 							</select>
 						</div>
 

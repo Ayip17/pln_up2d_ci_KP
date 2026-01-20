@@ -57,6 +57,10 @@ $route['translate_uri_dashes'] = FALSE;
 $route['assets'] = 'assets/index';
 $route['assets/table/(:any)'] = 'assets/table/$1';
 
+// Asset menu routes (hindari konflik dengan folder fisik "assets/" pada Windows/Apache)
+$route['asset'] = 'assets/index';
+$route['asset/table/(:any)'] = 'assets/table/$1';
+
 // Auth routes
 $route['login'] = 'login/index';
 $route['login/authenticate'] = 'login/authenticate';

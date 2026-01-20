@@ -119,8 +119,8 @@ class Notifikasi extends CI_Controller
     public function cleanup($days = 30)
     {
         // Only admin can cleanup
-        $role = $this->session->userdata('role');
-        if (strtolower($role) !== 'admin') {
+        $this->load->helper('authorization');
+        if (!is_admin()) {
             show_error('Unauthorized', 403);
         }
 

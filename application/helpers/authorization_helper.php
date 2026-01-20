@@ -41,6 +41,22 @@ if (!function_exists('is_admin')) {
 }
 
 /**
+ * Permission khusus untuk fitur Import.
+ * Prinsip: hanya role yang memang boleh melakukan perubahan data master.
+ */
+if (!function_exists('can_import')) {
+    function can_import()
+    {
+        if (is_guest()) {
+            return false;
+        }
+
+        $role = strtolower(get_user_role() ?? '');
+        return in_array($role, ['admin', 'administrator', 'pemeliharaan', 'fasilitas operasi', 'perencanaan'], true);
+    }
+}
+
+/**
  * ROLE MAPPING KHUSUS DATA KONTRAK
  */
 if (!function_exists('_role_allows_create_kontrak')) {
@@ -113,6 +129,11 @@ if (!function_exists('can_create')) {
         if (in_array($module, ['data_kontrak', 'input_kontrak'], true)) {
             if (is_admin()) return true;
             return _role_allows_create_kontrak($role);
+        }
+
+        // KHUSUS IMPORT
+        if ($module === 'import') {
+            return can_import();
         }
 
         // fallback: admin semua

@@ -36,13 +36,71 @@ class Import extends CI_Controller
         'master_rekomposisi' => 'master_rekomposisi',
     ];
 
+    /**
+     * Get primary key columns and their column metadata.
+     * Returns array of rows: [COLUMN_NAME, EXTRA, DATA_TYPE]
+     */
+    private function _get_primary_key_columns($table)
+    {
+        $dbName = $this->db->database;
+        $q = $this->db->query(
+            "SELECT k.COLUMN_NAME, c.EXTRA, c.DATA_TYPE\n" .
+            "FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS t\n" .
+            "JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE k\n" .
+            "  ON t.CONSTRAINT_NAME=k.CONSTRAINT_NAME AND t.TABLE_SCHEMA=k.TABLE_SCHEMA AND t.TABLE_NAME=k.TABLE_NAME\n" .
+            "JOIN INFORMATION_SCHEMA.COLUMNS c\n" .
+            "  ON c.TABLE_SCHEMA=k.TABLE_SCHEMA AND c.TABLE_NAME=k.TABLE_NAME AND c.COLUMN_NAME=k.COLUMN_NAME\n" .
+            "WHERE t.TABLE_SCHEMA=? AND t.TABLE_NAME=? AND t.CONSTRAINT_TYPE='PRIMARY KEY'\n" .
+            "ORDER BY k.ORDINAL_POSITION ASC",
+            [$dbName, $table]
+        );
+        return $q ? $q->result_array() : [];
+    }
+
+    /**
+     * If table has exactly one numeric PK that is NOT AUTO_INCREMENT, return PK column name.
+     * Otherwise return null.
+     */
+    private function _get_single_numeric_pk_non_ai($table)
+    {
+        $pkCols = $this->_get_primary_key_columns($table);
+        if (count($pkCols) !== 1) {
+            return null;
+        }
+
+        $extra = strtolower((string)($pkCols[0]['EXTRA'] ?? ''));
+        if (strpos($extra, 'auto_increment') !== false) {
+            return null;
+        }
+
+        $dataType = strtolower((string)($pkCols[0]['DATA_TYPE'] ?? ''));
+        $numericTypes = ['tinyint', 'smallint', 'mediumint', 'int', 'integer', 'bigint'];
+        if (!in_array($dataType, $numericTypes, true)) {
+            return null;
+        }
+
+        return (string)$pkCols[0]['COLUMN_NAME'];
+    }
+
     public function __construct()
     {
         parent::__construct();
         $this->load->helper(['url', 'form', 'file']);
+        $this->load->helper(['authorization']);
         $this->load->library(['session', 'upload']);
         $this->load->database();
         $this->load->model(['ImportJob_model']);
+
+        // Require login
+        if (!$this->session->userdata('logged_in')) {
+            redirect('login');
+        }
+
+        // Require permission
+        if (!can_import()) {
+            $this->session->set_flashdata('error', 'Anda tidak memiliki akses untuk melakukan import data.');
+            redirect('dashboard');
+        }
     }
 
     // Upload form (default GI)
@@ -290,6 +348,17 @@ class Import extends CI_Controller
             return redirect('import/status/' . $job_id);
         }
 
+        // If target has a single numeric PK that is NOT AUTO_INCREMENT, we will auto-fill it
+        // (only when CSV doesn't provide it) to avoid duplicate default values like 0.
+        $pk_col = $this->_get_single_numeric_pk_non_ai($target_table);
+        $next_pk = null;
+        if ($pk_col) {
+            // Start from MAX(pk)+1
+            $row = $this->db->select_max($pk_col, 'max_id')->get($target_table)->row_array();
+            $maxId = isset($row['max_id']) ? (int)$row['max_id'] : 0;
+            $next_pk = max(1, $maxId + 1);
+        }
+
         $target_fields = $this->db->list_fields($target_table);
 
         rewind($fp);
@@ -321,12 +390,34 @@ class Import extends CI_Controller
                 }
             }
 
+            // Auto-fill PK if needed and not provided by CSV
+            if ($pk_col && $next_pk !== null && !array_key_exists($pk_col, $assoc) && in_array($pk_col, $target_fields, true)) {
+                $assoc[$pk_col] = $next_pk;
+                $next_pk++;
+            }
+
             if (!empty($assoc)) {
                 $batch[] = $assoc;
             }
 
             if (count($batch) >= $chunkSize) {
-                $this->db->insert_batch($target_table, $batch);
+                // Guard: if table has non-AI PK but we couldn't auto-fill (e.g., non-numeric or composite)
+                // insert_batch may throw a DB error. We prefer a friendly message.
+                if (!$this->db->insert_batch($target_table, $batch)) {
+                    fclose($fp);
+                    $this->ImportJob_model->finish_job($job_id, [
+                        'total_rows' => $total,
+                        'inserted'   => $inserted,
+                        'failed'     => $failed + count($batch),
+                        'status'     => 'failed'
+                    ]);
+                    $this->session->set_flashdata(
+                        'error',
+                        'Import gagal saat insert ke tabel ' . $target_table . '. ' .
+                        'Cek apakah PRIMARY KEY tabel sudah AUTO_INCREMENT atau pastikan kolom PK ikut ada di CSV.'
+                    );
+                    return redirect('import/status/' . $job_id);
+                }
                 $aff = $this->db->affected_rows();
                 if ($aff > 0) $inserted += $aff;
                 else $failed += count($batch);
@@ -335,7 +426,21 @@ class Import extends CI_Controller
         }
 
         if (count($batch) > 0) {
-            $this->db->insert_batch($target_table, $batch);
+            if (!$this->db->insert_batch($target_table, $batch)) {
+                fclose($fp);
+                $this->ImportJob_model->finish_job($job_id, [
+                    'total_rows' => $total,
+                    'inserted'   => $inserted,
+                    'failed'     => $failed + count($batch),
+                    'status'     => 'failed'
+                ]);
+                $this->session->set_flashdata(
+                    'error',
+                    'Import gagal saat insert ke tabel ' . $target_table . '. ' .
+                    'Cek apakah PRIMARY KEY tabel sudah AUTO_INCREMENT atau pastikan kolom PK ikut ada di CSV.'
+                );
+                return redirect('import/status/' . $job_id);
+            }
             $aff = $this->db->affected_rows();
             if ($aff > 0) $inserted += $aff;
             else $failed += count($batch);

@@ -34,6 +34,39 @@
   <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
 
   <style>
+    /* =========================
+       Sidebar layout: logout nempel bawah
+       ========================= */
+    .sidenav#sidenav-main {
+      display: flex;
+      flex-direction: column;
+      min-height: calc(100vh - 1.5rem);
+    }
+
+    .sidenav#sidenav-main #sidenav-collapse-main {
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+      min-height: 0;
+      width: 100% !important;
+    }
+
+    .sidenav#sidenav-main #sidenav-collapse-main > .navbar-nav {
+      flex: 1 1 auto;
+      min-height: 0;
+      width: 100% !important;
+    }
+
+    .sidebar-logout-wrap {
+      margin-top: auto;
+      padding: 0.35rem 0.75rem 0.9rem;
+      width: 100%;
+    }
+
+    .sidebar-logout-wrap .sidebar-divider {
+      margin: 0.5rem 0.25rem 0.75rem;
+    }
+
     /* 1) Pastikan bullet/marker default tidak tampil di sidebar */
     .sidenav ul,
     .sidenav li {
@@ -58,6 +91,9 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      justify-content: flex-start;
+      width: 100%;
+      text-align: left;
     }
 
     .sidenav .nav-link .fa-chevron-down {
@@ -66,7 +102,7 @@
     }
 
     /* 4) Sedikit spacing supaya ikon & teks rapi */
-    .sidenav .nav-link i {
+    .sidenav .submenu-list .nav-link > i {
       margin-right: 0.6rem;
     }
 
@@ -88,6 +124,92 @@
       position: relative;
       z-index: 5;
       pointer-events: auto;
+    }
+
+    /* =========================
+       Sidebar polish (Dashboard + Asset only)
+       ========================= */
+    .sidebar-section-label {
+      display: block;
+      padding: 0.75rem 1.25rem 0.25rem;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #8392ab;
+    }
+
+    .sidebar-divider {
+      margin: 0.9rem 1rem 0.8rem;
+      height: 2px;
+      border: 0;
+      background: linear-gradient(
+        90deg,
+        rgba(52, 71, 103, 0.00) 0%,
+        rgba(52, 71, 103, 0.22) 20%,
+        rgba(52, 71, 103, 0.22) 80%,
+        rgba(52, 71, 103, 0.00) 100%
+      );
+    }
+
+    .sidenav .nav-link.nav-link-main {
+      margin: 0.15rem 0.35rem;
+      padding: 0.75rem 0.75rem;
+      border-radius: 0.85rem;
+      font-weight: 600;
+      justify-content: flex-start;
+    }
+
+    /* Konsisten jarak ikon ↔ teks pada menu utama */
+    .sidenav .nav-link.nav-link-main .sidebar-icon + .nav-link-text {
+      margin-left: 0.6rem;
+    }
+
+    .sidenav .nav-link.nav-link-main.active {
+      background: rgba(33, 82, 255, 0.10);
+      color: #344767;
+    }
+
+    .sidenav .nav-link.nav-link-main .sidebar-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 34px;
+    }
+
+    .sidenav .nav-link.nav-link-main .sidebar-icon i {
+      margin-right: 0;
+      opacity: 1;
+    }
+
+    .sidenav .submenu-list {
+      margin-top: 0.25rem;
+      padding-bottom: 0.25rem;
+    }
+
+    .sidenav .submenu-list .nav-link {
+      margin: 0.05rem 0.4rem;
+      padding: 0.55rem 0.65rem;
+      border-radius: 0.7rem;
+      justify-content: flex-start;
+    }
+
+    .sidenav .nav-link.logout-link {
+      margin: 0;
+      border-radius: 0.85rem;
+      background: rgba(244, 67, 53, 0.08);
+    }
+
+    .sidenav .nav-link.logout-link:hover {
+      background: rgba(244, 67, 53, 0.14);
+    }
+
+    .sidenav .nav-link.logout-link .nav-link-text {
+      color: #d32f2f;
+      font-weight: 700;
     }
   </style>
 
@@ -111,14 +233,9 @@
   $role_json = json_encode($role);
   $seg1 = strtolower((string)($this->uri->segment(1) ?? ''));
 
-  // Role UP3 (lebih aman pakai "contains", karena kadang role bisa "UP3 Pekanbaru", dll)
-  $is_up3 = ($role !== null) && (strpos($role, 'up3') !== false);
-
   // Route groups (lowercase)
-  $asset_routes   = ['unit', 'ulp', 'gardu_induk', 'gi_cell', 'gardu_hubung', 'gh_cell', 'pembangkit', 'kit_cell', 'pemutus', 'assets'];
-  $pustaka_routes = ['sop', 'bpm', 'ik', 'road_map', 'spln'];
-  $operasi_routes = ['operasi', 'single_line_diagram'];
-  $anggaran_routes = ['anggaran', 'data_kontrak', 'monitoring', 'rekomposisi', 'rekap_prk', 'entry_kontrak', 'prognosa'];
+  // (Scope fork ini: hanya menu Dashboard + Asset)
+  $asset_routes = ['unit', 'ulp', 'gardu_induk', 'gi_cell', 'gardu_hubung', 'gh_cell', 'pembangkit', 'kit_cell', 'pemutus', 'asset', 'assets'];
   ?>
 
   <!-- Sidebar -->
@@ -136,15 +253,14 @@
 
     <hr class="horizontal dark mt-0">
 
-    <div class="collapse navbar-collapse w-auto" id="sidenav-collapse-main">
+    <div class="collapse navbar-collapse w-100" id="sidenav-collapse-main">
       <ul class="navbar-nav">
         <!-- Dashboard -->
         <li class="nav-item">
-          <a class="nav-link <?= ($seg1 == 'dashboard') ? 'active' : '' ?>" href="<?= base_url('dashboard'); ?>" aria-current="<?= ($seg1 == 'dashboard') ? 'page' : 'false' ?>">
-            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <!-- Pakai Font Awesome agar tidak kotak -->
-              <i class="fas fa-gauge text-primary text-sm opacity-10" aria-hidden="true"></i>
-            </div>
+          <a class="nav-link nav-link-main <?= ($seg1 == 'dashboard') ? 'active' : '' ?>" href="<?= base_url('dashboard'); ?>" aria-current="<?= ($seg1 == 'dashboard') ? 'page' : 'false' ?>">
+            <span class="sidebar-icon bg-gradient-primary shadow-primary" aria-hidden="true">
+              <i class="fas fa-gauge text-white text-sm"></i>
+            </span>
             <span class="nav-link-text ms-1">Dashboard</span>
           </a>
         </li>
@@ -154,14 +270,12 @@
           <?php $asset_active = in_array($seg1, $asset_routes, true); ?>
           <li class="nav-item">
             <a href="#menuAsset"
-              class="nav-link d-flex align-items-center justify-content-between <?= $asset_active ? 'active text-dark bg-light' : 'text-secondary' ?>"
+              class="nav-link nav-link-main d-flex align-items-center <?= $asset_active ? 'active' : '' ?>"
               data-bs-toggle="collapse" role="button" aria-expanded="<?= $asset_active ? 'true' : 'false' ?>" aria-controls="menuAsset" style="font-weight: 600;">
-              <div class="d-flex align-items-center">
-                <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                  <i class="fas fa-boxes-stacked text-dark text-sm opacity-10" aria-hidden="true"></i>
-                </div>
-                <span class="nav-link-text">Asset</span>
-              </div>
+              <span class="sidebar-icon bg-gradient-warning shadow-warning" aria-hidden="true">
+                <i class="fas fa-boxes-stacked text-white text-sm"></i>
+              </span>
+              <span class="nav-link-text">Asset</span>
               <i class="fas fa-chevron-down text-xs me-2"></i>
             </a>
 
@@ -222,183 +336,19 @@
           </li>
         <?php endif; ?>
 
-        <!-- Pengaduan -->
-        <?php if ($role !== 'operasi sistem distribusi' && $role !== 'k3l & kam'): ?>
-          <li class="nav-item">
-            <a class="nav-link <?= ($seg1 == 'pengaduan') ? 'active' : '' ?>" href="<?= base_url('pengaduan'); ?>">
-              <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                <i class="fas fa-file-alt text-dark text-sm opacity-10" aria-hidden="true"></i>
-              </div>
-              <span class="nav-link-text ms-1">Pengaduan</span>
-            </a>
-          </li>
-        <?php endif; ?>
-
-        <!-- Pustaka -->
-        <?php $pustaka_active = in_array($seg1, $pustaka_routes, true); ?>
-        <li class="nav-item">
-          <a href="#menuPustaka" class="nav-link d-flex align-items-center justify-content-between <?= $pustaka_active ? 'active' : '' ?>"
-            data-bs-toggle="collapse" role="button" aria-expanded="<?= $pustaka_active ? 'true' : 'false' ?>" aria-controls="menuPustaka">
-            <div class="d-flex align-items-center">
-              <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                <i class="fas fa-book text-dark text-sm opacity-10" aria-hidden="true"></i>
-              </div>
-              <span class="nav-link-text ms-1">Pustaka</span>
-            </div>
-            <i class="fas fa-chevron-down text-xs me-2"></i>
-          </a>
-
-          <!-- FIX: collapse HARUS di dalam <li> -->
-          <div class="collapse <?= $pustaka_active ? 'show' : '' ?>" id="menuPustaka">
-            <ul class="nav flex-column submenu-list">
-              <li class="nav-item">
-                <a class="nav-link <?= ($seg1 == 'sop') ? 'active' : '' ?>" href="<?= base_url('sop'); ?>">
-                  <i class="fas fa-file-alt text-dark text-sm opacity-10"></i><span class="nav-link-text"> SOP</span>
-                </a>
-              </li>
-
-              <li class="nav-item">
-                <a class="nav-link <?= ($seg1 == 'bpm') ? 'active' : '' ?>" href="<?= base_url('bpm'); ?>">
-                  <i class="fas fa-project-diagram text-dark text-sm opacity-10"></i><span class="nav-link-text"> BPM</span>
-                </a>
-              </li>
-
-              <li class="nav-item">
-                <a class="nav-link <?= ($seg1 == 'ik') ? 'active' : '' ?>" href="<?= base_url('ik'); ?>">
-                  <i class="fas fa-info-circle text-dark text-sm opacity-10"></i><span class="nav-link-text"> IK</span>
-                </a>
-              </li>
-
-              <li class="nav-item">
-                <a class="nav-link <?= ($seg1 == 'road_map') ? 'active' : '' ?>" href="<?= base_url('road_map'); ?>">
-                  <i class="fas fa-road text-dark text-sm opacity-10"></i><span class="nav-link-text"> Road Map</span>
-                </a>
-              </li>
-
-              <li class="nav-item">
-                <a class="nav-link <?= ($seg1 == 'spln') ? 'active' : '' ?>" href="<?= base_url('spln'); ?>">
-                  <i class="fas fa-bolt text-dark text-sm opacity-10"></i><span class="nav-link-text"> SPLN</span>
-                </a>
-              </li>
-            </ul>
-          </div>
-        </li>
-
-        <!-- Operasi -->
-        <?php if ($role !== 'perencanaan' && $role !== 'pemeliharaan' && $role !== 'fasilitas operasi' && $role !== 'k3l & kam'): ?>
-          <?php $operasi_active = in_array($seg1, $operasi_routes, true); ?>
-          <li class="nav-item">
-            <a href="#menuOperasi" class="nav-link d-flex align-items-center justify-content-between <?= $operasi_active ? 'active' : '' ?>"
-              data-bs-toggle="collapse" role="button" aria-expanded="<?= $operasi_active ? 'true' : 'false' ?>" aria-controls="menuOperasi">
-              <div class="d-flex align-items-center">
-                <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                  <i class="fas fa-globe text-dark text-sm opacity-10" aria-hidden="true"></i>
-                </div>
-                <span class="nav-link-text ms-1">Operasi</span>
-              </div>
-              <i class="fas fa-chevron-down text-xs me-2"></i>
-            </a>
-
-            <!-- FIX: collapse HARUS di dalam <li> -->
-            <div class="collapse <?= $operasi_active ? 'show' : '' ?>" id="menuOperasi">
-              <ul class="nav flex-column submenu-list">
-                <li class="nav-item">
-                  <a class="nav-link <?= ($seg1 == 'single_line_diagram') ? 'active' : '' ?>" href="<?= base_url('single_line_diagram'); ?>">
-                    <i class="fas fa-project-diagram text-dark text-sm opacity-10"></i><span class="nav-link-text"> Single Line Diagram</span>
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </li>
-        <?php endif; ?>
-
-        <!-- Anggaran (DISIMPANHILANGKAN UNTUK ROLE UP3) -->
-        <?php if (!$is_up3): ?>
-          <?php $anggaran_active = in_array($seg1, $anggaran_routes, true); ?>
-          <li class="nav-item">
-            <a href="#menuAnggaran" class="nav-link d-flex align-items-center justify-content-between <?= $anggaran_active ? 'active text-dark bg-light' : '' ?>"
-              data-bs-toggle="collapse" role="button" aria-expanded="<?= $anggaran_active ? 'true' : 'false' ?>" aria-controls="menuAnggaran">
-              <div class="d-flex align-items-center">
-
-                <div class=" icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                  <i class="fas fa-credit-card text-dark text-sm opacity-10" aria-hidden="true"></i>
-                </div>
-                <span class="nav-link-text ms-1">Anggaran</span>
-              </div>
-              <i class="fas fa-chevron-down text-xs me-2"></i>
-            </a>
-
-            <div class="collapse <?= $anggaran_active ? 'show' : '' ?>" id="menuAnggaran">
-              <ul class="nav ms-4">
-                <li class="nav-item">
-                  <a class="nav-link <?= ($seg1 == 'rekomposisi') ? 'active' : '' ?>" href="<?= base_url('rekomposisi'); ?>">
-                    <i class="fas fa-random me-2"></i> Rekomposisi
-                  </a>
-                </li>
-
-                <li class="nav-item">
-                  <a class="nav-link <?= ($seg1 == 'entry_kontrak') ? 'active' : '' ?>" href="<?= base_url('entry_kontrak'); ?>">
-                    <i class="fas fa-file-signature me-2"></i> Entry Kontrak
-                  </a>
-                </li>
-
-                <li class="nav-item">
-                  <a class="nav-link <?= ($seg1 == 'monitoring') ? 'active' : '' ?>" href="<?= base_url('monitoring'); ?>">
-                    <i class="fas fa-chart-line me-2"></i> Monitoring
-                  </a>
-                </li>
-
-                <li class="nav-item">
-                  <a class="nav-link <?= ($seg1 == 'rekap_prk') ? 'active' : '' ?>" href="<?= base_url('rekap_prk'); ?>">
-                    <i class="fas fa-clipboard-list me-2"></i> Rekap PRK
-                  </a>
-                </li>
-
-                <li class="nav-item">
-                  <a class="nav-link <?= ($seg1 == 'prognosa') ? 'active' : '' ?>" href="<?= base_url('prognosa'); ?>">
-                    <i class="fas fa-chart-pie me-2"></i> Prognosa
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </li>
-        <?php endif; ?>
-
-        <!-- Account Pages -->
-        <li class="nav-item mt-3">
-          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Account Pages</h6>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link" href="<?= base_url('login'); ?>">
-            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="fas fa-right-to-bracket text-dark text-sm opacity-10" aria-hidden="true"></i>
-            </div>
-            <span class="nav-link-text ms-1">Sign In</span>
-          </a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link" href="<?= base_url('pages/sign-up'); ?>">
-            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="fas fa-user-plus text-dark text-sm opacity-10" aria-hidden="true"></i>
-            </div>
-            <span class="nav-link-text ms-1">Sign Up</span>
-          </a>
-        </li>
-
-        <?php if (isset($this->session) && $this->session->userdata('logged_in')): ?>
-          <li class="nav-item">
-            <a class="nav-link" href="<?= base_url('logout'); ?>">
-              <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                <i class="fas fa-power-off text-danger text-sm opacity-10" aria-hidden="true"></i>
-              </div>
-              <span class="nav-link-text ms-1">Logout</span>
-            </a>
-          </li>
-        <?php endif; ?>
-
       </ul>
+
+      <?php if (isset($this->session) && $this->session->userdata('logged_in')): ?>
+        <div class="sidebar-logout-wrap">
+          <div class="sidebar-divider" aria-hidden="true"></div>
+          <a class="nav-link logout-link d-flex align-items-center" href="<?= base_url('logout'); ?>">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="fas fa-power-off text-danger text-sm" aria-hidden="true"></i>
+            </div>
+            <span class="nav-link-text ms-1">Logout</span>
+          </a>
+        </div>
+      <?php endif; ?>
     </div>
   </aside>
 
@@ -427,10 +377,7 @@
 
         // Restore collapse states
         const groups = {
-          asset: ['unit', 'ulp', 'gardu_induk', 'gi_cell', 'gardu_hubung', 'gh_cell', 'pembangkit', 'kit_cell', 'pemutus', 'assets'],
-          pustaka: ['sop', 'bpm', 'ik', 'road_map', 'spln'],
-          operasi: ['operasi', 'single_line_diagram'],
-          anggaran: ['anggaran', 'data_kontrak', 'monitoring', 'rekomposisi', 'rekap_prk', 'entry_kontrak', 'prognosa']
+          asset: ['unit', 'ulp', 'gardu_induk', 'gi_cell', 'gardu_hubung', 'gh_cell', 'pembangkit', 'kit_cell', 'pemutus', 'asset', 'assets']
         };
 
         const mod = String(currentModule).toLowerCase();
@@ -441,25 +388,6 @@
           if (menu) menu.classList.add('show');
           if (toggler) toggler.setAttribute('aria-expanded', 'true');
         }
-        if (groups.pustaka.includes(mod)) {
-          const menu = document.getElementById('menuPustaka');
-          const toggler = document.querySelector('a[aria-controls="menuPustaka"]');
-          if (menu) menu.classList.add('show');
-          if (toggler) toggler.setAttribute('aria-expanded', 'true');
-        }
-        if (groups.operasi.includes(mod)) {
-          const menu = document.getElementById('menuOperasi');
-          const toggler = document.querySelector('a[aria-controls="menuOperasi"]');
-          if (menu) menu.classList.add('show');
-          if (toggler) toggler.setAttribute('aria-expanded', 'true');
-        }
-        if (groups.anggaran.includes(mod)) {
-          const menu = document.getElementById('menuAnggaran');
-          const toggler = document.querySelector('a[aria-controls="menuAnggaran"]');
-          if (menu) menu.classList.add('show');
-          if (toggler) toggler.setAttribute('aria-expanded', 'true');
-        }
-
       } catch (e) {
         console && console.error && console.error(e);
       }

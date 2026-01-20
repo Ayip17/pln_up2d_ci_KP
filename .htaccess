@@ -1,7 +1,7 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
     # App runs under subdirectory on localhost
-    RewriteBase /pln_up2d_ci/
+    RewriteBase /pln_up2d_ci_KP/
 
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d

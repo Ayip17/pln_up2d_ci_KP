@@ -2,14 +2,14 @@
     <!-- Navbar -->
     <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur" data-scroll="false">
         <div class="container-fluid py-1 px-3 d-flex justify-content-between align-items-center">
-            <h6 class="font-weight-bolder mb-0">
-                <i class="ni ni-bell-55 text-primary text-sm opacity-10 me-2"></i>
+            <h6 class="font-weight-bolder mb-0 text-white">
+                <i class="fas fa-bell text-white me-2" aria-hidden="true"></i>
                 Notifikasi Aktivitas
             </h6>
             <div>
                 <?php if (!empty($notifikasi) && $unread_count > 0): ?>
                     <a href="<?= base_url('Notifikasi/mark_all_read'); ?>" class="btn btn-sm btn-primary">
-                        <i class="ni ni-check-bold"></i> Tandai Semua Dibaca
+                        <i class="fas fa-check" aria-hidden="true"></i> Tandai Semua Dibaca
                     </a>
                 <?php endif; ?>
             </div>
@@ -19,7 +19,7 @@
     <div class="container-fluid py-4">
         <?php if ($this->session->flashdata('success')): ?>
             <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="ni ni-check-bold"></i> <?= $this->session->flashdata('success'); ?>
+                <i class="fas fa-check-circle" aria-hidden="true"></i> <?= $this->session->flashdata('success'); ?>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         <?php endif; ?>
@@ -27,7 +27,7 @@
         <div class="card shadow-lg border-radius-xl">
             <div class="card-header bg-gradient-primary text-white d-flex align-items-center justify-content-between">
                 <h6 class="mb-0">
-                    <i class="ni ni-notification-70 me-2 text-white"></i> 
+                    <i class="fas fa-clock-rotate-left me-2 text-white" aria-hidden="true"></i>
                     Riwayat Aktivitas Sistem
                 </h6>
                 <span class="badge bg-white text-primary">
@@ -59,7 +59,7 @@
                                             <strong><?= date('H:i:s', strtotime($n['tanggal_waktu'])) ?></strong>
                                         </td>
                                         <td>
-                                            <i class="ni ni-single-02 text-primary me-1"></i>
+                                            <i class="fas fa-user text-primary me-1" aria-hidden="true"></i>
                                             <?= htmlspecialchars($n['email']) ?>
                                         </td>
                                         <td>
@@ -70,27 +70,27 @@
                                         <td>
                                             <?php if ($n['jenis_aktivitas'] == 'login'): ?>
                                                 <span class="badge bg-success">
-                                                    <i class="ni ni-check-bold"></i> Login
+                                                    <i class="fas fa-right-to-bracket" aria-hidden="true"></i> Login
                                                 </span>
                                             <?php elseif ($n['jenis_aktivitas'] == 'logout'): ?>
                                                 <span class="badge bg-secondary">
-                                                    <i class="ni ni-button-power"></i> Logout
+                                                    <i class="fas fa-right-from-bracket" aria-hidden="true"></i> Logout
                                                 </span>
                                             <?php elseif ($n['jenis_aktivitas'] == 'create'): ?>
                                                 <span class="badge bg-success">
-                                                    <i class="ni ni-fat-add"></i> Tambah
+                                                    <i class="fas fa-plus" aria-hidden="true"></i> Tambah
                                                 </span>
                                             <?php elseif ($n['jenis_aktivitas'] == 'update'): ?>
                                                 <span class="badge bg-warning text-dark">
-                                                    <i class="ni ni-settings"></i> Edit
+                                                    <i class="fas fa-pen" aria-hidden="true"></i> Edit
                                                 </span>
                                             <?php elseif ($n['jenis_aktivitas'] == 'delete'): ?>
                                                 <span class="badge bg-danger">
-                                                    <i class="ni ni-fat-remove"></i> Hapus
+                                                    <i class="fas fa-trash" aria-hidden="true"></i> Hapus
                                                 </span>
                                             <?php elseif ($n['jenis_aktivitas'] == 'import'): ?>
                                                 <span class="badge bg-info">
-                                                    <i class="ni ni-cloud-upload-96"></i> Import
+                                                    <i class="fas fa-cloud-arrow-up" aria-hidden="true"></i> Import
                                                 </span>
                                             <?php else: ?>
                                                 <span class="badge bg-dark"><?= ucfirst($n['jenis_aktivitas']) ?></span>
@@ -104,7 +104,7 @@
                                             ?>
                                                 <a href="<?= $read_url ?>" class="text-primary text-decoration-none">
                                                     <?= htmlspecialchars($n['deskripsi']) ?>
-                                                    <i class="ni ni-bold-right ms-1"></i>
+                                                    <i class="fas fa-chevron-right ms-1" aria-hidden="true"></i>
                                                 </a>
                                             <?php else: ?>
                                                 <?= htmlspecialchars($n['deskripsi']) ?>
@@ -113,11 +113,11 @@
                                         <td class="text-center">
                                             <?php if ($n['status_baca'] == 0): ?>
                                                 <span class="badge bg-danger">
-                                                    <i class="ni ni-bell-55"></i> Baru
+                                                    <i class="fas fa-circle" aria-hidden="true"></i> Baru
                                                 </span>
                                             <?php else: ?>
                                                 <span class="badge bg-secondary">
-                                                    <i class="ni ni-check-bold"></i> Dibaca
+                                                    <i class="fas fa-check" aria-hidden="true"></i> Dibaca
                                                 </span>
                                             <?php endif; ?>
                                         </td>

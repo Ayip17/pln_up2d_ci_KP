@@ -6,6 +6,72 @@ class Unit_model extends CI_Model
     private $table = 'unit';
 
     /**
+     * Ambil daftar unik value kolom tertentu (untuk opsi dropdown).
+     * Aman karena kolom di-whitelist.
+     * @param string $column
+     * @return array
+     */
+    private function get_distinct_options($column)
+    {
+        $allowed = ['UNIT_PELAKSANA', 'UNIT_LAYANAN'];
+        if (!in_array($column, $allowed, true)) {
+            return [];
+        }
+
+        $this->db->distinct();
+        $this->db->select($column);
+        $this->db->from($this->table);
+        // filter null / empty
+        $this->db->where("$column IS NOT NULL", null, false);
+        $this->db->where($column . ' !=', '');
+        $this->db->order_by($column, 'ASC');
+        $rows = $this->db->get()->result_array();
+
+        $out = [];
+        foreach ($rows as $r) {
+            if (!isset($r[$column])) {
+                continue;
+            }
+            $v = trim((string)$r[$column]);
+            if ($v === '') {
+                continue;
+            }
+            $out[] = $v;
+        }
+
+        // unique preserve order
+        $out = array_values(array_unique($out));
+
+        // fallback kalau tabel kosong
+        if (empty($out)) {
+            if ($column === 'UNIT_PELAKSANA') {
+                return ['UP3 PEKANBARU', 'UP3 DUMAI', 'UP3 TANJUNG PINANG', 'UP3 RENGAT', 'UP3 BANGKINANG'];
+            }
+            return [];
+        }
+
+        return $out;
+    }
+
+    /**
+     * Opsi dropdown Unit Pelaksana.
+     * @return array
+     */
+    public function get_unit_pelaksana_options()
+    {
+        return $this->get_distinct_options('UNIT_PELAKSANA');
+    }
+
+    /**
+     * Opsi dropdown Unit Layanan.
+     * @return array
+     */
+    public function get_unit_layanan_options()
+    {
+        return $this->get_distinct_options('UNIT_LAYANAN');
+    }
+
+    /**
      * Ambil data unit dengan pagination dan optional search query
      * (urut berdasarkan ID_UNIT ASC agar data baru tetap di paling akhir)
      */
