@@ -222,10 +222,18 @@
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">STATUS_RC</label>
+							<?php
+							$rcBool = $gardu_hubung['STATUS_RC_BOOL'] ?? null;
+							$rcBool = ($rcBool === '' ? null : $rcBool);
+							$rcToken = strtoupper(trim((string) ($gardu_hubung['STATUS_RC'] ?? '')));
+							$rcIsAda = ($rcBool === 1 || $rcBool === '1' || $rcToken === 'ADA');
+							$rcIsTidakAda = ($rcBool === 0 || $rcBool === '0' || in_array($rcToken, ['TIDAK ADA', 'TIDAKADA', 'TIDAK_ADA'], true));
+							$rcIsEmpty = (!$rcIsAda && !$rcIsTidakAda);
+							?>
 							<select class="form-control" name="STATUS_RC">
-								<option value="" disabled <?= empty($gardu_hubung['STATUS_RC']) ? 'selected' : ''; ?>>-- Pilih STATUS_RC --</option>
-								<option value="ADA" <?= (($gardu_hubung['STATUS_RC'] ?? '') === 'ADA') ? 'selected' : ''; ?>>ADA</option>
-								<option value="TIDAK ADA" <?= (($gardu_hubung['STATUS_RC'] ?? '') === 'TIDAK ADA') ? 'selected' : ''; ?>>TIDAK ADA</option>
+								<option value="" disabled <?= $rcIsEmpty ? 'selected' : ''; ?>>-- Pilih STATUS_RC --</option>
+								<option value="ADA" <?= $rcIsAda ? 'selected' : ''; ?>>ADA</option>
+								<option value="TIDAK ADA" <?= $rcIsTidakAda ? 'selected' : ''; ?>>TIDAK ADA</option>
 							</select>
 						</div>
 

@@ -13,12 +13,109 @@ defined('BASEPATH') or exit('No direct script access allowed');
  */
 class Gardu_hubung extends CI_Controller
 {
+    /** @var bool|null */
+    private $ghHasStatusRcBoolColumn = null;
+
+    /** @var array<string,bool> */
+    private $ghColumnExistsCache = [];
+
     public function __construct()
     {
         parent::__construct();
         $this->load->model('Gardu_hubung_model');
         $this->load->helper(['url', 'form']);
         $this->load->library(['session', 'pagination']);
+    }
+
+    private function ghHasStatusRcBoolColumn(): bool
+    {
+        if ($this->ghHasStatusRcBoolColumn !== null) {
+            return $this->ghHasStatusRcBoolColumn;
+        }
+
+        $this->ghHasStatusRcBoolColumn = (bool) $this->db->field_exists('STATUS_RC_BOOL', 'gh');
+        return $this->ghHasStatusRcBoolColumn;
+    }
+
+    private function ghHasColumn(string $column): bool
+    {
+        if (array_key_exists($column, $this->ghColumnExistsCache)) {
+            return $this->ghColumnExistsCache[$column];
+        }
+
+        $this->ghColumnExistsCache[$column] = (bool) $this->db->field_exists($column, 'gh');
+        return $this->ghColumnExistsCache[$column];
+    }
+
+    private function parseDecimal($value): ?string
+    {
+        $raw = trim((string) $value);
+        if ($raw === '') {
+            return null;
+        }
+
+        $normalized = str_replace(',', '.', $raw);
+        if (!preg_match('/^-?\d+(\.\d+)?$/', $normalized)) {
+            return null;
+        }
+
+        return $normalized;
+    }
+
+    private function parseDateYmd($value): ?string
+    {
+        $raw = trim((string) $value);
+        if ($raw === '') {
+            return null;
+        }
+
+        // n/j/Y untuk mengakomodasi 1/2/2020 tanpa leading zero
+        if (preg_match('/^\d{1,2}\/\d{1,2}\/\d{4}$/', $raw)) {
+            $dt = DateTime::createFromFormat('n/j/Y', $raw);
+            if ($dt instanceof DateTime) {
+                return $dt->format('Y-m-d');
+            }
+            return null;
+        }
+
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $raw)) {
+            $dt = DateTime::createFromFormat('Y-m-d', $raw);
+            if ($dt instanceof DateTime) {
+                return $dt->format('Y-m-d');
+            }
+            return null;
+        }
+
+        return null;
+    }
+
+    private function parseStatusRcBool($statusRc): ?int
+    {
+        $token = strtoupper(trim((string) $statusRc));
+        if ($token === '') {
+            return null;
+        }
+
+        // Kasus eksplisit "NO RC" di mana pun dalam string
+        if (preg_match('/\bNO\s*RC\b/', $token)) {
+            return 0;
+        }
+
+        if (in_array($token, ['ADA', 'YES', 'Y', 'TRUE', '1', 'YA'], true)) {
+            return 1;
+        }
+        if (in_array($token, ['TIDAK ADA', 'TIDAKADA', 'TIDAK_ADA', 'NO', 'N', 'FALSE', '0', 'TIDAK', 'TDK'], true)) {
+            return 0;
+        }
+
+        if (preg_match('/^(TIDAK|TDK|NO)\b/', $token)) {
+            return 0;
+        }
+        if (preg_match('/^ADA\b/', $token)) {
+            return 1;
+        }
+
+        return null;
     }
 
     public function index()
@@ -131,6 +228,30 @@ class Gardu_hubung extends CI_Controller
                 'STATUS_RC' => $this->input->post('STATUS_RC'),
                 'TYPE_GARDU' => $this->input->post('TYPE_GARDU')
             ];
+
+            if ($this->ghHasStatusRcBoolColumn()) {
+                $insertData['STATUS_RC_BOOL'] = $this->parseStatusRcBool($insertData['STATUS_RC']);
+            }
+
+            if ($this->ghHasColumn('LATITUDEY_DEC')) {
+                $insertData['LATITUDEY_DEC'] = $this->parseDecimal($insertData['LATITUDEY']);
+            }
+            if ($this->ghHasColumn('LONGITUDEX_DEC')) {
+                $insertData['LONGITUDEX_DEC'] = $this->parseDecimal($insertData['LONGITUDEX']);
+            }
+            if ($this->ghHasColumn('INSTALLDATE_DATE')) {
+                $insertData['INSTALLDATE_DATE'] = $this->parseDateYmd($insertData['INSTALLDATE']);
+            }
+            if ($this->ghHasColumn('ACTUALOPRDATE_DATE')) {
+                $insertData['ACTUALOPRDATE_DATE'] = $this->parseDateYmd($insertData['ACTUALOPRDATE']);
+            }
+            if ($this->ghHasColumn('CHANGEDATE_DATE')) {
+                $insertData['CHANGEDATE_DATE'] = $this->parseDateYmd($insertData['CHANGEDATE']);
+            }
+            if ($this->ghHasColumn('SLOACTIVEDATE_DATE')) {
+                $insertData['SLOACTIVEDATE_DATE'] = $this->parseDateYmd($insertData['SLOACTIVEDATE']);
+            }
+
             $this->Gardu_hubung_model->insert_gardu_hubung($insertData);
             $this->session->set_flashdata('success', 'Data Gardu Hubung berhasil ditambahkan!');
             redirect('Gardu_hubung');
@@ -152,7 +273,7 @@ class Gardu_hubung extends CI_Controller
         if (empty($data['gardu_hubung'])) { show_404(); }
 
     // Ensure keys exist for the edit view (only fields that exist in database - 33 columns)
-        $expected = ['UP3_2D','UNITNAME_UP3','CXUNIT','UNITNAME','LOCATION','SSOTNUMBER','DESCRIPTION','STATUS','TUJDNUMBER','ASSETCLASSHI','SADDRESSCODE','CXCLASSIFICATIONDESC','PENYULANG','PARENT','PARENT_DESCRIPTION','INSTALLDATE','ACTUALOPRDATE','CHANGEDATE','CHANGEBY','LATITUDEY','LONGITUDEX','FORMATTEDADDRESS','STREETADDRESS','CITY','ISASSET','STATUS_KEPEMILIKAN','EXTERNALREFID','JENIS_PELAYANAN','NO_SLO','OWNERSYSID','SLOACTIVEDATE','STATUS_RC','TYPE_GARDU'];
+        $expected = ['UP3_2D','UNITNAME_UP3','CXUNIT','UNITNAME','LOCATION','SSOTNUMBER','DESCRIPTION','STATUS','TUJDNUMBER','ASSETCLASSHI','SADDRESSCODE','CXCLASSIFICATIONDESC','PENYULANG','PARENT','PARENT_DESCRIPTION','INSTALLDATE','ACTUALOPRDATE','CHANGEDATE','CHANGEBY','LATITUDEY','LONGITUDEX','FORMATTEDADDRESS','STREETADDRESS','CITY','ISASSET','STATUS_KEPEMILIKAN','EXTERNALREFID','JENIS_PELAYANAN','NO_SLO','OWNERSYSID','SLOACTIVEDATE','STATUS_RC','STATUS_RC_BOOL','TYPE_GARDU'];
         foreach ($expected as $k) {
             if (!array_key_exists($k, $data['gardu_hubung'])) {
                 $data['gardu_hubung'][$k] = '';
@@ -198,6 +319,30 @@ class Gardu_hubung extends CI_Controller
                 'STATUS_RC' => $this->input->post('STATUS_RC'),
                 'TYPE_GARDU' => $this->input->post('TYPE_GARDU')
             ];
+
+            if ($this->ghHasStatusRcBoolColumn()) {
+                $updateData['STATUS_RC_BOOL'] = $this->parseStatusRcBool($updateData['STATUS_RC']);
+            }
+
+            if ($this->ghHasColumn('LATITUDEY_DEC')) {
+                $updateData['LATITUDEY_DEC'] = $this->parseDecimal($updateData['LATITUDEY']);
+            }
+            if ($this->ghHasColumn('LONGITUDEX_DEC')) {
+                $updateData['LONGITUDEX_DEC'] = $this->parseDecimal($updateData['LONGITUDEX']);
+            }
+            if ($this->ghHasColumn('INSTALLDATE_DATE')) {
+                $updateData['INSTALLDATE_DATE'] = $this->parseDateYmd($updateData['INSTALLDATE']);
+            }
+            if ($this->ghHasColumn('ACTUALOPRDATE_DATE')) {
+                $updateData['ACTUALOPRDATE_DATE'] = $this->parseDateYmd($updateData['ACTUALOPRDATE']);
+            }
+            if ($this->ghHasColumn('CHANGEDATE_DATE')) {
+                $updateData['CHANGEDATE_DATE'] = $this->parseDateYmd($updateData['CHANGEDATE']);
+            }
+            if ($this->ghHasColumn('SLOACTIVEDATE_DATE')) {
+                $updateData['SLOACTIVEDATE_DATE'] = $this->parseDateYmd($updateData['SLOACTIVEDATE']);
+            }
+
             $update_success = $this->Gardu_hubung_model->update_gardu_hubung($original, $updateData);
             
             // Log aktivitas update

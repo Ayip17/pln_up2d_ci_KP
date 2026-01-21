@@ -13,6 +13,16 @@
 
 							<div class="card-body">
 								<?php
+								$statusRcBool = $gardu_hubung['STATUS_RC_BOOL'] ?? null;
+								$statusRcDisplay = '-';
+								if ($statusRcBool === 1 || $statusRcBool === '1') {
+									$statusRcDisplay = 'ADA';
+								} elseif ($statusRcBool === 0 || $statusRcBool === '0') {
+									$statusRcDisplay = 'TIDAK ADA';
+								} elseif (!empty($gardu_hubung['STATUS_RC'])) {
+									$statusRcDisplay = $gardu_hubung['STATUS_RC'];
+								}
+
 								$fields = [
 									'UP3_2D' => 'UP3 2D',
 									'UNITNAME_UP3' => 'Unit UP3',
@@ -66,7 +76,8 @@
 										<div class="col-md-6 mb-3">
 											<div class="detail-item">
 												<span class="label"><?= $label; ?></span>
-												<p class="value"><?= htmlspecialchars($gardu_hubung[$key] ?? '-'); ?></p>
+												<?php $value = ($key === 'STATUS_RC') ? $statusRcDisplay : ($gardu_hubung[$key] ?? '-'); ?>
+												<p class="value"><?= htmlspecialchars($value); ?></p>
 											</div>
 										</div>
 									<?php endforeach; ?>
